@@ -14,6 +14,9 @@
   },
   "types": "dist/maplibre-gl.d.ts",
   "type": "module",
+  "publishConfig": {
+    "access": "public"
+  },
   "dependencies": {
     "@globalfishingwatch/fourwings-aggregate": "4.0.1",
     "@mapbox/geojson-rewind": "^0.5.0",
