@@ -112,6 +112,18 @@ export type VectorSourceSpecification = {
     "volatile"?: boolean
 };
 
+export type TemporalgridSourceSpecification = {
+    "type": "temporalgrid",
+    "url"?: string,
+    "tiles"?: Array<string>,
+    "bounds"?: [number, number, number, number],
+    "scheme"?: "xyz",
+    "minzoom"?: number,
+    "maxzoom"?: number,
+    "attribution"?: string,
+    "promoteId"?: PromoteIdSpecification
+};
+
 export type RasterSourceSpecification = {
     "type": "raster",
     "url"?: string,
@@ -170,6 +182,7 @@ export type ImageSourceSpecification = {
 
 export type SourceSpecification =
     | VectorSourceSpecification
+    | TemporalgridSourceSpecification
     | RasterSourceSpecification
     | RasterDEMSourceSpecification
     | GeoJSONSourceSpecification
