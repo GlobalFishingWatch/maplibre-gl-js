@@ -77,6 +77,7 @@ export type SourceClass = {
 } & SourceStatics;
 
 import vector from '../source/vector_tile_source';
+import temporalgrid from '../source/temporalgrid_tile_source';
 import raster from '../source/raster_tile_source';
 import rasterDem from '../source/raster_dem_tile_source';
 import geojson from '../source/geojson_source';
@@ -89,6 +90,7 @@ import type {SourceSpecification} from '../style-spec/types.g';
 const sourceTypes = {
     vector,
     raster,
+    temporalgrid,
     'raster-dem': rasterDem,
     geojson,
     video,
