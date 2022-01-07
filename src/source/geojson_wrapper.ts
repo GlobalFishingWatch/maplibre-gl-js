@@ -71,7 +71,7 @@ class FeatureWrapper implements VectorTileFeature {
 }
 
 export type GeojsonWrapperOptions = {
-    name?: string
+    name?: string;
     extent?: number;
 };
 
@@ -83,7 +83,7 @@ class GeoJSONWrapper implements VectorTile, VectorTileLayer {
     _features: Array<Feature>;
 
     constructor(features: Array<Feature>, options?: GeojsonWrapperOptions) {
-        const { name = '_geojsonTileLayer', extent = EXTENT } = options || {}
+        const {name = '_geojsonTileLayer', extent = EXTENT} = options || {};
         this.layers = {[name]: this};
         this.name = name;
         this.extent = extent;

@@ -1,3 +1,4 @@
+/* eslint-disable camelcase */
 import Protobuf from 'pbf';
 import vtpbf from 'vt-pbf';
 import geojsonVt from 'geojson-vt';
@@ -7,6 +8,7 @@ import {getArrayBuffer} from '../util/ajax';
 import {aggregateTile} from '@globalfishingwatch/fourwings-aggregate';
 import tilebelt from '@mapbox/tilebelt';
 import {WorkerTileParameters} from './worker_source';
+import {extend} from '../util/util';
 
 const objectEntries =
     Object.entries ||
@@ -38,13 +40,13 @@ class SearchParams {
     }
     getSearchObject() {
         const {query} = this;
-        return query
-            ? (/^[?#]/.test(query) ? query.slice(1) : query).split('&').reduce((params, param) => {
-                  let [key, value] = param.split('=');
-                  params[key] = value ? decodeURIComponent(value.replace(/\+/g, ' ')) : '';
-                  return params;
-              }, {})
-            : {};
+        return query ?
+            (/^[?#]/.test(query) ? query.slice(1) : query).split('&').reduce((params, param) => {
+                const [key, value] = param.split('=');
+                params[key] = value ? decodeURIComponent(value.replace(/\+/g, ' ')) : '';
+                return params;
+            }, {}) :
+            {};
     }
     get(param) {
         const searchParams = this.getSearchObject();
@@ -78,12 +80,12 @@ const getAggregationParams = (params) => {
         delta: parseInt(finalParams.delta) || '10',
         sublayerCount: parseInt(finalParams.sublayerCount) || 1,
         sublayerBreaks: finalParams.sublayerBreaks ? JSON.parse(finalParams.sublayerBreaks) : null,
-        sublayerVisibility: finalParams.sublayerVisibility
-            ? JSON.parse(finalParams.sublayerVisibility)
-            : new Array(finalParams.sublayerCount).fill(true)
+        sublayerVisibility: finalParams.sublayerVisibility ?
+            JSON.parse(finalParams.sublayerVisibility) :
+            new Array(finalParams.sublayerCount).fill(true)
     };
     return objectFromEntries(
-        objectEntries(aggregationParams).filter(([key, value]) => {
+        objectEntries(aggregationParams).filter(([_, value]) => {
             return value !== undefined && value !== null;
         })
     );
@@ -110,7 +112,7 @@ const getFinalurl = (originalUrlString, {singleFrame, interval}: FinalUrlParams)
         'comparison-range': decodeURI(searchParams.get('comparison-range'))
     };
     const finalUrlParamsArr = objectEntries(finalUrlParams)
-        .filter(([key, value]) => {
+        .filter(([_, value]) => {
             return value !== undefined && value !== null && value !== 'undefined' && value !== 'null';
         })
         .map(([key, value]) => {
@@ -149,7 +151,6 @@ const getTile = (data, options) => {
     const {x, y, z} = options;
     const tileBBox = tilebelt.tileToBBOX([x, y, z]);
     const int16ArrayBuffer = decodeProto(data);
-    // TODO update lib version to support rows, columns, and multiplier
     const aggregated = aggregateTile(int16ArrayBuffer, {
         ...options,
         tileBBox
@@ -184,7 +185,7 @@ const loadVectorData = (params: WorkerTileParameters, callback: LoadVectorDataCa
     const aggregationParams = getAggregationParams(params);
     const url = getFinalurl(params.request.url, aggregationParams as FinalUrlParams);
     // console.log(url)
-    const requestParams = Object.assign({}, params.request, {url});
+    const requestParams = extend(params.request, {url});
     const request = getArrayBuffer(
         requestParams,
         (err?: Error | null, data?: ArrayBuffer | null, cacheControl?: string | null, expires?: string | null) => {
