@@ -156,7 +156,10 @@ describe('LngLatBounds', () => {
 
     test('#toArray', () => {
         const llb = new LngLatBounds([-73.9876, 40.7661], [-73.9397, 40.8002]);
-        expect(llb.toArray()).toEqual([[-73.9876, 40.7661], [-73.9397, 40.8002]]);
+        expect(llb.toArray()).toEqual([
+            [-73.9876, 40.7661],
+            [-73.9397, 40.8002]
+        ]);
     });
 
     test('#toString', () => {

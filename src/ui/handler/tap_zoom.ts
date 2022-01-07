@@ -3,7 +3,6 @@ import type Point from '../../util/point';
 import type Map from '../map';
 
 export default class TapZoomHandler {
-
     _enabled: boolean;
     _active: boolean;
     _zoomIn: TapRecognizer;
@@ -48,22 +47,30 @@ export default class TapZoomHandler {
             e.preventDefault();
             setTimeout(() => this.reset(), 0);
             return {
-                cameraAnimation: (map: Map) => map.easeTo({
-                    duration: 300,
-                    zoom: map.getZoom() + 1,
-                    around: map.unproject(zoomInPoint)
-                }, {originalEvent: e})
+                cameraAnimation: (map: Map) =>
+                    map.easeTo(
+                        {
+                            duration: 300,
+                            zoom: map.getZoom() + 1,
+                            around: map.unproject(zoomInPoint)
+                        },
+                        {originalEvent: e}
+                    )
             };
         } else if (zoomOutPoint) {
             this._active = true;
             e.preventDefault();
             setTimeout(() => this.reset(), 0);
             return {
-                cameraAnimation: (map: Map) => map.easeTo({
-                    duration: 300,
-                    zoom: map.getZoom() - 1,
-                    around: map.unproject(zoomOutPoint)
-                }, {originalEvent: e})
+                cameraAnimation: (map: Map) =>
+                    map.easeTo(
+                        {
+                            duration: 300,
+                            zoom: map.getZoom() - 1,
+                            around: map.unproject(zoomOutPoint)
+                        },
+                        {originalEvent: e}
+                    )
             };
         }
     }

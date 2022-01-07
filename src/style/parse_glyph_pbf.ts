@@ -16,10 +16,13 @@ function readFontstack(tag: number, glyphs: Array<StyleGlyph>, pbf: Protobuf) {
         const {id, bitmap, width, height, left, top, advance} = pbf.readMessage(readGlyph, {});
         glyphs.push({
             id,
-            bitmap: new AlphaImage({
-                width: width + 2 * border,
-                height: height + 2 * border
-            }, bitmap),
+            bitmap: new AlphaImage(
+                {
+                    width: width + 2 * border,
+                    height: height + 2 * border
+                },
+                bitmap
+            ),
             metrics: {width, height, left, top, advance}
         });
     }
@@ -35,7 +38,7 @@ function readGlyph(tag: number, glyph: any, pbf: Protobuf) {
     else if (tag === 7) glyph.advance = pbf.readVarint();
 }
 
-export default function(data: ArrayBuffer | Uint8Array): Array<StyleGlyph> {
+export default function (data: ArrayBuffer | Uint8Array): Array<StyleGlyph> {
     return new Protobuf(data).readFields(readFontstacks, []);
 }
 

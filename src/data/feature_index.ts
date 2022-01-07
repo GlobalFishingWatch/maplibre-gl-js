@@ -26,18 +26,18 @@ import type {FeatureState} from '../style-spec/expression';
 import type {VectorTileFeature, VectorTileLayer} from '@mapbox/vector-tile';
 
 type QueryParameters = {
-  scale: number;
-  pixelPosMatrix: mat4;
-  transform: Transform;
-  tileSize: number;
-  queryGeometry: Array<Point>;
-  cameraQueryGeometry: Array<Point>;
-  queryPadding: number;
-  params: {
-    filter: FilterSpecification;
-    layers: Array<string>;
-    availableImages: Array<string>;
-  };
+    scale: number;
+    pixelPosMatrix: mat4;
+    transform: Transform;
+    tileSize: number;
+    queryGeometry: Array<Point>;
+    cameraQueryGeometry: Array<Point>;
+    queryPadding: number;
+    params: {
+        filter: FilterSpecification;
+        layers: Array<string>;
+        availableImages: Array<string>;
+    };
 };
 
 class FeatureIndex {
@@ -67,7 +67,14 @@ class FeatureIndex {
         this.promoteId = promoteId;
     }
 
-    insert(feature: VectorTileFeature, geometry: Array<Array<Point>>, featureIndex: number, sourceLayerIndex: number, bucketIndex: number, is3D?: boolean) {
+    insert(
+        feature: VectorTileFeature,
+        geometry: Array<Array<Point>>,
+        featureIndex: number,
+        sourceLayerIndex: number,
+        bucketIndex: number,
+        is3D?: boolean
+    ) {
         const key = this.featureIndexArray.length;
         this.featureIndexArray.emplaceBack(featureIndex, sourceLayerIndex, bucketIndex);
 
@@ -85,10 +92,7 @@ class FeatureIndex {
                 bbox[3] = Math.max(bbox[3], p.y);
             }
 
-            if (bbox[0] < EXTENT &&
-                bbox[1] < EXTENT &&
-                bbox[2] >= 0 &&
-                bbox[3] >= 0) {
+            if (bbox[0] < EXTENT && bbox[1] < EXTENT && bbox[2] >= 0 && bbox[3] >= 0) {
                 grid.insert(key, bbox[0], bbox[1], bbox[2], bbox[3]);
             }
         }
@@ -97,21 +101,23 @@ class FeatureIndex {
     loadVTLayers(): {[_: string]: VectorTileLayer} {
         if (!this.vtLayers) {
             this.vtLayers = new vt.VectorTile(new Protobuf(this.rawTileData)).layers;
-            this.sourceLayerCoder = new DictionaryCoder(this.vtLayers ? Object.keys(this.vtLayers).sort() : ['_geojsonTileLayer']);
+            this.sourceLayerCoder = new DictionaryCoder(
+                this.vtLayers ? Object.keys(this.vtLayers).sort() : ['_geojsonTileLayer']
+            );
         }
         return this.vtLayers;
     }
 
     // Finds non-symbol features in this tile at a particular position.
     query(
-      args: QueryParameters,
-      styleLayers: {[_: string]: StyleLayer},
-      serializedLayers: {[_: string]: any},
-      sourceFeatureState: SourceFeatureState
+        args: QueryParameters,
+        styleLayers: {[_: string]: StyleLayer},
+        serializedLayers: {[_: string]: any},
+        sourceFeatureState: SourceFeatureState
     ): {[_: string]: Array<{featureIndex: number; feature: GeoJSONFeature}>} {
         this.loadVTLayers();
 
-        const params = args.params || {} as { filter: any; layers: string[]; availableImages: string[] },
+        const params = args.params || ({} as {filter: any; layers: string[]; availableImages: string[]}),
             pixelsToTileUnits = EXTENT / args.tileSize / args.scale,
             filter = featureFilter(params.filter);
 
@@ -119,14 +125,29 @@ class FeatureIndex {
         const queryPadding = args.queryPadding * pixelsToTileUnits;
 
         const bounds = getBounds(queryGeometry);
-        const matching = this.grid.query(bounds.minX - queryPadding, bounds.minY - queryPadding, bounds.maxX + queryPadding, bounds.maxY + queryPadding);
+        const matching = this.grid.query(
+            bounds.minX - queryPadding,
+            bounds.minY - queryPadding,
+            bounds.maxX + queryPadding,
+            bounds.maxY + queryPadding
+        );
 
         const cameraBounds = getBounds(args.cameraQueryGeometry);
         const matching3D = this.grid3D.query(
-                cameraBounds.minX - queryPadding, cameraBounds.minY - queryPadding, cameraBounds.maxX + queryPadding, cameraBounds.maxY + queryPadding,
-                (bx1, by1, bx2, by2) => {
-                    return polygonIntersectsBox(args.cameraQueryGeometry, bx1 - queryPadding, by1 - queryPadding, bx2 + queryPadding, by2 + queryPadding);
-                });
+            cameraBounds.minX - queryPadding,
+            cameraBounds.minY - queryPadding,
+            cameraBounds.maxX + queryPadding,
+            cameraBounds.maxY + queryPadding,
+            (bx1, by1, bx2, by2) => {
+                return polygonIntersectsBox(
+                    args.cameraQueryGeometry,
+                    bx1 - queryPadding,
+                    by1 - queryPadding,
+                    bx2 + queryPadding,
+                    by2 + queryPadding
+                );
+            }
+        );
 
         for (const key of matching3D) {
             matching.push(key);
@@ -156,12 +177,22 @@ class FeatureIndex {
                 styleLayers,
                 serializedLayers,
                 sourceFeatureState,
-                (feature: VectorTileFeature, styleLayer: StyleLayer, featureState: FeatureState) => { // eslint-disable-line no-loop-func
+                (feature: VectorTileFeature, styleLayer: StyleLayer, featureState: FeatureState) => {
+                    // eslint-disable-line no-loop-func
                     if (!featureGeometry) {
                         featureGeometry = loadGeometry(feature);
                     }
 
-                    return styleLayer.queryIntersectsFeature(queryGeometry, feature, featureState, featureGeometry, this.z, args.transform, pixelsToTileUnits, args.pixelPosMatrix);
+                    return styleLayer.queryIntersectsFeature(
+                        queryGeometry,
+                        feature,
+                        featureState,
+                        featureGeometry,
+                        this.z,
+                        args.transform,
+                        pixelsToTileUnits,
+                        args.pixelPosMatrix
+                    );
                 }
             );
         }
@@ -171,11 +202,11 @@ class FeatureIndex {
 
     loadMatchingFeature(
         result: {
-          [_: string]: Array<{
-            featureIndex: number;
-            feature: GeoJSONFeature;
-            intersectionZ?: boolean | number;
-          }>;
+            [_: string]: Array<{
+                featureIndex: number;
+                feature: GeoJSONFeature;
+                intersectionZ?: boolean | number;
+            }>;
         },
         bucketIndex: number,
         sourceLayerIndex: number,
@@ -187,15 +218,14 @@ class FeatureIndex {
         serializedLayers: {[_: string]: any},
         sourceFeatureState?: SourceFeatureState,
         intersectionTest?: (
-          feature: VectorTileFeature,
-          styleLayer: StyleLayer,
-          featureState: any,
-          id: string | number | void
-        ) => boolean | number) {
-
+            feature: VectorTileFeature,
+            styleLayer: StyleLayer,
+            featureState: any,
+            id: string | number | void
+        ) => boolean | number
+    ) {
         const layerIDs = this.bucketLayerIDs[bucketIndex];
-        if (filterLayerIDs && !arraysIntersect(filterLayerIDs, layerIDs))
-            return;
+        if (filterLayerIDs && !arraysIntersect(filterLayerIDs, layerIDs)) return;
 
         const sourceLayerName = this.sourceLayerCoder.decode(sourceLayerIndex);
         const sourceLayer = this.vtLayers[sourceLayerName];
@@ -203,7 +233,13 @@ class FeatureIndex {
 
         if (filter.needGeometry) {
             const evaluationFeature = toEvaluationFeature(feature, true);
-            if (!filter.filter(new EvaluationParameters(this.tileID.overscaledZ), evaluationFeature, this.tileID.canonical)) {
+            if (
+                !filter.filter(
+                    new EvaluationParameters(this.tileID.overscaledZ),
+                    evaluationFeature,
+                    this.tileID.canonical
+                )
+            ) {
                 return;
             }
         } else if (!filter.filter(new EvaluationParameters(this.tileID.overscaledZ), feature)) {
@@ -231,8 +267,20 @@ class FeatureIndex {
 
             const serializedLayer = extend({}, serializedLayers[layerID]);
 
-            serializedLayer.paint = evaluateProperties(serializedLayer.paint, styleLayer.paint, feature, featureState, availableImages);
-            serializedLayer.layout = evaluateProperties(serializedLayer.layout, styleLayer.layout, feature, featureState, availableImages);
+            serializedLayer.paint = evaluateProperties(
+                serializedLayer.paint,
+                styleLayer.paint,
+                feature,
+                featureState,
+                availableImages
+            );
+            serializedLayer.layout = evaluateProperties(
+                serializedLayer.layout,
+                styleLayer.layout,
+                feature,
+                featureState,
+                availableImages
+            );
 
             const intersectionZ = !intersectionTest || intersectionTest(feature, styleLayer, featureState);
             if (!intersectionZ) {
@@ -252,14 +300,16 @@ class FeatureIndex {
 
     // Given a set of symbol indexes that have already been looked up,
     // return a matching set of GeoJSONFeatures
-    lookupSymbolFeatures(symbolFeatureIndexes: Array<number>,
-                         serializedLayers: {[_: string]: StyleLayer},
-                         bucketIndex: number,
-                         sourceLayerIndex: number,
-                         filterSpec: FilterSpecification,
-                         filterLayerIDs: Array<string>,
-                         availableImages: Array<string>,
-                         styleLayers: {[_: string]: StyleLayer}) {
+    lookupSymbolFeatures(
+        symbolFeatureIndexes: Array<number>,
+        serializedLayers: {[_: string]: StyleLayer},
+        bucketIndex: number,
+        sourceLayerIndex: number,
+        filterSpec: FilterSpecification,
+        filterLayerIDs: Array<string>,
+        availableImages: Array<string>,
+        styleLayers: {[_: string]: StyleLayer}
+    ) {
         const result = {};
         this.loadVTLayers();
 
@@ -277,7 +327,6 @@ class FeatureIndex {
                 styleLayers,
                 serializedLayers
             );
-
         }
         return result;
     }
@@ -303,11 +352,7 @@ class FeatureIndex {
     }
 }
 
-register(
-    'FeatureIndex',
-    FeatureIndex,
-    {omit: ['rawTileData', 'sourceLayerCoder']}
-);
+register('FeatureIndex', FeatureIndex, {omit: ['rawTileData', 'sourceLayerCoder']});
 
 export default FeatureIndex;
 

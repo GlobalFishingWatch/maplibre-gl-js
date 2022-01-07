@@ -20,29 +20,32 @@ const defaultOptions = {
     maxWidth: '240px'
 };
 
-export type Offset = number | PointLike | {
-  [_ in PositionAnchor]: PointLike;
-};
+export type Offset =
+    | number
+    | PointLike
+    | {
+          [_ in PositionAnchor]: PointLike;
+      };
 
 export type PopupOptions = {
-  closeButton?: boolean;
-  closeOnClick?: boolean;
-  closeOnMove?: boolean;
-  focusAfterOpen?: boolean;
-  anchor?: PositionAnchor;
-  offset?: Offset;
-  className?: string;
-  maxWidth?: string;
+    closeButton?: boolean;
+    closeOnClick?: boolean;
+    closeOnMove?: boolean;
+    focusAfterOpen?: boolean;
+    anchor?: PositionAnchor;
+    offset?: Offset;
+    className?: string;
+    maxWidth?: string;
 };
 
 const focusQuerySelector = [
     'a[href]',
-    '[tabindex]:not([tabindex=\'-1\'])',
-    '[contenteditable]:not([contenteditable=\'false\'])',
+    "[tabindex]:not([tabindex='-1'])",
+    "[contenteditable]:not([contenteditable='false'])",
     'button:not([disabled])',
     'input:not([disabled])',
     'select:not([disabled])',
-    'textarea:not([disabled])',
+    'textarea:not([disabled])'
 ].join(', ');
 
 /**
@@ -303,7 +306,6 @@ export default class Popup extends Evented {
         }
 
         return this;
-
     }
 
     /**
@@ -466,7 +468,7 @@ export default class Popup extends Evented {
      * @param offset Sets the popup's offset.
      * @returns {Popup} `this`
      */
-    setOffset (offset?: Offset) {
+    setOffset(offset?: Offset) {
         this.options.offset = offset;
         this._update();
         return this;
@@ -491,7 +493,11 @@ export default class Popup extends Evented {
 
     _createCloseButton() {
         if (this.options.closeButton) {
-            this._closeButton = DOM.create('button', 'maplibregl-popup-close-button mapboxgl-popup-close-button', this._content);
+            this._closeButton = DOM.create(
+                'button',
+                'maplibregl-popup-close-button mapboxgl-popup-close-button',
+                this._content
+            );
             this._closeButton.type = 'button';
             this._closeButton.setAttribute('aria-label', 'Close popup');
             this._closeButton.innerHTML = '&#215;';
@@ -514,15 +520,16 @@ export default class Popup extends Evented {
     _update(cursor?: Point) {
         const hasPosition = this._lngLat || this._trackPointer;
 
-        if (!this._map || !hasPosition || !this._content) { return; }
+        if (!this._map || !hasPosition || !this._content) {
+            return;
+        }
 
         if (!this._container) {
             this._container = DOM.create('div', 'maplibregl-popup mapboxgl-popup', this._map.getContainer());
-            this._tip       = DOM.create('div', 'maplibregl-popup-tip mapboxgl-popup-tip', this._container);
+            this._tip = DOM.create('div', 'maplibregl-popup-tip mapboxgl-popup-tip', this._container);
             this._container.appendChild(this._content);
             if (this.options.className) {
-                this.options.className.split(' ').forEach(name =>
-                    this._container.classList.add(name));
+                this.options.className.split(' ').forEach(name => this._container.classList.add(name));
             }
 
             if (this._trackPointer) {
@@ -540,7 +547,7 @@ export default class Popup extends Evented {
 
         if (this._trackPointer && !cursor) return;
 
-        const pos = this._pos = this._trackPointer && cursor ? cursor : this._map.project(this._lngLat);
+        const pos = (this._pos = this._trackPointer && cursor ? cursor : this._map.project(this._lngLat));
 
         let anchor = this.options.anchor;
         const offset = normalizeOffset(this.options.offset);
@@ -567,12 +574,15 @@ export default class Popup extends Evented {
             if (anchorComponents.length === 0) {
                 anchor = 'bottom';
             } else {
-                anchor = (anchorComponents.join('-') as any);
+                anchor = anchorComponents.join('-') as any;
             }
         }
 
         const offsetedPos = pos.add(offset[anchor]).round();
-        DOM.setTransform(this._container, `${anchorTranslate[anchor]} translate(${offsetedPos.x}px,${offsetedPos.y}px)`);
+        DOM.setTransform(
+            this._container,
+            `${anchorTranslate[anchor]} translate(${offsetedPos.x}px,${offsetedPos.y}px)`
+        );
         applyAnchorClass(this._container, anchor, 'popup');
     }
 
@@ -592,49 +602,46 @@ export default class Popup extends Evented {
 function normalizeOffset(offset?: Offset | null) {
     if (!offset) {
         return normalizeOffset(new Point(0, 0));
-
     } else if (typeof offset === 'number') {
         // input specifies a radius from which to calculate offsets at all positions
         const cornerOffset = Math.round(Math.sqrt(0.5 * Math.pow(offset, 2)));
         return {
-            'center': new Point(0, 0),
-            'top': new Point(0, offset),
+            center: new Point(0, 0),
+            top: new Point(0, offset),
             'top-left': new Point(cornerOffset, cornerOffset),
             'top-right': new Point(-cornerOffset, cornerOffset),
-            'bottom': new Point(0, -offset),
+            bottom: new Point(0, -offset),
             'bottom-left': new Point(cornerOffset, -cornerOffset),
             'bottom-right': new Point(-cornerOffset, -cornerOffset),
-            'left': new Point(offset, 0),
-            'right': new Point(-offset, 0)
+            left: new Point(offset, 0),
+            right: new Point(-offset, 0)
         };
-
     } else if (offset instanceof Point || Array.isArray(offset)) {
         // input specifies a single offset to be applied to all positions
         const convertedOffset = Point.convert(offset);
         return {
-            'center': convertedOffset,
-            'top': convertedOffset,
+            center: convertedOffset,
+            top: convertedOffset,
             'top-left': convertedOffset,
             'top-right': convertedOffset,
-            'bottom': convertedOffset,
+            bottom: convertedOffset,
             'bottom-left': convertedOffset,
             'bottom-right': convertedOffset,
-            'left': convertedOffset,
-            'right': convertedOffset
+            left: convertedOffset,
+            right: convertedOffset
         };
-
     } else {
         // input specifies an offset per position
         return {
-            'center': Point.convert(offset['center'] || [0, 0]),
-            'top': Point.convert(offset['top'] || [0, 0]),
+            center: Point.convert(offset['center'] || [0, 0]),
+            top: Point.convert(offset['top'] || [0, 0]),
             'top-left': Point.convert(offset['top-left'] || [0, 0]),
             'top-right': Point.convert(offset['top-right'] || [0, 0]),
-            'bottom': Point.convert(offset['bottom'] || [0, 0]),
+            bottom: Point.convert(offset['bottom'] || [0, 0]),
             'bottom-left': Point.convert(offset['bottom-left'] || [0, 0]),
             'bottom-right': Point.convert(offset['bottom-right'] || [0, 0]),
-            'left': Point.convert(offset['left'] || [0, 0]),
-            'right': Point.convert(offset['right'] || [0, 0])
+            left: Point.convert(offset['left'] || [0, 0]),
+            right: Point.convert(offset['right'] || [0, 0])
         };
     }
 }

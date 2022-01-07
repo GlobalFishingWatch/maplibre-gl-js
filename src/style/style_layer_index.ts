@@ -12,9 +12,9 @@ export type Family<Layer extends TypedStyleLayer> = Array<Layer>;
 
 class StyleLayerIndex {
     familiesBySource: {
-      [source: string]: {
-        [sourceLayer: string]: Array<Family<any>>;
-      };
+        [source: string]: {
+            [sourceLayer: string]: Array<Family<any>>;
+        };
     };
     keyCache: {[source: string]: string};
 
@@ -38,10 +38,9 @@ class StyleLayerIndex {
         for (const layerConfig of layerConfigs) {
             this._layerConfigs[layerConfig.id] = layerConfig;
 
-            const layer = this._layers[layerConfig.id] = createStyleLayer(layerConfig);
+            const layer = (this._layers[layerConfig.id] = createStyleLayer(layerConfig));
             layer._featureFilter = featureFilter(layer.filter);
-            if (this.keyCache[layerConfig.id])
-                delete this.keyCache[layerConfig.id];
+            if (this.keyCache[layerConfig.id]) delete this.keyCache[layerConfig.id];
         }
         for (const id of removedIds) {
             delete this.keyCache[id];
@@ -54,7 +53,7 @@ class StyleLayerIndex {
         const groups = groupByLayout(Object.values(this._layerConfigs), this.keyCache);
 
         for (const layerConfigs of groups) {
-            const layers = layerConfigs.map((layerConfig) => this._layers[layerConfig.id]);
+            const layers = layerConfigs.map(layerConfig => this._layers[layerConfig.id]);
 
             const layer = layers[0];
             if (layer.visibility === 'none') {

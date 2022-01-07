@@ -1,6 +1,6 @@
 import type {SymbolFeature} from '../data/bucket/symbol_bucket';
 
-export default function(features: Array<SymbolFeature>): Array<SymbolFeature> {
+export default function (features: Array<SymbolFeature>): Array<SymbolFeature> {
     const leftIndex: {[_: string]: number} = {};
     const rightIndex: {[_: string]: number} = {};
     const mergedFeatures = [];
@@ -49,7 +49,7 @@ export default function(features: Array<SymbolFeature>): Array<SymbolFeature> {
         const leftKey = getKey(text, geom),
             rightKey = getKey(text, geom, true);
 
-        if ((leftKey in rightIndex) && (rightKey in leftIndex) && (rightIndex[leftKey] !== leftIndex[rightKey])) {
+        if (leftKey in rightIndex && rightKey in leftIndex && rightIndex[leftKey] !== leftIndex[rightKey]) {
             // found lines with the same text adjacent to both ends of the current line, merge all three
             const j = mergeFromLeft(leftKey, rightKey, geom);
             const i = mergeFromRight(leftKey, rightKey, mergedFeatures[j].geometry);
@@ -59,15 +59,12 @@ export default function(features: Array<SymbolFeature>): Array<SymbolFeature> {
 
             rightIndex[getKey(text, mergedFeatures[i].geometry, true)] = i;
             mergedFeatures[j].geometry = null;
-
         } else if (leftKey in rightIndex) {
             // found mergeable line adjacent to the start of the current line, merge
             mergeFromRight(leftKey, rightKey, geom);
-
         } else if (rightKey in leftIndex) {
             // found mergeable line adjacent to the end of the current line, merge
             mergeFromLeft(leftKey, rightKey, geom);
-
         } else {
             // no adjacent lines, add as a new item
             add(k);
@@ -76,5 +73,5 @@ export default function(features: Array<SymbolFeature>): Array<SymbolFeature> {
         }
     }
 
-    return mergedFeatures.filter((f) => f.geometry);
+    return mergedFeatures.filter(f => f.geometry);
 }

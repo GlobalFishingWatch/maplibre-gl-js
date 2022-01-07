@@ -8,31 +8,43 @@ import type {RequestManager} from '../util/request_manager';
 import type {Callback} from '../types/callback';
 import type {Cancelable} from '../types/cancelable';
 
-export default function(
-  baseURL: string,
-  requestManager: RequestManager,
-  callback: Callback<{[_: string]: StyleImage}>
+export default function (
+    baseURL: string,
+    requestManager: RequestManager,
+    callback: Callback<{[_: string]: StyleImage}>
 ): Cancelable {
     let json: any, image, error;
     const format = devicePixelRatio > 1 ? '@2x' : '';
 
-    let jsonRequest = getJSON(requestManager.transformRequest(requestManager.normalizeSpriteURL(baseURL, format, '.json'), ResourceType.SpriteJSON), (err?: Error | null, data?: any | null) => {
-        jsonRequest = null;
-        if (!error) {
-            error = err;
-            json = data;
-            maybeComplete();
+    let jsonRequest = getJSON(
+        requestManager.transformRequest(
+            requestManager.normalizeSpriteURL(baseURL, format, '.json'),
+            ResourceType.SpriteJSON
+        ),
+        (err?: Error | null, data?: any | null) => {
+            jsonRequest = null;
+            if (!error) {
+                error = err;
+                json = data;
+                maybeComplete();
+            }
         }
-    });
+    );
 
-    let imageRequest = getImage(requestManager.transformRequest(requestManager.normalizeSpriteURL(baseURL, format, '.png'), ResourceType.SpriteImage), (err, img) => {
-        imageRequest = null;
-        if (!error) {
-            error = err;
-            image = img;
-            maybeComplete();
+    let imageRequest = getImage(
+        requestManager.transformRequest(
+            requestManager.normalizeSpriteURL(baseURL, format, '.png'),
+            ResourceType.SpriteImage
+        ),
+        (err, img) => {
+            imageRequest = null;
+            if (!error) {
+                error = err;
+                image = img;
+                maybeComplete();
+            }
         }
-    });
+    );
 
     function maybeComplete() {
         if (error) {

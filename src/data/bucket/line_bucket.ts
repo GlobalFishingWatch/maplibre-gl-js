@@ -15,13 +15,7 @@ import toEvaluationFeature from '../evaluation_feature';
 import EvaluationParameters from '../../style/evaluation_parameters';
 
 import type {CanonicalTileID} from '../../source/tile_id';
-import type {
-    Bucket,
-    BucketParameters,
-    BucketFeature,
-    IndexedFeature,
-    PopulateParameters
-} from '../bucket';
+import type {Bucket, BucketParameters, BucketFeature, IndexedFeature, PopulateParameters} from '../bucket';
 import type LineStyleLayer from '../../style/style_layer/line_style_layer';
 import type Point from '../../util/point';
 import type {Segment} from '../segment';
@@ -53,7 +47,7 @@ const EXTRUDE_SCALE = 63;
  *
  * The newly created vertices are placed SHARP_CORNER_OFFSET pixels from the corner.
  */
-const COS_HALF_SHARP_CORNER = Math.cos(75 / 2 * (Math.PI / 180));
+const COS_HALF_SHARP_CORNER = Math.cos((75 / 2) * (Math.PI / 180));
 const SHARP_CORNER_OFFSET = 15;
 
 // Angle per triangle for approximating round line joins.
@@ -71,14 +65,14 @@ const LINE_DISTANCE_SCALE = 1 / 2;
 const MAX_LINE_DISTANCE = Math.pow(2, LINE_DISTANCE_BUFFER_BITS - 1) / LINE_DISTANCE_SCALE;
 
 type LineClips = {
-  start: number;
-  end: number;
+    start: number;
+    end: number;
 };
 
 type GradientTexture = {
-  texture?: Texture;
-  gradient?: RGBAImage;
-  version?: number;
+    texture?: Texture;
+    gradient?: RGBAImage;
+    version?: number;
 };
 
 /**
@@ -139,7 +133,7 @@ class LineBucket implements Bucket {
         this.segments = new SegmentVector();
         this.maxLineLength = 0;
 
-        this.stateDependentLayerIds = this.layers.filter((l) => l.isStateDependent()).map((l) => l.id);
+        this.stateDependentLayerIds = this.layers.filter(l => l.isStateDependent()).map(l => l.id);
     }
 
     populate(features: Array<IndexedFeature>, options: PopulateParameters, canonical: CanonicalTileID) {
@@ -152,11 +146,12 @@ class LineBucket implements Bucket {
             const needGeometry = this.layers[0]._featureFilter.needGeometry;
             const evaluationFeature = toEvaluationFeature(feature, needGeometry);
 
-            if (!this.layers[0]._featureFilter.filter(new EvaluationParameters(this.zoom), evaluationFeature, canonical)) continue;
+            if (
+                !this.layers[0]._featureFilter.filter(new EvaluationParameters(this.zoom), evaluationFeature, canonical)
+            )
+                continue;
 
-            const sortKey = sortFeaturesByKey ?
-                lineSortKey.evaluate(evaluationFeature, {}, canonical) :
-                undefined;
+            const sortKey = sortFeaturesByKey ? lineSortKey.evaluate(evaluationFeature, {}, canonical) : undefined;
 
             const bucketFeature: BucketFeature = {
                 id,
@@ -174,7 +169,7 @@ class LineBucket implements Bucket {
 
         if (sortFeaturesByKey) {
             bucketFeatures.sort((a, b) => {
-                return (a.sortKey) - (b.sortKey);
+                return a.sortKey - b.sortKey;
             });
         }
 
@@ -182,7 +177,13 @@ class LineBucket implements Bucket {
             const {geometry, index, sourceLayerIndex} = bucketFeature;
 
             if (this.hasPattern) {
-                const patternBucketFeature = addPatternDependencies('line', this.layers, bucketFeature, this.zoom, options);
+                const patternBucketFeature = addPatternDependencies(
+                    'line',
+                    this.layers,
+                    bucketFeature,
+                    this.zoom,
+                    options
+                );
                 // pattern features are added only once the pattern is loaded into the image atlas
                 // so are stored during populate until later updated with positions by tile worker in addFeatures
                 this.patternFeatures.push(patternBucketFeature);
@@ -235,14 +236,24 @@ class LineBucket implements Bucket {
     }
 
     lineFeatureClips(feature: BucketFeature): LineClips | undefined {
-        if (!!feature.properties && Object.prototype.hasOwnProperty.call(feature.properties, 'mapbox_clip_start') && Object.prototype.hasOwnProperty.call(feature.properties, 'mapbox_clip_end')) {
+        if (
+            !!feature.properties &&
+            Object.prototype.hasOwnProperty.call(feature.properties, 'mapbox_clip_start') &&
+            Object.prototype.hasOwnProperty.call(feature.properties, 'mapbox_clip_end')
+        ) {
             const start = +feature.properties['mapbox_clip_start'];
             const end = +feature.properties['mapbox_clip_end'];
             return {start, end};
         }
     }
 
-    addFeature(feature: BucketFeature, geometry: Array<Array<Point>>, index: number, canonical: CanonicalTileID, imagePositions: {[_: string]: ImagePosition}) {
+    addFeature(
+        feature: BucketFeature,
+        geometry: Array<Array<Point>>,
+        index: number,
+        canonical: CanonicalTileID,
+        imagePositions: {[_: string]: ImagePosition}
+    ) {
         const layout = this.layers[0].layout;
         const join = layout.get('line-join').evaluate(feature, {});
         const cap = layout.get('line-cap');
@@ -254,10 +265,23 @@ class LineBucket implements Bucket {
             this.addLine(line, feature, join, cap, miterLimit, roundLimit);
         }
 
-        this.programConfigurations.populatePaintArrays(this.layoutVertexArray.length, feature, index, imagePositions, canonical);
+        this.programConfigurations.populatePaintArrays(
+            this.layoutVertexArray.length,
+            feature,
+            index,
+            imagePositions,
+            canonical
+        );
     }
 
-    addLine(vertices: Array<Point>, feature: BucketFeature, join: string, cap: string, miterLimit: number, roundLimit: number) {
+    addLine(
+        vertices: Array<Point>,
+        feature: BucketFeature,
+        join: string,
+        cap: string,
+        miterLimit: number,
+        roundLimit: number
+    ) {
         this.distance = 0;
         this.scaledDistance = 0;
         this.totalDistance = 0;
@@ -289,9 +313,8 @@ class LineBucket implements Bucket {
 
         if (join === 'bevel') miterLimit = 1.05;
 
-        const sharpCornerOffset = this.overscaling <= 16 ?
-            SHARP_CORNER_OFFSET * EXTENT / (512 * this.overscaling) :
-            0;
+        const sharpCornerOffset =
+            this.overscaling <= 16 ? (SHARP_CORNER_OFFSET * EXTENT) / (512 * this.overscaling) : 0;
 
         // we could be more precise, but it would only save a negligible amount of space
         const segment = this.segments.prepareSegment(len * 10, this.layoutVertexArray, this.indexArray);
@@ -311,10 +334,12 @@ class LineBucket implements Bucket {
         }
 
         for (let i = first; i < len; i++) {
-
-            nextVertex = i === len - 1 ?
-                (isPolygon ? vertices[first + 1] : undefined) : // if it's a polygon, treat the last vertex like the first
-                vertices[i + 1]; // just the next vertex
+            nextVertex =
+                i === len - 1
+                    ? isPolygon
+                        ? vertices[first + 1]
+                        : undefined // if it's a polygon, treat the last vertex like the first
+                    : vertices[i + 1]; // just the next vertex
 
             // if two consecutive vertices exist, skip the current one
             if (nextVertex && vertices[i].equals(nextVertex)) continue;
@@ -370,7 +395,12 @@ class LineBucket implements Bucket {
             if (isSharpCorner && i > first) {
                 const prevSegmentLength = currentVertex.dist(prevVertex);
                 if (prevSegmentLength > 2 * sharpCornerOffset) {
-                    const newPrevVertex = currentVertex.sub(currentVertex.sub(prevVertex)._mult(sharpCornerOffset / prevSegmentLength)._round());
+                    const newPrevVertex = currentVertex.sub(
+                        currentVertex
+                            .sub(prevVertex)
+                            ._mult(sharpCornerOffset / prevSegmentLength)
+                            ._round()
+                    );
                     this.updateDistance(prevVertex, newPrevVertex);
                     this.addCurrentVertex(newPrevVertex, prevNormal, 0, 0, segment);
                     prevVertex = newPrevVertex;
@@ -407,24 +437,21 @@ class LineBucket implements Bucket {
             if (prevVertex) this.updateDistance(prevVertex, currentVertex);
 
             if (currentJoin === 'miter') {
-
                 joinNormal._mult(miterLength);
                 this.addCurrentVertex(currentVertex, joinNormal, 0, 0, segment);
-
             } else if (currentJoin === 'flipbevel') {
                 // miter is too big, flip the direction to make a beveled join
 
                 if (miterLength > 100) {
                     // Almost parallel lines
                     joinNormal = nextNormal.mult(-1);
-
                 } else {
-                    const bevelLength = miterLength * prevNormal.add(nextNormal).mag() / prevNormal.sub(nextNormal).mag();
+                    const bevelLength =
+                        (miterLength * prevNormal.add(nextNormal).mag()) / prevNormal.sub(nextNormal).mag();
                     joinNormal._perp()._mult(bevelLength * (lineTurnsLeft ? -1 : 1));
                 }
                 this.addCurrentVertex(currentVertex, joinNormal, 0, 0, segment);
                 this.addCurrentVertex(currentVertex, joinNormal.mult(-1), 0, 0, segment);
-
             } else if (currentJoin === 'bevel' || currentJoin === 'fakeround') {
                 const offset = -Math.sqrt(miterLength * miterLength - 1);
                 const offsetA = lineTurnsLeft ? offset : 0;
@@ -442,7 +469,7 @@ class LineBucket implements Bucket {
                     // it looks like it is at the sizes we render lines at.
 
                     // pick the number of triangles for approximating round join by based on the angle between normals
-                    const n = Math.round((approxAngle * 180 / Math.PI) / DEG_PER_TRIANGLE);
+                    const n = Math.round((approxAngle * 180) / Math.PI / DEG_PER_TRIANGLE);
 
                     for (let m = 1; m < n; m++) {
                         let t = m / n;
@@ -453,7 +480,12 @@ class LineBucket implements Bucket {
                             const B = 0.848013 + cosAngle * (-1.06021 + cosAngle * 0.215638);
                             t = t + t * t2 * (t - 1) * (A * t2 * t2 + B);
                         }
-                        const extrude = nextNormal.sub(prevNormal)._mult(t)._add(prevNormal)._unit()._mult(lineTurnsLeft ? -1 : 1);
+                        const extrude = nextNormal
+                            .sub(prevNormal)
+                            ._mult(t)
+                            ._add(prevNormal)
+                            ._unit()
+                            ._mult(lineTurnsLeft ? -1 : 1);
                         this.addHalfVertex(currentVertex, extrude.x, extrude.y, false, lineTurnsLeft, 0, segment);
                     }
                 }
@@ -462,16 +494,12 @@ class LineBucket implements Bucket {
                     // Start next segment
                     this.addCurrentVertex(currentVertex, nextNormal, -offsetA, -offsetB, segment);
                 }
-
             } else if (currentJoin === 'butt') {
                 this.addCurrentVertex(currentVertex, joinNormal, 0, 0, segment); // butt cap
-
             } else if (currentJoin === 'square') {
                 const offset = prevVertex ? 1 : -1; // closing or starting square cap
                 this.addCurrentVertex(currentVertex, joinNormal, offset, offset, segment);
-
             } else if (currentJoin === 'round') {
-
                 if (prevVertex) {
                     // Close previous segment with butt
                     this.addCurrentVertex(currentVertex, prevNormal, 0, 0, segment);
@@ -491,7 +519,12 @@ class LineBucket implements Bucket {
             if (isSharpCorner && i < len - 1) {
                 const nextSegmentLength = currentVertex.dist(nextVertex);
                 if (nextSegmentLength > 2 * sharpCornerOffset) {
-                    const newCurrentVertex = currentVertex.add(nextVertex.sub(currentVertex)._mult(sharpCornerOffset / nextSegmentLength)._round());
+                    const newCurrentVertex = currentVertex.add(
+                        nextVertex
+                            .sub(currentVertex)
+                            ._mult(sharpCornerOffset / nextSegmentLength)
+                            ._round()
+                    );
                     this.updateDistance(currentVertex, newCurrentVertex);
                     this.addCurrentVertex(newCurrentVertex, nextNormal, 0, 0, segment);
                     currentVertex = newCurrentVertex;
@@ -511,7 +544,14 @@ class LineBucket implements Bucket {
      * @param round whether this is a round cap
      * @private
      */
-    addCurrentVertex(p: Point, normal: Point, endLeft: number, endRight: number, segment: Segment, round: boolean = false) {
+    addCurrentVertex(
+        p: Point,
+        normal: Point,
+        endLeft: number,
+        endRight: number,
+        segment: Segment,
+        round: boolean = false
+    ) {
         // left and right extrude vectors, perpendicularly shifted by endLeft/endRight
         const leftX = normal.x + normal.y * endLeft;
         const leftY = normal.y - normal.x * endLeft;
@@ -531,7 +571,15 @@ class LineBucket implements Bucket {
         }
     }
 
-    addHalfVertex({x, y}: Point, extrudeX: number, extrudeY: number, round: boolean, up: boolean, dir: number, segment: Segment) {
+    addHalfVertex(
+        {x, y}: Point,
+        extrudeX: number,
+        extrudeY: number,
+        round: boolean,
+        up: boolean,
+        dir: number,
+        segment: Segment
+    ) {
         const totalDistance = this.lineClips ? this.scaledDistance * (MAX_LINE_DISTANCE - 1) : this.scaledDistance;
         // scale down so that we can store longer distances while sacrificing precision.
         const linesofarScaled = totalDistance * LINE_DISTANCE_SCALE;
@@ -549,8 +597,9 @@ class LineBucket implements Bucket {
             // Combine it with the lower 6 bits of `linesofarScaled` (shifted by 2 bits to make
             // room for the direction value). The upper 8 bits of `linesofarScaled` are placed in
             // the `w` component.
-            ((dir === 0 ? 0 : (dir < 0 ? -1 : 1)) + 1) | ((linesofarScaled & 0x3F) << 2),
-            linesofarScaled >> 6);
+            ((dir === 0 ? 0 : dir < 0 ? -1 : 1) + 1) | ((linesofarScaled & 0x3f) << 2),
+            linesofarScaled >> 6
+        );
 
         // Constructs a second vertex buffer with higher precision line progress
         if (this.lineClips) {
@@ -577,9 +626,9 @@ class LineBucket implements Bucket {
         // as the total distance (in tile units) of this tiled feature, and the distance
         // (in tile units) of the current vertex, we can determine the relative distance
         // of this vertex along the full linestring feature and scale it to [0, 2^15)
-        this.scaledDistance = this.lineClips ?
-            this.lineClips.start + (this.lineClips.end - this.lineClips.start) * this.distance / this.totalDistance :
-            this.distance;
+        this.scaledDistance = this.lineClips
+            ? this.lineClips.start + ((this.lineClips.end - this.lineClips.start) * this.distance) / this.totalDistance
+            : this.distance;
     }
 
     updateDistance(prev: Point, next: Point) {

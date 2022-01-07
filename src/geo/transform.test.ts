@@ -17,17 +17,17 @@ describe('transform', () => {
         expect(transform.minPitch).toBe(0);
         // Support signed zero
         expect(transform.bearing === 0 ? 0 : transform.bearing).toBe(0);
-        expect(transform.bearing = 1).toBe(1);
+        expect((transform.bearing = 1)).toBe(1);
         expect(transform.bearing).toBe(1);
-        expect(transform.bearing = 0).toBe(0);
+        expect((transform.bearing = 0)).toBe(0);
         expect(transform.unmodified).toBe(false);
-        expect(transform.minZoom = 10).toBe(10);
-        expect(transform.maxZoom = 10).toBe(10);
+        expect((transform.minZoom = 10)).toBe(10);
+        expect((transform.maxZoom = 10)).toBe(10);
         expect(transform.minZoom).toBe(10);
         expect(transform.center).toEqual({lng: 0, lat: 0});
         expect(transform.maxZoom).toBe(10);
-        expect(transform.minPitch = 10).toBe(10);
-        expect(transform.maxPitch = 10).toBe(10);
+        expect((transform.minPitch = 10)).toBe(10);
+        expect((transform.maxPitch = 10)).toBe(10);
         expect(transform.size.equals(new Point(500, 500))).toBe(true);
         expect(transform.centerPoint.equals(new Point(250, 250))).toBe(true);
         expect(transform.scaleZoom(0)).toBe(-Infinity);
@@ -113,7 +113,6 @@ describe('transform', () => {
         transform.resize(200, 200);
 
         test('generell', () => {
-
             // make slightly off center so that sort order is not subject to precision issues
             transform.center = new LngLat(-0.01, 0.01);
 
@@ -125,33 +124,37 @@ describe('transform', () => {
                 new OverscaledTileID(1, 0, 1, 0, 0),
                 new OverscaledTileID(1, 0, 1, 1, 0),
                 new OverscaledTileID(1, 0, 1, 0, 1),
-                new OverscaledTileID(1, 0, 1, 1, 1)]);
+                new OverscaledTileID(1, 0, 1, 1, 1)
+            ]);
 
             transform.zoom = 2.4;
             expect(transform.coveringTiles(options)).toEqual([
                 new OverscaledTileID(2, 0, 2, 1, 1),
                 new OverscaledTileID(2, 0, 2, 2, 1),
                 new OverscaledTileID(2, 0, 2, 1, 2),
-                new OverscaledTileID(2, 0, 2, 2, 2)]);
+                new OverscaledTileID(2, 0, 2, 2, 2)
+            ]);
 
             transform.zoom = 10;
             expect(transform.coveringTiles(options)).toEqual([
                 new OverscaledTileID(10, 0, 10, 511, 511),
                 new OverscaledTileID(10, 0, 10, 512, 511),
                 new OverscaledTileID(10, 0, 10, 511, 512),
-                new OverscaledTileID(10, 0, 10, 512, 512)]);
+                new OverscaledTileID(10, 0, 10, 512, 512)
+            ]);
 
             transform.zoom = 11;
             expect(transform.coveringTiles(options)).toEqual([
                 new OverscaledTileID(10, 0, 10, 511, 511),
                 new OverscaledTileID(10, 0, 10, 512, 511),
                 new OverscaledTileID(10, 0, 10, 511, 512),
-                new OverscaledTileID(10, 0, 10, 512, 512)]);
+                new OverscaledTileID(10, 0, 10, 512, 512)
+            ]);
 
             transform.zoom = 5.1;
             transform.pitch = 60.0;
             transform.bearing = 32.0;
-            transform.center = new LngLat(56.90, 48.20);
+            transform.center = new LngLat(56.9, 48.2);
             transform.resize(1024, 768);
             expect(transform.coveringTiles(options)).toEqual([
                 new OverscaledTileID(5, 0, 5, 21, 11),
@@ -242,7 +245,6 @@ describe('transform', () => {
                 new OverscaledTileID(1, 0, 1, 0, 1)
             ]);
         });
-
     });
 
     test('coveringZoomLevel', () => {
@@ -250,7 +252,7 @@ describe('transform', () => {
             minzoom: 1,
             maxzoom: 10,
             tileSize: 512,
-            roundZoom: false,
+            roundZoom: false
         };
 
         const transform = new Transform(0, 22, 0, 60, true);
@@ -307,8 +309,12 @@ describe('transform', () => {
     test('clamps latitude', () => {
         const transform = new Transform(0, 22, 0, 60, true);
 
-        expect(transform.project(new LngLat(0, -90))).toEqual(transform.project(new LngLat(0, -transform.maxValidLatitude)));
-        expect(transform.project(new LngLat(0, 90))).toEqual(transform.project(new LngLat(0, transform.maxValidLatitude)));
+        expect(transform.project(new LngLat(0, -90))).toEqual(
+            transform.project(new LngLat(0, -transform.maxValidLatitude))
+        );
+        expect(transform.project(new LngLat(0, 90))).toEqual(
+            transform.project(new LngLat(0, transform.maxValidLatitude))
+        );
     });
 
     test('clamps pitch', () => {

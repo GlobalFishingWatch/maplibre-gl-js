@@ -1,13 +1,6 @@
 import {mat4} from 'gl-matrix';
 import Context from '../gl/context';
-import {
-    Uniform1i,
-    Uniform1f,
-    Uniform2f,
-    Uniform3f,
-    Uniform4f,
-    UniformMatrix4f
-} from './uniform_binding';
+import {Uniform1i, Uniform1f, Uniform2f, Uniform3f, Uniform4f, UniformMatrix4f} from './uniform_binding';
 
 describe('Uniform Binding', () => {
     test('Uniform1i', () => {
@@ -16,7 +9,9 @@ describe('Uniform Binding', () => {
 
         const context = {
             gl: {
-                uniform1i: () => { expect(true).toBeTruthy(); }
+                uniform1i: () => {
+                    expect(true).toBeTruthy();
+                }
             }
         } as any as Context;
 
@@ -34,7 +29,9 @@ describe('Uniform Binding', () => {
 
         const context = {
             gl: {
-                uniform1f: () => { expect(true).toBeTruthy(); }
+                uniform1f: () => {
+                    expect(true).toBeTruthy();
+                }
             }
         } as any as Context;
 
@@ -52,7 +49,9 @@ describe('Uniform Binding', () => {
 
         const context = {
             gl: {
-                uniform2f: () => { expect(true).toBeTruthy(); }
+                uniform2f: () => {
+                    expect(true).toBeTruthy();
+                }
             }
         } as any as Context;
 
@@ -70,7 +69,9 @@ describe('Uniform Binding', () => {
 
         const context = {
             gl: {
-                uniform3f: () => { expect(true).toBeTruthy(); }
+                uniform3f: () => {
+                    expect(true).toBeTruthy();
+                }
             }
         } as any as Context;
 
@@ -88,7 +89,9 @@ describe('Uniform Binding', () => {
 
         const context = {
             gl: {
-                uniform4f: () => { expect(true).toBeTruthy(); }
+                uniform4f: () => {
+                    expect(true).toBeTruthy();
+                }
             }
         } as any as Context;
 
@@ -106,7 +109,9 @@ describe('Uniform Binding', () => {
 
         const context = {
             gl: {
-                uniformMatrix4fv: () => { expect(true).toBeTruthy(); }
+                uniformMatrix4fv: () => {
+                    expect(true).toBeTruthy();
+                }
             }
         } as any as Context;
 
@@ -118,5 +123,4 @@ describe('Uniform Binding', () => {
         u.set(ident);
         u.set([2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1]);
     });
-
 });

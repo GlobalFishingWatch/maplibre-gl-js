@@ -9,15 +9,17 @@ import type {Type} from './types';
 import type {Value} from './values';
 
 export type Varargs = {
-  type: Type;
+    type: Type;
 };
 type Signature = Array<Type> | Varargs;
 type Evaluate = (b: EvaluationContext, a: Array<Expression>) => Value;
 
-type Definition = [Type, Signature, Evaluate] | {
-  type: Type;
-  overloads: Array<[Signature, Evaluate]>;
-};
+type Definition =
+    | [Type, Signature, Evaluate]
+    | {
+          type: Type;
+          overloads: Array<[Signature, Evaluate]>;
+      };
 
 class CompoundExpression implements Expression {
     name: string;
@@ -51,24 +53,25 @@ class CompoundExpression implements Expression {
     }
 
     static parse(args: ReadonlyArray<unknown>, context: ParsingContext): Expression {
-        const op: string = (args[0] as any);
+        const op: string = args[0] as any;
         const definition = CompoundExpression.definitions[op];
         if (!definition) {
-            return context.error(`Unknown expression "${op}". If you wanted a literal array, use ["literal", [...]].`, 0) as null;
+            return context.error(
+                `Unknown expression "${op}". If you wanted a literal array, use ["literal", [...]].`,
+                0
+            ) as null;
         }
 
         // Now check argument types against each signature
-        const type = Array.isArray(definition) ?
-            definition[0] : definition.type;
+        const type = Array.isArray(definition) ? definition[0] : definition.type;
 
-        const availableOverloads = Array.isArray(definition) ?
-            [[definition[1], definition[2]]] :
-            definition.overloads;
+        const availableOverloads = Array.isArray(definition) ? [[definition[1], definition[2]]] : definition.overloads;
 
-        const overloads = availableOverloads.filter(([signature]) => (
-            !Array.isArray(signature) || // varags
-            signature.length === args.length - 1 // correct param count
-        ));
+        const overloads = availableOverloads.filter(
+            ([signature]) =>
+                !Array.isArray(signature) || // varags
+                signature.length === args.length - 1 // correct param count
+        );
 
         let signatureContext: ParsingContext = null;
 
@@ -83,9 +86,7 @@ class CompoundExpression implements Expression {
             let argParseFailed = false;
             for (let i = 1; i < args.length; i++) {
                 const arg = args[i];
-                const expectedType = Array.isArray(params) ?
-                    params[i - 1] :
-                    (params as Varargs).type;
+                const expectedType = Array.isArray(params) ? params[i - 1] : (params as Varargs).type;
 
                 const parsed = signatureContext.parse(arg, 1 + parsedArgs.length, expectedType);
                 if (!parsed) {
@@ -102,7 +103,9 @@ class CompoundExpression implements Expression {
 
             if (Array.isArray(params)) {
                 if (params.length !== parsedArgs.length) {
-                    signatureContext.error(`Expected ${params.length} arguments, but found ${parsedArgs.length} instead.`);
+                    signatureContext.error(
+                        `Expected ${params.length} arguments, but found ${parsedArgs.length} instead.`
+                    );
                     continue;
                 }
             }
@@ -124,9 +127,7 @@ class CompoundExpression implements Expression {
             context.errors.push(...signatureContext.errors);
         } else {
             const expected = overloads.length ? overloads : availableOverloads;
-            const signatures = expected
-                .map(([params]) => stringifySignature(params as Signature))
-                .join(' | ');
+            const signatures = expected.map(([params]) => stringifySignature(params as Signature)).join(' | ');
 
             const actualTypes = [];
             // For error message, re-parse arguments without trying to
@@ -142,10 +143,7 @@ class CompoundExpression implements Expression {
         return null;
     }
 
-    static register(
-        registry: ExpressionRegistry,
-        definitions: {[_: string]: Definition}
-    ) {
+    static register(registry: ExpressionRegistry, definitions: {[_: string]: Definition}) {
         assert(!CompoundExpression.definitions);
         CompoundExpression.definitions = definitions;
         for (const name in definitions) {

@@ -41,12 +41,9 @@ class Coalesce implements Expression {
         // preempt the desired null-coalescing behavior.
         // Thus, if any of our arguments would have needed an annotation, we
         // need to wrap the enclosing coalesce expression with it instead.
-        const needsAnnotation = expectedType &&
-            parsedArgs.some(arg => checkSubtype(expectedType, arg.type));
+        const needsAnnotation = expectedType && parsedArgs.some(arg => checkSubtype(expectedType, arg.type));
 
-        return needsAnnotation ?
-            new Coalesce(ValueType, parsedArgs) :
-            new Coalesce((outputType as any), parsedArgs);
+        return needsAnnotation ? new Coalesce(ValueType, parsedArgs) : new Coalesce(outputType as any, parsedArgs);
     }
 
     evaluate(ctx: EvaluationContext) {
@@ -83,7 +80,9 @@ class Coalesce implements Expression {
 
     serialize() {
         const serialized = ['coalesce' as unknown];
-        this.eachChild(child => { serialized.push(child.serialize()); });
+        this.eachChild(child => {
+            serialized.push(child.serialize());
+        });
         return serialized;
     }
 }

@@ -1,7 +1,7 @@
 import resolveTokens from './resolve_tokens';
 
 test('resolveToken', () => {
-    expect('3 Fine Fields').toBe(resolveTokens({a:3, b:'Fine', c:'Fields'}, '{a} {b} {c}'));
+    expect('3 Fine Fields').toBe(resolveTokens({a: 3, b: 'Fine', c: 'Fields'}, '{a} {b} {c}'));
 
     // No tokens.
     expect(resolveTokens({}, 'Test')).toBe('Test');
@@ -33,9 +33,6 @@ test('resolveToken', () => {
 
     // Special characters in token.
     expect(resolveTokens({'dashed-property': 'dashed'}, '{dashed-property}')).toBe('dashed');
-    expect(resolveTokens({'HØYDE': 150}, '{HØYDE} m')).toBe('150 m');
-    expect(
-        resolveTokens({'$special:characters;': 'mapbox'}, '{$special:characters;}')
-    ).toBe('mapbox');
-
+    expect(resolveTokens({HØYDE: 150}, '{HØYDE} m')).toBe('150 m');
+    expect(resolveTokens({'$special:characters;': 'mapbox'}, '{$special:characters;}')).toBe('mapbox');
 });

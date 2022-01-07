@@ -48,5 +48,4 @@ describe('VertexBuffer', () => {
             [6, 2, context.gl['SHORT'], false, 6, 304]
         ]);
     });
-
 });

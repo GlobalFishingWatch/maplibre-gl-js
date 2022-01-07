@@ -5,11 +5,11 @@ import assert from 'assert';
 import type {StylePropertyExpression} from '../style-spec/expression/index';
 
 export type ColorRampParams = {
-  expression: StylePropertyExpression;
-  evaluationKey: string;
-  resolution?: number;
-  image?: RGBAImage;
-  clips?: Array<any>;
+    expression: StylePropertyExpression;
+    evaluationKey: string;
+    resolution?: number;
+    image?: RGBAImage;
+    clips?: Array<any>;
 };
 
 /**
@@ -31,9 +31,9 @@ export function renderColorRamp(params: ColorRampParams): RGBAImage {
         const pxColor = params.expression.evaluate(evaluationGlobals as any);
         // the colors are being unpremultiplied because Color uses
         // premultiplied values, and the Texture class expects unpremultiplied ones
-        image.data[stride + index + 0] = Math.floor(pxColor.r * 255 / pxColor.a);
-        image.data[stride + index + 1] = Math.floor(pxColor.g * 255 / pxColor.a);
-        image.data[stride + index + 2] = Math.floor(pxColor.b * 255 / pxColor.a);
+        image.data[stride + index + 0] = Math.floor((pxColor.r * 255) / pxColor.a);
+        image.data[stride + index + 1] = Math.floor((pxColor.g * 255) / pxColor.a);
+        image.data[stride + index + 2] = Math.floor((pxColor.b * 255) / pxColor.a);
         image.data[stride + index + 3] = Math.floor(pxColor.a * 255);
     };
 

@@ -14,7 +14,12 @@ import type {OverscaledTileID} from '../source/tile_id';
 
 export default drawRaster;
 
-function drawRaster(painter: Painter, sourceCache: SourceCache, layer: RasterStyleLayer, tileIDs: Array<OverscaledTileID>) {
+function drawRaster(
+    painter: Painter,
+    sourceCache: SourceCache,
+    layer: RasterStyleLayer,
+    tileIDs: Array<OverscaledTileID>
+) {
     if (painter.renderPass !== 'translucent') return;
     if (layer.paint.get('raster-opacity') === 0) return;
     if (!tileIDs.length) return;
@@ -26,8 +31,8 @@ function drawRaster(painter: Painter, sourceCache: SourceCache, layer: RasterSty
 
     const colorMode = painter.colorModeForRenderPass();
 
-    const [stencilModes, coords] = source instanceof ImageSource ? [{}, tileIDs] :
-        painter.stencilConfigForOverlap(tileIDs);
+    const [stencilModes, coords] =
+        source instanceof ImageSource ? [{}, tileIDs] : painter.stencilConfigForOverlap(tileIDs);
 
     const minTileZ = coords[coords.length - 1].overscaledZ;
 
@@ -35,8 +40,11 @@ function drawRaster(painter: Painter, sourceCache: SourceCache, layer: RasterSty
     for (const coord of coords) {
         // Set the lower zoom level to sublayer 0, and higher zoom levels to higher sublayers
         // Use gl.LESS to prevent double drawing in areas where tiles overlap.
-        const depthMode = painter.depthModeForSublayer(coord.overscaledZ - minTileZ,
-            layer.paint.get('raster-opacity') === 1 ? DepthMode.ReadWrite : DepthMode.ReadOnly, gl.LESS);
+        const depthMode = painter.depthModeForSublayer(
+            coord.overscaledZ - minTileZ,
+            layer.paint.get('raster-opacity') === 1 ? DepthMode.ReadWrite : DepthMode.ReadOnly,
+            gl.LESS
+        );
 
         const tile = sourceCache.getTile(coord);
         const posMatrix = painter.transform.calculatePosMatrix(coord.toUnwrapped(), align);
@@ -48,7 +56,7 @@ function drawRaster(painter: Painter, sourceCache: SourceCache, layer: RasterSty
 
         let parentScaleBy, parentTL;
 
-        const textureFilter = layer.paint.get('raster-resampling') === 'nearest' ?  gl.NEAREST : gl.LINEAR;
+        const textureFilter = layer.paint.get('raster-resampling') === 'nearest' ? gl.NEAREST : gl.LINEAR;
 
         context.activeTexture.set(gl.TEXTURE0);
         tile.texture.bind(textureFilter, gl.CLAMP_TO_EDGE, gl.LINEAR_MIPMAP_NEAREST);
@@ -58,8 +66,7 @@ function drawRaster(painter: Painter, sourceCache: SourceCache, layer: RasterSty
         if (parentTile) {
             parentTile.texture.bind(textureFilter, gl.CLAMP_TO_EDGE, gl.LINEAR_MIPMAP_NEAREST);
             parentScaleBy = Math.pow(2, parentTile.tileID.overscaledZ - tile.tileID.overscaledZ);
-            parentTL = [tile.tileID.canonical.x * parentScaleBy % 1, tile.tileID.canonical.y * parentScaleBy % 1];
-
+            parentTL = [(tile.tileID.canonical.x * parentScaleBy) % 1, (tile.tileID.canonical.y * parentScaleBy) % 1];
         } else {
             tile.texture.bind(textureFilter, gl.CLAMP_TO_EDGE, gl.LINEAR_MIPMAP_NEAREST);
         }
@@ -67,13 +74,33 @@ function drawRaster(painter: Painter, sourceCache: SourceCache, layer: RasterSty
         const uniformValues = rasterUniformValues(posMatrix, parentTL || [0, 0], parentScaleBy || 1, fade, layer);
 
         if (source instanceof ImageSource) {
-            program.draw(context, gl.TRIANGLES, depthMode, StencilMode.disabled, colorMode, CullFaceMode.disabled,
-                uniformValues, layer.id, source.boundsBuffer,
-                painter.quadTriangleIndexBuffer, source.boundsSegments);
+            program.draw(
+                context,
+                gl.TRIANGLES,
+                depthMode,
+                StencilMode.disabled,
+                colorMode,
+                CullFaceMode.disabled,
+                uniformValues,
+                layer.id,
+                source.boundsBuffer,
+                painter.quadTriangleIndexBuffer,
+                source.boundsSegments
+            );
         } else {
-            program.draw(context, gl.TRIANGLES, depthMode, stencilModes[coord.overscaledZ], colorMode, CullFaceMode.disabled,
-                uniformValues, layer.id, painter.rasterBoundsBuffer,
-                painter.quadTriangleIndexBuffer, painter.rasterBoundsSegments);
+            program.draw(
+                context,
+                gl.TRIANGLES,
+                depthMode,
+                stencilModes[coord.overscaledZ],
+                colorMode,
+                CullFaceMode.disabled,
+                uniformValues,
+                layer.id,
+                painter.rasterBoundsBuffer,
+                painter.quadTriangleIndexBuffer,
+                painter.rasterBoundsSegments
+            );
         }
     }
 }
@@ -93,9 +120,12 @@ function getFadeValues(tile, parentTile, sourceCache, layer, transform) {
         });
 
         // if no parent or parent is older, fade in; if parent is younger, fade out
-        const fadeIn = !parentTile || Math.abs(parentTile.tileID.overscaledZ - idealZ) > Math.abs(tile.tileID.overscaledZ - idealZ);
+        const fadeIn =
+            !parentTile ||
+            Math.abs(parentTile.tileID.overscaledZ - idealZ) > Math.abs(tile.tileID.overscaledZ - idealZ);
 
-        const childOpacity = (fadeIn && tile.refreshedUponExpiration) ? 1 : clamp(fadeIn ? sinceTile : 1 - sinceParent, 0, 1);
+        const childOpacity =
+            fadeIn && tile.refreshedUponExpiration ? 1 : clamp(fadeIn ? sinceTile : 1 - sinceParent, 0, 1);
 
         // we don't crossfade tiles that were just refreshed upon expiring:
         // once they're old enough to pass the crossfading threshold

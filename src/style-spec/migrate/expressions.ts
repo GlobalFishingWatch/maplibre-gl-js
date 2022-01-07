@@ -10,12 +10,12 @@ import type {FilterSpecification, LayerSpecification, StyleSpecification} from '
  * this will convert (a) "stop" functions, and (b) legacy filters to their
  * expression equivalents.
  */
-export default function(style: StyleSpecification) {
+export default function (style: StyleSpecification) {
     const converted = [];
 
-    eachLayer(style, (layer: LayerSpecification & { filter?: FilterSpecification }) => {
+    eachLayer(style, (layer: LayerSpecification & {filter?: FilterSpecification}) => {
         if (layer.filter) {
-            layer.filter = (convertFilter(layer.filter) as any);
+            layer.filter = convertFilter(layer.filter) as any;
         }
     });
 
@@ -31,4 +31,3 @@ export default function(style: StyleSpecification) {
 
     return style;
 }
-

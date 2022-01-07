@@ -26,15 +26,16 @@ class VertexArrayObject {
         this.vao = null;
     }
 
-    bind(context: Context,
-         program: Program<any>,
-         layoutVertexBuffer: VertexBuffer,
-         paintVertexBuffers: Array<VertexBuffer>,
-         indexBuffer?: IndexBuffer | null,
-         vertexOffset?: number | null,
-         dynamicVertexBuffer?: VertexBuffer | null,
-         dynamicVertexBuffer2?: VertexBuffer | null) {
-
+    bind(
+        context: Context,
+        program: Program<any>,
+        layoutVertexBuffer: VertexBuffer,
+        paintVertexBuffers: Array<VertexBuffer>,
+        indexBuffer?: IndexBuffer | null,
+        vertexOffset?: number | null,
+        dynamicVertexBuffer?: VertexBuffer | null,
+        dynamicVertexBuffer2?: VertexBuffer | null
+    ) {
         this.context = context;
 
         let paintBuffersDiffer = this.boundPaintVertexBuffers.length !== paintVertexBuffers.length;
@@ -44,7 +45,7 @@ class VertexArrayObject {
             }
         }
 
-        const isFreshBindRequired = (
+        const isFreshBindRequired =
             !this.vao ||
             this.boundProgram !== program ||
             this.boundLayoutVertexBuffer !== layoutVertexBuffer ||
@@ -52,11 +53,18 @@ class VertexArrayObject {
             this.boundIndexBuffer !== indexBuffer ||
             this.boundVertexOffset !== vertexOffset ||
             this.boundDynamicVertexBuffer !== dynamicVertexBuffer ||
-            this.boundDynamicVertexBuffer2 !== dynamicVertexBuffer2
-        );
+            this.boundDynamicVertexBuffer2 !== dynamicVertexBuffer2;
 
         if (!context.extVertexArrayObject || isFreshBindRequired) {
-            this.freshBind(program, layoutVertexBuffer, paintVertexBuffers, indexBuffer, vertexOffset, dynamicVertexBuffer, dynamicVertexBuffer2);
+            this.freshBind(
+                program,
+                layoutVertexBuffer,
+                paintVertexBuffers,
+                indexBuffer,
+                vertexOffset,
+                dynamicVertexBuffer,
+                dynamicVertexBuffer2
+            );
         } else {
             context.bindVertexArrayOES.set(this.vao);
 
@@ -75,13 +83,15 @@ class VertexArrayObject {
         }
     }
 
-    freshBind(program: Program<any>,
-              layoutVertexBuffer: VertexBuffer,
-              paintVertexBuffers: Array<VertexBuffer>,
-              indexBuffer?: IndexBuffer | null,
-              vertexOffset?: number | null,
-              dynamicVertexBuffer?: VertexBuffer | null,
-              dynamicVertexBuffer2?: VertexBuffer | null) {
+    freshBind(
+        program: Program<any>,
+        layoutVertexBuffer: VertexBuffer,
+        paintVertexBuffers: Array<VertexBuffer>,
+        indexBuffer?: IndexBuffer | null,
+        vertexOffset?: number | null,
+        dynamicVertexBuffer?: VertexBuffer | null,
+        dynamicVertexBuffer2?: VertexBuffer | null
+    ) {
         let numPrevAttributes;
         const numNextAttributes = program.numAttributes;
 
@@ -102,7 +112,6 @@ class VertexArrayObject {
             this.boundVertexOffset = vertexOffset;
             this.boundDynamicVertexBuffer = dynamicVertexBuffer;
             this.boundDynamicVertexBuffer2 = dynamicVertexBuffer2;
-
         } else {
             numPrevAttributes = context.currentNumAttributes || 0;
 

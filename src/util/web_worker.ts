@@ -7,12 +7,7 @@ import MaplibreWorker from '../source/worker';
 
 import type {WorkerSource} from '../source/worker_source';
 
-type MessageListener = (
-    a: {
-        data: any;
-        target: any;
-    }
-) => unknown;
+type MessageListener = (a: {data: any; target: any}) => unknown;
 
 // The main thread interface. Provided by Worker in a browser environment,
 // and MessageBus below in a node environment.
@@ -28,7 +23,7 @@ export interface WorkerGlobalScopeInterface {
     registerWorkerSource: (
         b: string,
         a: {
-            new(...args: any): WorkerSource;
+            new (...args: any): WorkerSource;
         }
     ) => void;
     registerRTLTextPlugin: (_: any) => void;
@@ -76,7 +71,7 @@ class MessageBus implements WorkerInterface, WorkerGlobalScopeInterface {
         this.postListeners.splice(0, this.postListeners.length);
     }
 
-    importScripts() { }
+    importScripts() {}
 }
 
 export default function workerFactory(): WorkerInterface {

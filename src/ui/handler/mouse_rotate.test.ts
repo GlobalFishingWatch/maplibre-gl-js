@@ -32,7 +32,7 @@ describe('mouse rotate', () => {
         map._renderTaskQueue.run();
         expect(mouseRotate.isActive()).toBe(true);
 
-        simulate.mouseup(map.getCanvas(),   {buttons: 0, button: 2});
+        simulate.mouseup(map.getCanvas(), {buttons: 0, button: 2});
         map._renderTaskQueue.run();
         expect(mouseRotate.isActive()).toBe(false);
 

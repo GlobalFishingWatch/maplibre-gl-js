@@ -86,14 +86,16 @@ class LineAtlas {
             let range = ranges[currIndex];
 
             for (let x = 0; x < this.width; x++) {
-                if (x / range.right > 1) { range = ranges[++currIndex]; }
+                if (x / range.right > 1) {
+                    range = ranges[++currIndex];
+                }
 
                 const distLeft = Math.abs(x - range.left);
                 const distRight = Math.abs(x - range.right);
                 const minDist = Math.min(distLeft, distRight);
                 let signedDistance;
 
-                const distMiddle =  y / n * (halfStretch + 1);
+                const distMiddle = (y / n) * (halfStretch + 1);
                 if (range.isDash) {
                     const distEdge = halfStretch - Math.abs(distMiddle);
                     signedDistance = Math.sqrt(minDist * minDist + distEdge * distEdge);
@@ -107,7 +109,6 @@ class LineAtlas {
     }
 
     addRegularDash(ranges: any) {
-
         // Collapse any zero-length range
         // Collapse neighbouring same-type parts into a single part
         for (let i = ranges.length - 1; i >= 0; --i) {
@@ -158,7 +159,9 @@ class LineAtlas {
         }
 
         let length = 0;
-        for (let i = 0; i < dasharray.length; i++) { length += dasharray[i]; }
+        for (let i = 0; i < dasharray.length; i++) {
+            length += dasharray[i];
+        }
 
         if (length !== 0) {
             const stretch = this.width / length;
@@ -173,7 +176,7 @@ class LineAtlas {
 
         const dashEntry = {
             y: (this.nextRow + n + 0.5) / this.height,
-            height: 2 * n / this.height,
+            height: (2 * n) / this.height,
             width: length
         };
 
@@ -192,14 +195,33 @@ class LineAtlas {
             gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.REPEAT);
             gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
             gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-            gl.texImage2D(gl.TEXTURE_2D, 0, gl.ALPHA, this.width, this.height, 0, gl.ALPHA, gl.UNSIGNED_BYTE, this.data);
-
+            gl.texImage2D(
+                gl.TEXTURE_2D,
+                0,
+                gl.ALPHA,
+                this.width,
+                this.height,
+                0,
+                gl.ALPHA,
+                gl.UNSIGNED_BYTE,
+                this.data
+            );
         } else {
             gl.bindTexture(gl.TEXTURE_2D, this.texture);
 
             if (this.dirty) {
                 this.dirty = false;
-                gl.texSubImage2D(gl.TEXTURE_2D, 0, 0, 0, this.width, this.height, gl.ALPHA, gl.UNSIGNED_BYTE, this.data);
+                gl.texSubImage2D(
+                    gl.TEXTURE_2D,
+                    0,
+                    0,
+                    0,
+                    this.width,
+                    this.height,
+                    gl.ALPHA,
+                    gl.UNSIGNED_BYTE,
+                    this.data
+                );
             }
         }
     }

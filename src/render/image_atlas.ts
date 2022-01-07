@@ -18,13 +18,7 @@ export class ImagePosition {
     stretchX: Array<[number, number]>;
     content: [number, number, number, number];
 
-    constructor(paddedRect: Rect, {
-        pixelRatio,
-        version,
-        stretchX,
-        stretchY,
-        content
-    }: StyleImage) {
+    constructor(paddedRect: Rect, {pixelRatio, version, stretchX, stretchY, content}: StyleImage) {
         this.paddedRect = paddedRect;
         this.pixelRatio = pixelRatio;
         this.stretchX = stretchX;
@@ -34,10 +28,7 @@ export class ImagePosition {
     }
 
     get tl(): [number, number] {
-        return [
-            this.paddedRect.x + IMAGE_PADDING,
-            this.paddedRect.y + IMAGE_PADDING
-        ];
+        return [this.paddedRect.x + IMAGE_PADDING, this.paddedRect.y + IMAGE_PADDING];
     }
 
     get br(): [number, number] {
@@ -67,7 +58,8 @@ export default class ImageAtlas {
     uploaded: boolean;
 
     constructor(icons: {[_: string]: StyleImage}, patterns: {[_: string]: StyleImage}) {
-        const iconPositions = {}, patternPositions = {};
+        const iconPositions = {},
+            patternPositions = {};
         this.haveRenderCallbacks = [];
 
         const bins = [];
@@ -81,7 +73,13 @@ export default class ImageAtlas {
         for (const id in icons) {
             const src = icons[id];
             const bin = iconPositions[id].paddedRect;
-            RGBAImage.copy(src.data, image, {x: 0, y: 0}, {x: bin.x + IMAGE_PADDING, y: bin.y + IMAGE_PADDING}, src.data);
+            RGBAImage.copy(
+                src.data,
+                image,
+                {x: 0, y: 0},
+                {x: bin.x + IMAGE_PADDING, y: bin.y + IMAGE_PADDING},
+                src.data
+            );
         }
 
         for (const id in patterns) {
@@ -95,9 +93,9 @@ export default class ImageAtlas {
             RGBAImage.copy(src.data, image, {x: 0, y: 0}, {x, y}, src.data);
             // Add 1 pixel wrapped padding on each side of the image.
             RGBAImage.copy(src.data, image, {x: 0, y: h - 1}, {x, y: y - 1}, {width: w, height: 1}); // T
-            RGBAImage.copy(src.data, image, {x: 0, y:     0}, {x, y: y + h}, {width: w, height: 1}); // B
+            RGBAImage.copy(src.data, image, {x: 0, y: 0}, {x, y: y + h}, {width: w, height: 1}); // B
             RGBAImage.copy(src.data, image, {x: w - 1, y: 0}, {x: x - 1, y}, {width: 1, height: h}); // L
-            RGBAImage.copy(src.data, image, {x: 0,     y: 0}, {x: x + w, y}, {width: 1, height: h}); // R
+            RGBAImage.copy(src.data, image, {x: 0, y: 0}, {x: x + w, y}, {width: 1, height: h}); // R
         }
 
         this.image = image;
@@ -112,7 +110,7 @@ export default class ImageAtlas {
                 x: 0,
                 y: 0,
                 w: src.data.width + 2 * IMAGE_PADDING,
-                h: src.data.height + 2 * IMAGE_PADDING,
+                h: src.data.height + 2 * IMAGE_PADDING
             };
             bins.push(bin);
             positions[id] = new ImagePosition(bin, src);
@@ -140,7 +138,6 @@ export default class ImageAtlas {
         const [x, y] = position.tl;
         texture.update(image.data, undefined, {x, y});
     }
-
 }
 
 register('ImagePosition', ImagePosition);

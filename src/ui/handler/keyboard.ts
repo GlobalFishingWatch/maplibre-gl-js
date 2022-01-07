@@ -29,8 +29,8 @@ class KeyboardHandler {
     _rotationDisabled: boolean;
 
     /**
-    * @private
-    */
+     * @private
+     */
     constructor() {
         const stepOptions = defaultOptions;
         this._panStep = stepOptions.panStep;
@@ -53,57 +53,57 @@ class KeyboardHandler {
         let yDir = 0;
 
         switch (e.keyCode) {
-        case 61:
-        case 107:
-        case 171:
-        case 187:
-            zoomDir = 1;
-            break;
+            case 61:
+            case 107:
+            case 171:
+            case 187:
+                zoomDir = 1;
+                break;
 
-        case 189:
-        case 109:
-        case 173:
-            zoomDir = -1;
-            break;
+            case 189:
+            case 109:
+            case 173:
+                zoomDir = -1;
+                break;
 
-        case 37:
-            if (e.shiftKey) {
-                bearingDir = -1;
-            } else {
-                e.preventDefault();
-                xDir = -1;
-            }
-            break;
+            case 37:
+                if (e.shiftKey) {
+                    bearingDir = -1;
+                } else {
+                    e.preventDefault();
+                    xDir = -1;
+                }
+                break;
 
-        case 39:
-            if (e.shiftKey) {
-                bearingDir = 1;
-            } else {
-                e.preventDefault();
-                xDir = 1;
-            }
-            break;
+            case 39:
+                if (e.shiftKey) {
+                    bearingDir = 1;
+                } else {
+                    e.preventDefault();
+                    xDir = 1;
+                }
+                break;
 
-        case 38:
-            if (e.shiftKey) {
-                pitchDir = 1;
-            } else {
-                e.preventDefault();
-                yDir = -1;
-            }
-            break;
+            case 38:
+                if (e.shiftKey) {
+                    pitchDir = 1;
+                } else {
+                    e.preventDefault();
+                    yDir = -1;
+                }
+                break;
 
-        case 40:
-            if (e.shiftKey) {
-                pitchDir = -1;
-            } else {
-                e.preventDefault();
-                yDir = 1;
-            }
-            break;
+            case 40:
+                if (e.shiftKey) {
+                    pitchDir = -1;
+                } else {
+                    e.preventDefault();
+                    yDir = 1;
+                }
+                break;
 
-        default:
-            return;
+            default:
+                return;
         }
 
         if (this._rotationDisabled) {
@@ -114,17 +114,20 @@ class KeyboardHandler {
         return {
             cameraAnimation: (map: Map) => {
                 const zoom = map.getZoom();
-                map.easeTo({
-                    duration: 300,
-                    easeId: 'keyboardHandler',
-                    easing: easeOut,
+                map.easeTo(
+                    {
+                        duration: 300,
+                        easeId: 'keyboardHandler',
+                        easing: easeOut,
 
-                    zoom: zoomDir ? Math.round(zoom) + zoomDir * (e.shiftKey ? 2 : 1) : zoom,
-                    bearing: map.getBearing() + bearingDir * this._bearingStep,
-                    pitch: map.getPitch() + pitchDir * this._pitchStep,
-                    offset: [-xDir * this._panStep, -yDir * this._panStep],
-                    center: map.getCenter()
-                }, {originalEvent: e});
+                        zoom: zoomDir ? Math.round(zoom) + zoomDir * (e.shiftKey ? 2 : 1) : zoom,
+                        bearing: map.getBearing() + bearingDir * this._bearingStep,
+                        pitch: map.getPitch() + pitchDir * this._pitchStep,
+                        offset: [-xDir * this._panStep, -yDir * this._panStep],
+                        center: map.getCenter()
+                    },
+                    {originalEvent: e}
+                );
             }
         };
     }

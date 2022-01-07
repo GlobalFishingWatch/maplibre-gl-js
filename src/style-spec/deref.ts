@@ -1,4 +1,3 @@
-
 import refProperties from './util/ref_properties';
 
 function deref(layer, parent) {
@@ -10,7 +9,7 @@ function deref(layer, parent) {
         }
     }
 
-    refProperties.forEach((k) => {
+    refProperties.forEach(k => {
         if (k in parent) {
             result[k] = parent[k];
         }

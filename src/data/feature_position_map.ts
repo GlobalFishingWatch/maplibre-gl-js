@@ -3,14 +3,14 @@ import {register} from '../util/web_worker_transfer';
 import assert from 'assert';
 
 type SerializedFeaturePositionMap = {
-  ids: Float64Array;
-  positions: Uint32Array;
+    ids: Float64Array;
+    positions: Uint32Array;
 };
 
 type FeaturePosition = {
-  index: number;
-  start: number;
-  end: number;
+    index: number;
+    start: number;
+    end: number;
 };
 
 // A transferable data structure that maps feature ids to their indices and buffer offsets
@@ -75,8 +75,8 @@ export default class FeaturePositionMap {
         const map = new FeaturePositionMap();
         // after transferring, we only use these arrays statically (no pushes),
         // so TypedArray vs Array distinction that flow points out doesn't matter
-        map.ids = (obj.ids as any);
-        map.positions = (obj.positions as any);
+        map.ids = obj.ids as any;
+        map.positions = obj.positions as any;
         map.indexed = true;
         return map;
     }
@@ -99,8 +99,10 @@ function sort(ids, positions, left, right) {
         let j = right + 1;
 
         while (true) {
-            do i++; while (ids[i] < pivot);
-            do j--; while (ids[j] > pivot);
+            do i++;
+            while (ids[i] < pivot);
+            do j--;
+            while (ids[j] > pivot);
             if (i >= j) break;
             swap(ids, i, j);
             swap(positions, 3 * i, 3 * j);

@@ -10,7 +10,7 @@ const earthCircumfrence = 2 * Math.PI * earthRadius; // meters
  * The circumference at a line of latitude in meters.
  */
 function circumferenceAtLatitude(latitude: number) {
-    return earthCircumfrence * Math.cos(latitude * Math.PI / 180);
+    return earthCircumfrence * Math.cos((latitude * Math.PI) / 180);
 }
 
 export function mercatorXfromLng(lng: number) {
@@ -18,7 +18,7 @@ export function mercatorXfromLng(lng: number) {
 }
 
 export function mercatorYfromLat(lat: number) {
-    return (180 - (180 / Math.PI * Math.log(Math.tan(Math.PI / 4 + lat * Math.PI / 360)))) / 360;
+    return (180 - (180 / Math.PI) * Math.log(Math.tan(Math.PI / 4 + (lat * Math.PI) / 360))) / 360;
 }
 
 export function mercatorZfromAltitude(altitude: number, lat: number) {
@@ -31,7 +31,7 @@ export function lngFromMercatorX(x: number) {
 
 export function latFromMercatorY(y: number) {
     const y2 = 180 - y * 360;
-    return 360 / Math.PI * Math.atan(Math.exp(y2 * Math.PI / 180)) - 90;
+    return (360 / Math.PI) * Math.atan(Math.exp((y2 * Math.PI) / 180)) - 90;
 }
 
 export function altitudeFromMercatorZ(z: number, y: number) {
@@ -49,7 +49,7 @@ export function altitudeFromMercatorZ(z: number, y: number) {
  * @private
  */
 export function mercatorScale(lat: number) {
-    return 1 / Math.cos(lat * Math.PI / 180);
+    return 1 / Math.cos((lat * Math.PI) / 180);
 }
 
 /**
@@ -99,9 +99,10 @@ class MercatorCoordinate {
         const lngLat = LngLat.convert(lngLatLike);
 
         return new MercatorCoordinate(
-                mercatorXfromLng(lngLat.lng),
-                mercatorYfromLat(lngLat.lat),
-                mercatorZfromAltitude(altitude, lngLat.lat));
+            mercatorXfromLng(lngLat.lng),
+            mercatorYfromLat(lngLat.lat),
+            mercatorZfromAltitude(altitude, lngLat.lat)
+        );
     }
 
     /**
@@ -113,9 +114,7 @@ class MercatorCoordinate {
      * var lngLat = coord.toLngLat(); // LngLat(0, 0)
      */
     toLngLat() {
-        return new LngLat(
-                lngFromMercatorX(this.x),
-                latFromMercatorY(this.y));
+        return new LngLat(lngFromMercatorX(this.x), latFromMercatorY(this.y));
     }
 
     /**
@@ -140,9 +139,8 @@ class MercatorCoordinate {
      */
     meterInMercatorCoordinateUnits() {
         // 1 meter / circumference at equator in meters * Mercator projection scale factor at this latitude
-        return 1 / earthCircumfrence * mercatorScale(latFromMercatorY(this.y));
+        return (1 / earthCircumfrence) * mercatorScale(latFromMercatorY(this.y));
     }
-
 }
 
 export default MercatorCoordinate;

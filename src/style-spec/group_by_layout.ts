@@ -1,4 +1,3 @@
-
 import refProperties from './util/ref_properties';
 
 function stringify(obj) {
@@ -52,11 +51,9 @@ function groupByLayout(layers, cachedKeys) {
     const groups = {};
 
     for (let i = 0; i < layers.length; i++) {
-
         const k = (cachedKeys && cachedKeys[layers[i].id]) || getKey(layers[i]);
         // update the cache if there is one
-        if (cachedKeys)
-            cachedKeys[layers[i].id] = k;
+        if (cachedKeys) cachedKeys[layers[i].id] = k;
 
         let group = groups[k];
         if (!group) {

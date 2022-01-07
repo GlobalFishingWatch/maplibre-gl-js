@@ -4,7 +4,10 @@ import StyleLayer from '../style_layer';
 import LineBucket from '../../data/bucket/line_bucket';
 import {polygonIntersectsBufferedMultiLine} from '../../util/intersection_tests';
 import {getMaximumPaintValue, translateDistance, translate} from '../query_utils';
-import properties, {LineLayoutPropsPossiblyEvaluated, LinePaintPropsPossiblyEvaluated} from './line_style_layer_properties';
+import properties, {
+    LineLayoutPropsPossiblyEvaluated,
+    LinePaintPropsPossiblyEvaluated
+} from './line_style_layer_properties';
 import {extend} from '../../util/util';
 import EvaluationParameters from '../evaluation_parameters';
 import {Transitionable, Transitioning, Layout, PossiblyEvaluated, DataDrivenProperty} from '../properties';
@@ -57,7 +60,8 @@ class LineStyleLayer extends StyleLayer {
 
     _handleSpecialPaintPropertyUpdate(name: string) {
         if (name === 'line-gradient') {
-            const expression: ZoomConstantExpression<'source'> = (this._transitionablePaint._values['line-gradient'].value.expression as any);
+            const expression: ZoomConstantExpression<'source'> = this._transitionablePaint._values['line-gradient']
+                .value.expression as any;
             this.stepInterpolant = expression._styleExpression.expression instanceof Step;
             this.gradientVersion = (this.gradientVersion + 1) % Number.MAX_SAFE_INTEGER;
         }
@@ -70,8 +74,10 @@ class LineStyleLayer extends StyleLayer {
     recalculate(parameters: EvaluationParameters, availableImages: Array<string>) {
         super.recalculate(parameters, availableImages);
 
-        (this.paint._values as any)['line-floorwidth'] =
-            lineFloorwidthProperty.possiblyEvaluate(this._transitioningPaint._values['line-width'].value, parameters);
+        (this.paint._values as any)['line-floorwidth'] = lineFloorwidthProperty.possiblyEvaluate(
+            this._transitioningPaint._values['line-width'].value,
+            parameters
+        );
     }
 
     createBucket(parameters: BucketParameters<any>) {
@@ -79,30 +85,37 @@ class LineStyleLayer extends StyleLayer {
     }
 
     queryRadius(bucket: Bucket): number {
-        const lineBucket: LineBucket = (bucket as any);
+        const lineBucket: LineBucket = bucket as any;
         const width = getLineWidth(
             getMaximumPaintValue('line-width', this, lineBucket),
-            getMaximumPaintValue('line-gap-width', this, lineBucket));
+            getMaximumPaintValue('line-gap-width', this, lineBucket)
+        );
         const offset = getMaximumPaintValue('line-offset', this, lineBucket);
         return width / 2 + Math.abs(offset) + translateDistance(this.paint.get('line-translate'));
     }
 
     queryIntersectsFeature(
-      queryGeometry: Array<Point>,
-      feature: VectorTileFeature,
-      featureState: FeatureState,
-      geometry: Array<Array<Point>>,
-      zoom: number,
-      transform: Transform,
-      pixelsToTileUnits: number
+        queryGeometry: Array<Point>,
+        feature: VectorTileFeature,
+        featureState: FeatureState,
+        geometry: Array<Array<Point>>,
+        zoom: number,
+        transform: Transform,
+        pixelsToTileUnits: number
     ): boolean {
-        const translatedPolygon = translate(queryGeometry,
+        const translatedPolygon = translate(
+            queryGeometry,
             this.paint.get('line-translate'),
             this.paint.get('line-translate-anchor'),
-            transform.angle, pixelsToTileUnits);
-        const halfWidth = pixelsToTileUnits / 2 * getLineWidth(
-            this.paint.get('line-width').evaluate(feature, featureState),
-            this.paint.get('line-gap-width').evaluate(feature, featureState));
+            transform.angle,
+            pixelsToTileUnits
+        );
+        const halfWidth =
+            (pixelsToTileUnits / 2) *
+            getLineWidth(
+                this.paint.get('line-width').evaluate(feature, featureState),
+                this.paint.get('line-gap-width').evaluate(feature, featureState)
+            );
         const lineOffset = this.paint.get('line-offset').evaluate(feature, featureState);
         if (lineOffset) {
             geometry = offsetLine(geometry, lineOffset * pixelsToTileUnits);

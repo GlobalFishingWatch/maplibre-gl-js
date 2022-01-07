@@ -7,10 +7,9 @@ import EvaluationParameters from './evaluation_parameters';
 import {FormattedSection} from '../style-spec/expression/types/formatted';
 
 describe('evaluate', () => {
-
     test('override constant', () => {
-        const defaultColor = {'r': 0, 'g': 1, 'b': 0, 'a': 1};
-        const overridenColor = {'r': 1, 'g': 0, 'b': 0, 'a': 1};
+        const defaultColor = {r: 0, g: 1, b: 0, a: 1};
+        const overridenColor = {r: 1, g: 0, b: 0, a: 1};
         const overriden = new PossiblyEvaluatedPropertyValue(
             properties.paint.properties['text-color'],
             {kind: 'constant', value: defaultColor},
@@ -25,25 +24,21 @@ describe('evaluate', () => {
 
         ctx.formattedSection = {textColor: overridenColor} as FormattedSection;
         expect(override.evaluate(ctx)).toEqual(overridenColor);
-
     });
 
     test('override expression', () => {
         const warn = console.warn;
-        console.warn = (_) => {};
-        const defaultColor = {'r': 0, 'g': 0, 'b': 0, 'a': 1};
-        const propertyColor = {'r': 1, 'g': 0, 'b': 0, 'a': 1};
-        const overridenColor = {'r': 0, 'g': 0, 'b': 1, 'a': 1};
-        const styleExpr = createExpression(
-            ['get', 'color'],
-            properties.paint.properties['text-color'].specification);
+        console.warn = _ => {};
+        const defaultColor = {r: 0, g: 0, b: 0, a: 1};
+        const propertyColor = {r: 1, g: 0, b: 0, a: 1};
+        const overridenColor = {r: 0, g: 0, b: 1, a: 1};
+        const styleExpr = createExpression(['get', 'color'], properties.paint.properties['text-color'].specification);
 
         const sourceExpr = new ZoomConstantExpression('source', styleExpr.value as StyleExpression);
-        const overriden = new PossiblyEvaluatedPropertyValue(
-            properties.paint.properties['text-color'],
-            sourceExpr,
-            {zoom: 0, zoomHistory: {}} as EvaluationParameters
-        );
+        const overriden = new PossiblyEvaluatedPropertyValue(properties.paint.properties['text-color'], sourceExpr, {
+            zoom: 0,
+            zoomHistory: {}
+        } as EvaluationParameters);
 
         const override = new FormatSectionOverride(overriden);
         const ctx = new EvaluationContext();
@@ -60,5 +55,4 @@ describe('evaluate', () => {
 
         console.warn = warn;
     });
-
 });

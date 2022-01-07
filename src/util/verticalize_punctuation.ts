@@ -3,7 +3,7 @@ import {charHasRotatedVerticalOrientation} from './script_detection';
 export const verticalizedCharacterMap = {
     '!': '︕',
     '#': '＃',
-    '$': '＄',
+    $: '＄',
     '%': '％',
     '&': '＆',
     '(': '︵',
@@ -25,7 +25,7 @@ export const verticalizedCharacterMap = {
     '\\': '＼',
     ']': '﹈',
     '^': '＾',
-    '_': '︳',
+    _: '︳',
     '`': '｀',
     '{': '︷',
     '|': '―',
@@ -93,10 +93,13 @@ export default function verticalizePunctuation(input: string) {
         const nextCharCode = input.charCodeAt(i + 1) || null;
         const prevCharCode = input.charCodeAt(i - 1) || null;
 
-        const canReplacePunctuation = (
-            (!nextCharCode || !charHasRotatedVerticalOrientation(nextCharCode) || verticalizedCharacterMap[input[i + 1]]) &&
-            (!prevCharCode || !charHasRotatedVerticalOrientation(prevCharCode) || verticalizedCharacterMap[input[i - 1]])
-        );
+        const canReplacePunctuation =
+            (!nextCharCode ||
+                !charHasRotatedVerticalOrientation(nextCharCode) ||
+                verticalizedCharacterMap[input[i + 1]]) &&
+            (!prevCharCode ||
+                !charHasRotatedVerticalOrientation(prevCharCode) ||
+                verticalizedCharacterMap[input[i - 1]]);
 
         if (canReplacePunctuation && verticalizedCharacterMap[input[i]]) {
             output += verticalizedCharacterMap[input[i]];
@@ -107,4 +110,3 @@ export default function verticalizePunctuation(input: string) {
 
     return output;
 }
-

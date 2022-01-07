@@ -63,7 +63,6 @@ describe('EdgeInsets', () => {
             expect(inset3.left).toBe(75);
             expect(inset3.right).toBe(10);
         });
-
     });
 
     test('#equals', () => {

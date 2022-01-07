@@ -16,7 +16,6 @@ function buttonStillPressed(e: MouseEvent, button: number) {
 }
 
 class MouseHandler {
-
     _enabled: boolean;
     _active: boolean;
     _lastPoint: Point;
@@ -24,9 +23,7 @@ class MouseHandler {
     _moved: boolean;
     _clickTolerance: number;
 
-    constructor(options: {
-      clickTolerance: number;
-    }) {
+    constructor(options: {clickTolerance: number}) {
         this.reset();
         this._clickTolerance = options.clickTolerance || 1;
     }
@@ -38,11 +35,13 @@ class MouseHandler {
         delete this._eventButton;
     }
 
-    _correctButton(e: MouseEvent, button: number) {  //eslint-disable-line
+    _correctButton(e: MouseEvent, button: number) {
+        //eslint-disable-line
         return false; // implemented by child
     }
 
-    _move(lastPoint: Point, point: Point) {  //eslint-disable-line
+    _move(lastPoint: Point, point: Point) {
+        //eslint-disable-line
         return {}; // implemented by child
     }
 
@@ -107,7 +106,6 @@ class MouseHandler {
 }
 
 export class MousePanHandler extends MouseHandler {
-
     mousedown(e: MouseEvent, point: Point) {
         super.mousedown(e, point);
         if (this._lastPoint) this._active = true;
@@ -126,7 +124,7 @@ export class MousePanHandler extends MouseHandler {
 
 export class MouseRotateHandler extends MouseHandler {
     _correctButton(e: MouseEvent, button: number) {
-        return (button === LEFT_BUTTON && e.ctrlKey) || (button === RIGHT_BUTTON);
+        return (button === LEFT_BUTTON && e.ctrlKey) || button === RIGHT_BUTTON;
     }
 
     _move(lastPoint: Point, point: Point) {
@@ -147,7 +145,7 @@ export class MouseRotateHandler extends MouseHandler {
 
 export class MousePitchHandler extends MouseHandler {
     _correctButton(e: MouseEvent, button: number) {
-        return (button === LEFT_BUTTON && e.ctrlKey) || (button === RIGHT_BUTTON);
+        return (button === LEFT_BUTTON && e.ctrlKey) || button === RIGHT_BUTTON;
     }
 
     _move(lastPoint: Point, point: Point) {

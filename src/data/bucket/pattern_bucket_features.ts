@@ -2,10 +2,7 @@ import type FillStyleLayer from '../../style/style_layer/fill_style_layer';
 import type FillExtrusionStyleLayer from '../../style/style_layer/fill_extrusion_style_layer';
 import type LineStyleLayer from '../../style/style_layer/line_style_layer';
 
-import type {
-    BucketFeature,
-    PopulateParameters
-} from '../bucket';
+import type {BucketFeature, PopulateParameters} from '../bucket';
 import {PossiblyEvaluated} from '../../style/properties';
 
 type PatternStyleLayers = Array<LineStyleLayer> | Array<FillStyleLayer> | Array<FillExtrusionStyleLayer>;
@@ -23,18 +20,24 @@ export function hasPattern(type: string, layers: PatternStyleLayers, options: Po
         const constantPattern = patternProperty.constantOr(null);
         if (constantPattern) {
             hasPattern = true;
-            patterns[constantPattern.to] =  true;
-            patterns[constantPattern.from] =  true;
+            patterns[constantPattern.to] = true;
+            patterns[constantPattern.from] = true;
         }
     }
 
     return hasPattern;
 }
 
-export function addPatternDependencies(type: string, layers: PatternStyleLayers, patternFeature: BucketFeature, zoom: number, options: PopulateParameters) {
+export function addPatternDependencies(
+    type: string,
+    layers: PatternStyleLayers,
+    patternFeature: BucketFeature,
+    zoom: number,
+    options: PopulateParameters
+) {
     const patterns = options.patternDependencies;
     for (const layer of layers) {
-        const patternProperty = (layer.paint  as PossiblyEvaluated<any, any>).get(`${type}-pattern`);
+        const patternProperty = (layer.paint as PossiblyEvaluated<any, any>).get(`${type}-pattern`);
 
         const patternPropertyValue = patternProperty.value;
         if (patternPropertyValue.kind !== 'constant') {

@@ -1,4 +1,3 @@
-
 import deref from '../deref';
 
 function eachLayer(style, callback) {
@@ -7,14 +6,14 @@ function eachLayer(style, callback) {
     }
 }
 
-export default function(style) {
+export default function (style) {
     style.version = 9;
 
     // remove user-specified refs
     style.layers = deref(style.layers);
 
     // remove class-specific paint properties
-    eachLayer(style, (layer) => {
+    eachLayer(style, layer => {
         for (const k in layer) {
             if (/paint\..*/.test(k)) {
                 delete layer[k];

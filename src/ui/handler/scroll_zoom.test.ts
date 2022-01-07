@@ -8,9 +8,9 @@ function createMap() {
     return new Map({
         container: DOM.create('div', '', window.document.body),
         style: {
-            'version': 8,
-            'sources': {},
-            'layers': []
+            version: 8,
+            sources: {},
+            layers: []
         }
     });
 }
@@ -22,7 +22,6 @@ beforeEach(() => {
 });
 
 describe('ScrollZoomHandler', () => {
-
     test('Zooms for single mouse wheel tick', () => {
         const browserNow = jest.spyOn(browser, 'now');
         let now = 1555555555555;
@@ -80,7 +79,7 @@ describe('ScrollZoomHandler', () => {
             [1, {type: 'wheel', deltaY: -801}],
             [5, {type: 'wheel', deltaY: -326}],
             [20, {type: 'wheel', deltaY: -345}],
-            [22, {type: 'wheel', deltaY: -376}],
+            [22, {type: 'wheel', deltaY: -376}]
         ] as [number, any][];
 
         const end = now + 500;
@@ -88,7 +87,7 @@ describe('ScrollZoomHandler', () => {
 
         // simulate the above sequence of wheel events, with render frames
         // interspersed every 20ms
-        while (now  < end) {
+        while (now < end) {
             now += 1;
             browserNow.mockReturnValue(now);
             if (events.length && lastWheelEvent + events[0][0] === now) {
@@ -127,7 +126,6 @@ describe('ScrollZoomHandler', () => {
         map._renderTaskQueue.run();
 
         expect(map.getZoom() - startZoom).toBe(0.0);
-
     });
 
     test('Gracefully handle wheel events that cancel each other out before the first scroll frame', () => {
@@ -150,7 +148,6 @@ describe('ScrollZoomHandler', () => {
         now += 400;
         browserNow.mockReturnValue(now);
         map._renderTaskQueue.run();
-
     });
 
     test('does not zoom if preventDefault is called on the wheel event', () => {
@@ -220,7 +217,6 @@ describe('ScrollZoomHandler', () => {
 
         expect(startCount).toBe(1);
         expect(endCount).toBe(1);
-
     });
 
     test('emits one zoomstart event and one zoomend event while zooming', () => {
@@ -245,7 +241,7 @@ describe('ScrollZoomHandler', () => {
         const events = [
             [2, {type: 'trackpad', deltaY: -1}],
             [7, {type: 'trackpad', deltaY: -2}],
-            [30, {type: 'wheel', deltaY: -5}],
+            [30, {type: 'wheel', deltaY: -5}]
         ] as [number, any][];
 
         const end = now + 50;
@@ -269,7 +265,5 @@ describe('ScrollZoomHandler', () => {
 
         expect(startCount).toBe(1);
         expect(endCount).toBe(1);
-
     });
-
 });

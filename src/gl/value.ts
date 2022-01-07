@@ -13,16 +13,16 @@ import type {
     TextureUnitType,
     ViewportType,
     CullFaceModeType,
-    FrontFaceType,
+    FrontFaceType
 } from './types';
 
 export interface IValue<T> {
-  current: T;
-  default: T;
-  dirty: boolean;
-  get(): T;
-  setDefault(): void;
-  set(value: T): void;
+    current: T;
+    default: T;
+    dirty: boolean;
+    get(): T;
+    setDefault(): void;
+    set(value: T): void;
 }
 
 class BaseValue<T> implements IValue<T> {
@@ -41,7 +41,8 @@ class BaseValue<T> implements IValue<T> {
     get(): T {
         return this.current;
     }
-    set(value: T) { // eslint-disable-line
+    set(value: T) {
+        // eslint-disable-line
         // overridden in child classes;
     }
 
@@ -117,7 +118,7 @@ export class DepthMask extends BaseValue<DepthMaskType> {
 
 export class StencilMask extends BaseValue<number> {
     getDefault(): number {
-        return 0xFF;
+        return 0xff;
     }
     set(v: number): void {
         if (v === this.current && !this.dirty) return;
@@ -132,7 +133,7 @@ export class StencilFunc extends BaseValue<StencilFuncType> {
         return {
             func: this.gl.ALWAYS,
             ref: 0,
-            mask: 0xFF
+            mask: 0xff
         };
     }
     set(v: StencilFuncType): void {
@@ -428,7 +429,7 @@ export class BindVertexArrayOES extends BaseValue<any> {
         return null;
     }
     set(v: any) {
-        if (!this.vao || v === this.current && !this.dirty) return;
+        if (!this.vao || (v === this.current && !this.dirty)) return;
         this.vao.bindVertexArrayOES(v);
         this.current = v;
         this.dirty = false;
@@ -455,7 +456,7 @@ export class PixelStoreUnpackPremultiplyAlpha extends BaseValue<boolean> {
     set(v: boolean): void {
         if (v === this.current && !this.dirty) return;
         const gl = this.gl;
-        gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, ((v as any)));
+        gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, v as any);
         this.current = v;
         this.dirty = false;
     }
@@ -468,7 +469,7 @@ export class PixelStoreUnpackFlipY extends BaseValue<boolean> {
     set(v: boolean): void {
         if (v === this.current && !this.dirty) return;
         const gl = this.gl;
-        gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, ((v as any)));
+        gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, v as any);
         this.current = v;
         this.dirty = false;
     }

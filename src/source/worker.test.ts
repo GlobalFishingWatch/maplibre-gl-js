@@ -33,31 +33,38 @@ describe('load tile', () => {
         const server = fakeServer.create();
         global.fetch = null;
         const worker = new Worker(_self);
-        worker.loadTile('0', {
-            type: 'vector',
-            source: 'source',
-            uid: '0',
-            tileID: {overscaledZ: 0, wrap: 0, canonical: {x: 0, y: 0, z: 0} as CanonicalTileID} as any as OverscaledTileID,
-            request: {url: '/error'}// Sinon fake server gives 404 responses by default
-        } as WorkerTileParameters & { type: string }, (err) => {
-            expect(err).toBeTruthy();
-            server.restore();
-            done();
-        });
+        worker.loadTile(
+            '0',
+            {
+                type: 'vector',
+                source: 'source',
+                uid: '0',
+                tileID: {
+                    overscaledZ: 0,
+                    wrap: 0,
+                    canonical: {x: 0, y: 0, z: 0} as CanonicalTileID
+                } as any as OverscaledTileID,
+                request: {url: '/error'} // Sinon fake server gives 404 responses by default
+            } as WorkerTileParameters & {type: string},
+            err => {
+                expect(err).toBeTruthy();
+                server.restore();
+                done();
+            }
+        );
         server.respond();
     });
 
-    test('isolates different instances\' data', () => {
+    test("isolates different instances' data", () => {
         const worker = new Worker(_self);
 
-        worker.setLayers('0', [
-            {id: 'one', type: 'circle'} as LayerSpecification
-        ], () => {});
+        worker.setLayers('0', [{id: 'one', type: 'circle'} as LayerSpecification], () => {});
 
-        worker.setLayers('1', [
-            {id: 'one', type: 'circle'} as LayerSpecification,
-            {id: 'two', type: 'circle'} as LayerSpecification,
-        ], () => {});
+        worker.setLayers(
+            '1',
+            [{id: 'one', type: 'circle'} as LayerSpecification, {id: 'two', type: 'circle'} as LayerSpecification],
+            () => {}
+        );
 
         expect(worker.layerIndexes[0]).not.toBe(worker.layerIndexes[1]);
     });
@@ -79,7 +86,7 @@ describe('load tile', () => {
             _self.registerWorkerSource(workerName, WorkerSourceMock);
         }).toThrow(`Worker source with name "${workerName}" already registered.`);
 
-        worker.loadTile('999', {type: 'test'} as WorkerTileParameters & { type: string }, () => {});
+        worker.loadTile('999', {type: 'test'} as WorkerTileParameters & {type: string}, () => {});
     });
 });
 
@@ -92,7 +99,7 @@ describe('register RTLTextPlugin', () => {
         const rtlTextPlugin = {
             applyArabicShaping: 'test',
             processBidirectionalText: 'test',
-            processStyledBidirectionalText: 'test',
+            processStyledBidirectionalText: 'test'
         };
 
         _self.registerRTLTextPlugin(rtlTextPlugin);
@@ -109,7 +116,7 @@ describe('register RTLTextPlugin', () => {
         const rtlTextPlugin = {
             applyArabicShaping: jest.fn(),
             processBidirectionalText: jest.fn(),
-            processStyledBidirectionalText: jest.fn(),
+            processStyledBidirectionalText: jest.fn()
         };
 
         expect(() => {
@@ -131,13 +138,17 @@ describe('load worker source', () => {
         const server = fakeServer.create();
         global.fetch = null;
         const worker = new Worker(_self);
-        worker.loadWorkerSource('0', {
-            url: '/error',
-        }, (err) => {
-            expect(err).toBeTruthy();
-            server.restore();
-            done();
-        });
+        worker.loadWorkerSource(
+            '0',
+            {
+                url: '/error'
+            },
+            err => {
+                expect(err).toBeTruthy();
+                server.restore();
+                done();
+            }
+        );
         server.respond();
     });
 });

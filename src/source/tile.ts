@@ -34,13 +34,15 @@ import type Point from '../util/point';
 import {mat4} from 'gl-matrix';
 import type {VectorTileLayer} from '@mapbox/vector-tile';
 
-export type TileState = // Tile data is in the process of loading.
-'loading' | // Tile data has been loaded. Tile can be rendered.
-'loaded' | // Tile data has been loaded and is being updated. Tile can be rendered.
-'reloading' | // Tile data has been deleted.
-'unloaded' | // Tile data was not loaded because of an error.
-'errored' | 'expired';  /* Tile data was previously loaded, but has expired per its
-                   * HTTP headers and is in the process of refreshing. */
+export type TileState =  // Tile data is in the process of loading.
+    | 'loading' // Tile data has been loaded. Tile can be rendered.
+    | 'loaded' // Tile data has been loaded and is being updated. Tile can be rendered.
+    | 'reloading' // Tile data has been deleted.
+    | 'unloaded' // Tile data was not loaded because of an error.
+    | 'errored'
+    | 'expired';
+/* Tile data was previously loaded, but has expired per its
+ * HTTP headers and is in the process of refreshing. */
 
 /**
  * A tile object is the combination of a Coordinate, which defines
@@ -268,41 +270,48 @@ class Tile {
     // Queries non-symbol features rendered for this tile.
     // Symbol features are queried globally
     queryRenderedFeatures(
-      layers: {[_: string]: StyleLayer},
-      serializedLayers: {[_: string]: any},
-      sourceFeatureState: SourceFeatureState,
-      queryGeometry: Array<Point>,
-      cameraQueryGeometry: Array<Point>,
-      scale: number,
-      params: {
-        filter: FilterSpecification;
-        layers: Array<string>;
-        availableImages: Array<string>;
-      },
-      transform: Transform,
-      maxPitchScaleFactor: number,
-      pixelPosMatrix: mat4
+        layers: {[_: string]: StyleLayer},
+        serializedLayers: {[_: string]: any},
+        sourceFeatureState: SourceFeatureState,
+        queryGeometry: Array<Point>,
+        cameraQueryGeometry: Array<Point>,
+        scale: number,
+        params: {
+            filter: FilterSpecification;
+            layers: Array<string>;
+            availableImages: Array<string>;
+        },
+        transform: Transform,
+        maxPitchScaleFactor: number,
+        pixelPosMatrix: mat4
     ): {[_: string]: Array<{featureIndex: number; feature: GeoJSONFeature}>} {
-        if (!this.latestFeatureIndex || !this.latestFeatureIndex.rawTileData)
-            return {};
+        if (!this.latestFeatureIndex || !this.latestFeatureIndex.rawTileData) return {};
 
-        return this.latestFeatureIndex.query({
-            queryGeometry,
-            cameraQueryGeometry,
-            scale,
-            tileSize: this.tileSize,
-            pixelPosMatrix,
-            transform,
-            params,
-            queryPadding: this.queryPadding * maxPitchScaleFactor
-        }, layers, serializedLayers, sourceFeatureState);
+        return this.latestFeatureIndex.query(
+            {
+                queryGeometry,
+                cameraQueryGeometry,
+                scale,
+                tileSize: this.tileSize,
+                pixelPosMatrix,
+                transform,
+                params,
+                queryPadding: this.queryPadding * maxPitchScaleFactor
+            },
+            layers,
+            serializedLayers,
+            sourceFeatureState
+        );
     }
 
-    querySourceFeatures(result: Array<GeoJSONFeature>, params?: {
-        sourceLayer: string;
-        filter: Array<any>;
-        validate?: boolean;
-    }) {
+    querySourceFeatures(
+        result: Array<GeoJSONFeature>,
+        params?: {
+            sourceLayer: string;
+            filter: Array<any>;
+            validate?: boolean;
+        }
+    ) {
         const featureIndex = this.latestFeatureIndex;
         if (!featureIndex || !featureIndex.rawTileData) return;
 
@@ -321,7 +330,14 @@ class Tile {
             const feature = layer.feature(i);
             if (filter.needGeometry) {
                 const evaluationFeature = toEvaluationFeature(feature, true);
-                if (!filter.filter(new EvaluationParameters(this.tileID.overscaledZ), evaluationFeature, this.tileID.canonical)) continue;
+                if (
+                    !filter.filter(
+                        new EvaluationParameters(this.tileID.overscaledZ),
+                        evaluationFeature,
+                        this.tileID.canonical
+                    )
+                )
+                    continue;
             } else if (!filter.filter(new EvaluationParameters(this.tileID.overscaledZ), feature)) {
                 continue;
             }
@@ -362,7 +378,6 @@ class Tile {
                 // Expiring date is going backwards:
                 // fall back to exponential backoff
                 isExpired = true;
-
             } else {
                 const delta = this.expirationTime - prior;
 
@@ -370,13 +385,11 @@ class Tile {
                     // Server is serving the same expired resource over and over: fall
                     // back to exponential backoff.
                     isExpired = true;
-
                 } else {
                     // Assume that either the client or the server clock is wrong and
                     // try to interpolate a valid expiration date (from the client POV)
                     // observing a minimum timeout.
                     this.expirationTime = now + Math.max(delta, CLOCK_SKEW_RETRY_TIMEOUT);
-
                 }
             }
 
@@ -401,9 +414,7 @@ class Tile {
     }
 
     setFeatureState(states: LayerFeatureStates, painter: any) {
-        if (!this.latestFeatureIndex ||
-            !this.latestFeatureIndex.rawTileData ||
-            Object.keys(states).length === 0) {
+        if (!this.latestFeatureIndex || !this.latestFeatureIndex.rawTileData || Object.keys(states).length === 0) {
             return;
         }
 
@@ -419,7 +430,7 @@ class Tile {
             const sourceLayerStates = states[sourceLayerId];
             if (!sourceLayer || !sourceLayerStates || Object.keys(sourceLayerStates).length === 0) continue;
 
-            bucket.update(sourceLayerStates, sourceLayer, this.imageAtlas && this.imageAtlas.patternPositions || {});
+            bucket.update(sourceLayerStates, sourceLayer, (this.imageAtlas && this.imageAtlas.patternPositions) || {});
             const layer = painter && painter.style && painter.style.getLayer(id);
             if (layer) {
                 this.queryPadding = Math.max(this.queryPadding, layer.queryRadius(bucket));

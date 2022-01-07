@@ -3,19 +3,16 @@ import assert from 'assert';
 import {register} from './web_worker_transfer';
 
 export type Size = {
-  width: number;
-  height: number;
+    width: number;
+    height: number;
 };
 
 type Point2D = {
-  x: number;
-  y: number;
+    x: number;
+    y: number;
 };
 
-function createImage(image: any, {
-    width,
-    height
-}: Size, channels: number, data?: Uint8Array | Uint8ClampedArray) {
+function createImage(image: any, {width, height}: Size, channels: number, data?: Uint8Array | Uint8ClampedArray) {
     if (!data) {
         data = new Uint8Array(width * height * channels);
     } else if (data instanceof Uint8ClampedArray) {
@@ -29,20 +26,24 @@ function createImage(image: any, {
     return image;
 }
 
-function resizeImage(image: any, {
-    width,
-    height
-}: Size, channels: number) {
+function resizeImage(image: any, {width, height}: Size, channels: number) {
     if (width === image.width && height === image.height) {
         return;
     }
 
     const newImage = createImage({}, {width, height}, channels);
 
-    copyImage(image, newImage, {x: 0, y: 0}, {x: 0, y: 0}, {
-        width: Math.min(image.width, width),
-        height: Math.min(image.height, height)
-    }, channels);
+    copyImage(
+        image,
+        newImage,
+        {x: 0, y: 0},
+        {x: 0, y: 0},
+        {
+            width: Math.min(image.width, width),
+            height: Math.min(image.height, height)
+        },
+        channels
+    );
 
     image.width = width;
     image.height = height;
@@ -54,17 +55,21 @@ function copyImage(srcImg: any, dstImg: any, srcPt: Point2D, dstPt: Point2D, siz
         return dstImg;
     }
 
-    if (size.width > srcImg.width ||
+    if (
+        size.width > srcImg.width ||
         size.height > srcImg.height ||
         srcPt.x > srcImg.width - size.width ||
-        srcPt.y > srcImg.height - size.height) {
+        srcPt.y > srcImg.height - size.height
+    ) {
         throw new RangeError('out of range source coordinates for image copy');
     }
 
-    if (size.width > dstImg.width ||
+    if (
+        size.width > dstImg.width ||
         size.height > dstImg.height ||
         dstPt.x > dstImg.width - size.width ||
-        dstPt.y > dstImg.height - size.height) {
+        dstPt.y > dstImg.height - size.height
+    ) {
         throw new RangeError('out of range destination coordinates for image copy');
     }
 

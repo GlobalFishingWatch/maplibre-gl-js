@@ -10,7 +10,7 @@ import type {ControlPosition, IControl} from './control';
  *
  * @implements {IControl}
  * @private
-**/
+ **/
 
 class LogoControl implements IControl {
     _map: Map;
@@ -83,7 +83,6 @@ class LogoControl implements IControl {
             }
         }
     }
-
 }
 
 export default LogoControl;

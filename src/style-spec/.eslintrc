@@ -1,5 +1,5 @@
 {
-  "rules": {
-    "flowtype/require-valid-file-annotation": [0]
-  }
+    "rules": {
+        "flowtype/require-valid-file-annotation": [0]
+    }
 }

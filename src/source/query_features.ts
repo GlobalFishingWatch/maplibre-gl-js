@@ -49,7 +49,6 @@ export function queryRenderedFeatures(
     },
     transform: Transform
 ) {
-
     const has3DLayer = queryIncludes3DLayer(params && params.layers, styleLayers, sourceCache.id);
     const maxPitchScaleFactor = transform.maxPitchScaleFactor();
     const tilesIn = sourceCache.tilesIn(queryGeometry, maxPitchScaleFactor, has3DLayer);
@@ -69,7 +68,8 @@ export function queryRenderedFeatures(
                 params,
                 transform,
                 maxPitchScaleFactor,
-                getPixelPosMatrix(sourceCache.transform, tileIn.tileID))
+                getPixelPosMatrix(sourceCache.transform, tileIn.tileID)
+            )
         });
     }
 
@@ -77,7 +77,7 @@ export function queryRenderedFeatures(
 
     // Merge state from SourceCache into the results
     for (const layerID in result) {
-        result[layerID].forEach((featureWrapper) => {
+        result[layerID].forEach(featureWrapper => {
             const feature = featureWrapper.feature;
             const state = sourceCache.getFeatureState(feature.layer['source-layer'], feature.id);
             feature.source = feature.layer.source;
@@ -90,19 +90,21 @@ export function queryRenderedFeatures(
     return result;
 }
 
-export function queryRenderedSymbols(styleLayers: {[_: string]: StyleLayer},
-                            serializedLayers: {[_: string]: StyleLayer},
-                            sourceCaches: {[_: string]: SourceCache},
-                            queryGeometry: Array<Point>,
-                            params: {
-                              filter: FilterSpecification;
-                              layers: Array<string>;
-                              availableImages: Array<string>;
-                            },
-                            collisionIndex: CollisionIndex,
-                            retainedQueryData: {
-                              [_: number]: RetainedQueryData;
-                            }) {
+export function queryRenderedSymbols(
+    styleLayers: {[_: string]: StyleLayer},
+    serializedLayers: {[_: string]: StyleLayer},
+    sourceCaches: {[_: string]: SourceCache},
+    queryGeometry: Array<Point>,
+    params: {
+        filter: FilterSpecification;
+        layers: Array<string>;
+        availableImages: Array<string>;
+    },
+    collisionIndex: CollisionIndex,
+    retainedQueryData: {
+        [_: number]: RetainedQueryData;
+    }
+) {
     const result = {};
     const renderedSymbols = collisionIndex.queryRenderedSymbols(queryGeometry);
     const bucketQueryData = [];
@@ -113,17 +115,18 @@ export function queryRenderedSymbols(styleLayers: {[_: string]: StyleLayer},
 
     for (const queryData of bucketQueryData) {
         const bucketSymbols = queryData.featureIndex.lookupSymbolFeatures(
-                renderedSymbols[queryData.bucketInstanceId],
-                serializedLayers,
-                queryData.bucketIndex,
-                queryData.sourceLayerIndex,
-                params.filter,
-                params.layers,
-                params.availableImages,
-                styleLayers);
+            renderedSymbols[queryData.bucketInstanceId],
+            serializedLayers,
+            queryData.bucketIndex,
+            queryData.sourceLayerIndex,
+            params.filter,
+            params.layers,
+            params.availableImages,
+            styleLayers
+        );
 
         for (const layerID in bucketSymbols) {
-            const resultFeatures = result[layerID] = result[layerID] || [];
+            const resultFeatures = (result[layerID] = result[layerID] || []);
             const layerSymbols = bucketSymbols[layerID];
             layerSymbols.sort((a, b) => {
                 // Match topDownFeatureComparator from FeatureIndex, but using
@@ -153,7 +156,7 @@ export function queryRenderedSymbols(styleLayers: {[_: string]: StyleLayer},
 
     // Merge state from SourceCache into the results
     for (const layerName in result) {
-        result[layerName].forEach((featureWrapper) => {
+        result[layerName].forEach(featureWrapper => {
             const feature = featureWrapper.feature;
             const layer = styleLayers[layerName];
             const sourceCache = sourceCaches[layer.source];
@@ -168,12 +171,15 @@ export function queryRenderedSymbols(styleLayers: {[_: string]: StyleLayer},
     return result;
 }
 
-export function querySourceFeatures(sourceCache: SourceCache, params: {
-    sourceLayer: string;
-    filter: Array<any>;
-    validate?: boolean;
-}) {
-    const tiles = sourceCache.getRenderableIds().map((id) => {
+export function querySourceFeatures(
+    sourceCache: SourceCache,
+    params: {
+        sourceLayer: string;
+        filter: Array<any>;
+        validate?: boolean;
+    }
+) {
+    const tiles = sourceCache.getRenderableIds().map(id => {
         return sourceCache.getTileByID(id);
     });
 
@@ -195,7 +201,12 @@ export function querySourceFeatures(sourceCache: SourceCache, params: {
 function sortTilesIn(a, b) {
     const idA = a.tileID;
     const idB = b.tileID;
-    return (idA.overscaledZ - idB.overscaledZ) || (idA.canonical.y - idB.canonical.y) || (idA.wrap - idB.wrap) || (idA.canonical.x - idB.canonical.x);
+    return (
+        idA.overscaledZ - idB.overscaledZ ||
+        idA.canonical.y - idB.canonical.y ||
+        idA.wrap - idB.wrap ||
+        idA.canonical.x - idB.canonical.x
+    );
 }
 
 function mergeRenderedFeatureLayers(tiles) {
@@ -206,11 +217,11 @@ function mergeRenderedFeatureLayers(tiles) {
     for (const tile of tiles) {
         const queryResults = tile.queryResults;
         const wrappedID = tile.wrappedTileID;
-        const wrappedIDLayers = wrappedIDLayerMap[wrappedID] = wrappedIDLayerMap[wrappedID] || {};
+        const wrappedIDLayers = (wrappedIDLayerMap[wrappedID] = wrappedIDLayerMap[wrappedID] || {});
         for (const layerID in queryResults) {
             const tileFeatures = queryResults[layerID];
-            const wrappedIDFeatures = wrappedIDLayers[layerID] = wrappedIDLayers[layerID] || {};
-            const resultFeatures = result[layerID] = result[layerID] || [];
+            const wrappedIDFeatures = (wrappedIDLayers[layerID] = wrappedIDLayers[layerID] || {});
+            const resultFeatures = (result[layerID] = result[layerID] || []);
             for (const tileFeature of tileFeatures) {
                 if (!wrappedIDFeatures[tileFeature.featureIndex]) {
                     wrappedIDFeatures[tileFeature.featureIndex] = true;

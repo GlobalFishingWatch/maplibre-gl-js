@@ -69,7 +69,6 @@ describe('dbclick_zoom', () => {
             map.remove();
             done();
         });
-
     });
 
     test('DoubleClickZoomHandler does not zoom on double tap if touchstart events are > 500ms apart', done => {
@@ -84,7 +83,6 @@ describe('dbclick_zoom', () => {
             map.remove();
             done();
         });
-
     });
 
     test('DoubleClickZoomHandler does not zoom on double tap if touchstart events are in different locations', done => {
@@ -114,7 +112,6 @@ describe('dbclick_zoom', () => {
             map.remove();
             done();
         });
-
     });
 
     test('DoubleClickZoomHandler zooms on the second touchend event of a double tap', () => {
@@ -148,7 +145,6 @@ describe('dbclick_zoom', () => {
         map._renderTaskQueue.run();
 
         expect(zoom).toHaveBeenCalled();
-
     });
 
     test('DoubleClickZoomHandler does not zoom on double tap if second touchend is >300ms after first touchstart', done => {

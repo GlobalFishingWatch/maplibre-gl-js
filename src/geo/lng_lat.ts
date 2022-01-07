@@ -2,10 +2,10 @@ import {wrap} from '../util/util';
 import LngLatBounds from './lng_lat_bounds';
 
 /*
-* Approximate radius of the earth in meters.
-* Uses the WGS-84 approximation. The radius at the equator is ~6378137 and at the poles is ~6356752. https://en.wikipedia.org/wiki/World_Geodetic_System#WGS84
-* 6371008.8 is one published "average radius" see https://en.wikipedia.org/wiki/Earth_radius#Mean_radius, or ftp://athena.fsv.cvut.cz/ZFG/grs80-Moritz.pdf p.4
-*/
+ * Approximate radius of the earth in meters.
+ * Uses the WGS-84 approximation. The radius at the equator is ~6378137 and at the poles is ~6356752. https://en.wikipedia.org/wiki/World_Geodetic_System#WGS84
+ * 6371008.8 is one published "average radius" see https://en.wikipedia.org/wiki/Earth_radius#Mean_radius, or ftp://athena.fsv.cvut.cz/ZFG/grs80-Moritz.pdf p.4
+ */
 export const earthRadius = 6371008.8;
 
 /**
@@ -95,7 +95,8 @@ class LngLat {
         const rad = Math.PI / 180;
         const lat1 = this.lat * rad;
         const lat2 = lngLat.lat * rad;
-        const a = Math.sin(lat1) * Math.sin(lat2) + Math.cos(lat1) * Math.cos(lat2) * Math.cos((lngLat.lng - this.lng) * rad);
+        const a =
+            Math.sin(lat1) * Math.sin(lat2) + Math.cos(lat1) * Math.cos(lat2) * Math.cos((lngLat.lng - this.lng) * rad);
 
         const maxMeters = earthRadius * Math.acos(Math.min(a, 1));
         return maxMeters;
@@ -112,11 +113,13 @@ class LngLat {
      */
     toBounds(radius: number = 0) {
         const earthCircumferenceInMetersAtEquator = 40075017;
-        const latAccuracy = 360 * radius / earthCircumferenceInMetersAtEquator,
+        const latAccuracy = (360 * radius) / earthCircumferenceInMetersAtEquator,
             lngAccuracy = latAccuracy / Math.cos((Math.PI / 180) * this.lat);
 
-        return new LngLatBounds(new LngLat(this.lng - lngAccuracy, this.lat - latAccuracy),
-            new LngLat(this.lng + lngAccuracy, this.lat + latAccuracy));
+        return new LngLatBounds(
+            new LngLat(this.lng - lngAccuracy, this.lat - latAccuracy),
+            new LngLat(this.lng + lngAccuracy, this.lat + latAccuracy)
+        );
     }
 
     /**
@@ -146,7 +149,9 @@ class LngLat {
                 Number(input.lat)
             );
         }
-        throw new Error('`LngLatLike` argument must be specified as a LngLat instance, an object {lng: <lng>, lat: <lat>}, an object {lon: <lng>, lat: <lat>}, or an array of [<lng>, <lat>]');
+        throw new Error(
+            '`LngLatLike` argument must be specified as a LngLat instance, an object {lng: <lng>, lat: <lat>}, an object {lon: <lng>, lat: <lat>}, or an array of [<lng>, <lat>]'
+        );
     }
 }
 
@@ -160,12 +165,16 @@ class LngLat {
  * var v2 = [-122.420679, 37.772537];
  * var v3 = {lon: -122.420679, lat: 37.772537};
  */
-export type LngLatLike = LngLat | {
-  lng: number;
-  lat: number;
-} | {
-  lon: number;
-  lat: number;
-} | [number, number];
+export type LngLatLike =
+    | LngLat
+    | {
+          lng: number;
+          lat: number;
+      }
+    | {
+          lon: number;
+          lat: number;
+      }
+    | [number, number];
 
 export default LngLat;

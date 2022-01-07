@@ -9,7 +9,6 @@ import type TapDragZoomHandler from '../tap_drag_zoom';
  * hold the finger down and drag up or down to zoom in or out.
  */
 export default class TouchZoomRotateHandler {
-
     _el: HTMLElement;
     _touchZoom: TouchZoomHandler;
     _touchRotate: TouchRotateHandler;
@@ -19,8 +18,13 @@ export default class TouchZoomRotateHandler {
 
     /**
      * @private
-    */
-    constructor(el: HTMLElement, touchZoom: TouchZoomHandler, touchRotate: TouchRotateHandler, tapDragZoom: TapDragZoomHandler) {
+     */
+    constructor(
+        el: HTMLElement,
+        touchZoom: TouchZoomHandler,
+        touchRotate: TouchRotateHandler,
+        tapDragZoom: TapDragZoomHandler
+    ) {
         this._el = el;
         this._touchZoom = touchZoom;
         this._touchRotate = touchRotate;
@@ -40,9 +44,11 @@ export default class TouchZoomRotateHandler {
      * @example
      *   map.touchZoomRotate.enable({ around: 'center' });
      */
-    enable(options?: {
-      around?: 'center';
-    } | null) {
+    enable(
+        options?: {
+            around?: 'center';
+        } | null
+    ) {
         this._touchZoom.enable(options);
         if (!this._rotationDisabled) this._touchRotate.enable(options);
         this._tapDragZoom.enable();
@@ -68,9 +74,11 @@ export default class TouchZoomRotateHandler {
      * @returns {boolean} `true` if the "pinch to rotate and zoom" interaction is enabled.
      */
     isEnabled() {
-        return this._touchZoom.isEnabled() &&
+        return (
+            this._touchZoom.isEnabled() &&
             (this._rotationDisabled || this._touchRotate.isEnabled()) &&
-            this._tapDragZoom.isEnabled();
+            this._tapDragZoom.isEnabled()
+        );
     }
 
     /**

@@ -65,14 +65,14 @@ import type {RGBAImage} from '../util/image';
 export type RenderPass = 'offscreen' | 'opaque' | 'translucent';
 
 type PainterOptions = {
-  showOverdrawInspector: boolean;
-  showTileBoundaries: boolean;
-  showPadding: boolean;
-  rotating: boolean;
-  zooming: boolean;
-  moving: boolean;
-  gpuTiming: boolean;
-  fadeDuration: number;
+    showOverdrawInspector: boolean;
+    showTileBoundaries: boolean;
+    showPadding: boolean;
+    rotating: boolean;
+    zooming: boolean;
+    moving: boolean;
+    gpuTiming: boolean;
+    fadeDuration: number;
 };
 
 /**
@@ -85,7 +85,7 @@ class Painter {
     context: Context;
     transform: Transform;
     _tileTextures: {
-      [_: number]: Array<Texture>;
+        [_: number]: Array<Texture>;
     };
     numSublayers: number;
     depthEpsilon: number;
@@ -206,14 +206,18 @@ class Painter {
         quadTriangleIndices.emplaceBack(2, 1, 3);
         this.quadTriangleIndexBuffer = context.createIndexBuffer(quadTriangleIndices);
 
-        this.emptyTexture = new Texture(context, {
-            width: 1,
-            height: 1,
-            data: new Uint8Array([0, 0, 0, 0])
-        } as RGBAImage, context.gl.RGBA);
+        this.emptyTexture = new Texture(
+            context,
+            {
+                width: 1,
+                height: 1,
+                data: new Uint8Array([0, 0, 0, 0])
+            } as RGBAImage,
+            context.gl.RGBA
+        );
 
         const gl = this.context.gl;
-        this.stencilClearMode = new StencilMode({func: gl.ALWAYS, mask: 0}, 0x0, 0xFF, gl.ZERO, gl.ZERO, gl.ZERO);
+        this.stencilClearMode = new StencilMode({func: gl.ALWAYS, mask: 0}, 0x0, 0xff, gl.ZERO, gl.ZERO, gl.ZERO);
     }
 
     /*
@@ -236,11 +240,19 @@ class Painter {
         mat4.ortho(matrix, 0, this.width, this.height, 0, 0, 1);
         mat4.scale(matrix, matrix, [gl.drawingBufferWidth, gl.drawingBufferHeight, 0]);
 
-        this.useProgram('clippingMask').draw(context, gl.TRIANGLES,
-            DepthMode.disabled, this.stencilClearMode, ColorMode.disabled, CullFaceMode.disabled,
+        this.useProgram('clippingMask').draw(
+            context,
+            gl.TRIANGLES,
+            DepthMode.disabled,
+            this.stencilClearMode,
+            ColorMode.disabled,
+            CullFaceMode.disabled,
             clippingMaskUniformValues(matrix),
-            '$clipping', this.viewportBuffer,
-            this.quadTriangleIndexBuffer, this.viewportSegments);
+            '$clipping',
+            this.viewportBuffer,
+            this.quadTriangleIndexBuffer,
+            this.viewportSegments
+        );
     }
 
     _renderTileClippingMasks(layer: StyleLayer, tileIDs: Array<OverscaledTileID>) {
@@ -264,14 +276,22 @@ class Painter {
         this._tileClippingMaskIDs = {};
 
         for (const tileID of tileIDs) {
-            const id = this._tileClippingMaskIDs[tileID.key] = this.nextStencilID++;
+            const id = (this._tileClippingMaskIDs[tileID.key] = this.nextStencilID++);
 
-            program.draw(context, gl.TRIANGLES, DepthMode.disabled,
+            program.draw(
+                context,
+                gl.TRIANGLES,
+                DepthMode.disabled,
                 // Tests will always pass, and ref value will be written to stencil buffer.
-                new StencilMode({func: gl.ALWAYS, mask: 0}, id, 0xFF, gl.KEEP, gl.KEEP, gl.REPLACE),
-                ColorMode.disabled, CullFaceMode.disabled, clippingMaskUniformValues(tileID.posMatrix),
-                '$clipping', this.tileExtentBuffer,
-                this.quadTriangleIndexBuffer, this.tileExtentSegments);
+                new StencilMode({func: gl.ALWAYS, mask: 0}, id, 0xff, gl.KEEP, gl.KEEP, gl.REPLACE),
+                ColorMode.disabled,
+                CullFaceMode.disabled,
+                clippingMaskUniformValues(tileID.posMatrix),
+                '$clipping',
+                this.tileExtentBuffer,
+                this.quadTriangleIndexBuffer,
+                this.tileExtentSegments
+            );
         }
     }
 
@@ -284,12 +304,19 @@ class Painter {
 
         const id = this.nextStencilID++;
         const gl = this.context.gl;
-        return new StencilMode({func: gl.NOTEQUAL, mask: 0xFF}, id, 0xFF, gl.KEEP, gl.KEEP, gl.REPLACE);
+        return new StencilMode({func: gl.NOTEQUAL, mask: 0xff}, id, 0xff, gl.KEEP, gl.KEEP, gl.REPLACE);
     }
 
     stencilModeForClipping(tileID: OverscaledTileID): StencilMode {
         const gl = this.context.gl;
-        return new StencilMode({func: gl.EQUAL, mask: 0xFF}, this._tileClippingMaskIDs[tileID.key], 0x00, gl.KEEP, gl.KEEP, gl.REPLACE);
+        return new StencilMode(
+            {func: gl.EQUAL, mask: 0xff},
+            this._tileClippingMaskIDs[tileID.key],
+            0x00,
+            gl.KEEP,
+            gl.KEEP,
+            gl.REPLACE
+        );
     }
 
     /*
@@ -302,9 +329,12 @@ class Painter {
      *
      * Returns [StencilMode for tile overscaleZ map, sortedCoords].
      */
-    stencilConfigForOverlap(tileIDs: Array<OverscaledTileID>): [{
-      [_: number]: Readonly<StencilMode>;
-    }, Array<OverscaledTileID>] {
+    stencilConfigForOverlap(tileIDs: Array<OverscaledTileID>): [
+        {
+            [_: number]: Readonly<StencilMode>;
+        },
+        Array<OverscaledTileID>
+    ] {
         const gl = this.context.gl;
         const coords = tileIDs.sort((a, b) => b.overscaledZ - a.overscaledZ);
         const minTileZ = coords[coords.length - 1].overscaledZ;
@@ -316,7 +346,14 @@ class Painter {
             }
             const zToStencilMode = {};
             for (let i = 0; i < stencilValues; i++) {
-                zToStencilMode[i + minTileZ] = new StencilMode({func: gl.GEQUAL, mask: 0xFF}, i + this.nextStencilID, 0xFF, gl.KEEP, gl.KEEP, gl.REPLACE);
+                zToStencilMode[i + minTileZ] = new StencilMode(
+                    {func: gl.GEQUAL, mask: 0xff},
+                    i + this.nextStencilID,
+                    0xff,
+                    gl.KEEP,
+                    gl.KEEP,
+                    gl.REPLACE
+                );
             }
             this.nextStencilID += stencilValues;
             return [zToStencilMode, coords];
@@ -421,7 +458,7 @@ class Painter {
         this.clearStencil();
 
         this._showOverdrawInspector = options.showOverdrawInspector;
-        this.depthRangeFor3D = [0, 1 - ((style._order.length + 2) * this.numSublayers * this.depthEpsilon)];
+        this.depthRangeFor3D = [0, 1 - (style._order.length + 2) * this.numSublayers * this.depthEpsilon];
 
         // Opaque pass ===============================================
         // Draw opaque layers top-to-bottom first.
@@ -458,12 +495,12 @@ class Painter {
             let selectedSource;
             let sourceCache;
             const layers = Object.values(this.style._layers);
-            layers.forEach((layer) => {
+            layers.forEach(layer => {
                 if (layer.source && !layer.isHidden(this.transform.zoom)) {
                     if (layer.source !== (sourceCache && sourceCache.id)) {
                         sourceCache = this.style.sourceCaches[layer.source];
                     }
-                    if (!selectedSource || (selectedSource.getSource().maxzoom < sourceCache.getSource().maxzoom)) {
+                    if (!selectedSource || selectedSource.getSource().maxzoom < sourceCache.getSource().maxzoom) {
                         selectedSource = sourceCache;
                     }
                 }
@@ -541,20 +578,27 @@ class Painter {
      * @returns {mat4} matrix
      * @private
      */
-    translatePosMatrix(matrix: mat4, tile: Tile, translate: [number, number], translateAnchor: 'map' | 'viewport', inViewportPixelUnitsUnits?: boolean) {
+    translatePosMatrix(
+        matrix: mat4,
+        tile: Tile,
+        translate: [number, number],
+        translateAnchor: 'map' | 'viewport',
+        inViewportPixelUnitsUnits?: boolean
+    ) {
         if (!translate[0] && !translate[1]) return matrix;
 
-        const angle = inViewportPixelUnitsUnits ?
-            (translateAnchor === 'map' ? this.transform.angle : 0) :
-            (translateAnchor === 'viewport' ? -this.transform.angle : 0);
+        const angle = inViewportPixelUnitsUnits
+            ? translateAnchor === 'map'
+                ? this.transform.angle
+                : 0
+            : translateAnchor === 'viewport'
+            ? -this.transform.angle
+            : 0;
 
         if (angle) {
             const sinA = Math.sin(angle);
             const cosA = Math.cos(angle);
-            translate = [
-                translate[0] * cosA - translate[1] * sinA,
-                translate[0] * sinA + translate[1] * cosA
-            ];
+            translate = [translate[0] * cosA - translate[1] * sinA, translate[0] * sinA + translate[1] * cosA];
         }
 
         const translation = vec3.fromValues(
@@ -598,9 +642,18 @@ class Painter {
 
     useProgram(name: string, programConfiguration?: ProgramConfiguration | null): Program<any> {
         this.cache = this.cache || {};
-        const key = `${name}${programConfiguration ? programConfiguration.cacheKey : ''}${this._showOverdrawInspector ? '/overdraw' : ''}`;
+        const key = `${name}${programConfiguration ? programConfiguration.cacheKey : ''}${
+            this._showOverdrawInspector ? '/overdraw' : ''
+        }`;
         if (!this.cache[key]) {
-            this.cache[key] = new Program(this.context, name, shaders[name], programConfiguration, programUniforms[name], this._showOverdrawInspector);
+            this.cache[key] = new Program(
+                this.context,
+                name,
+                shaders[name],
+                programConfiguration,
+                programUniforms[name],
+                this._showOverdrawInspector
+            );
         }
         return this.cache[key];
     }

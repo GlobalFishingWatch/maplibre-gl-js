@@ -5,7 +5,6 @@ import type {MouseRotateHandler, MousePitchHandler} from '../mouse';
  * dragging the cursor while holding the right mouse button or `ctrl` key.
  */
 export default class DragRotateHandler {
-
     _mouseRotate: MouseRotateHandler;
     _mousePitch: MousePitchHandler;
     _pitchWithRotate: boolean;
@@ -17,9 +16,13 @@ export default class DragRotateHandler {
      * @param {bool} [options.pitchWithRotate=true] Control the map pitch in addition to the bearing
      * @private
      */
-    constructor(options: {
-      pitchWithRotate: boolean;
-    }, mouseRotate: MouseRotateHandler, mousePitch: MousePitchHandler) {
+    constructor(
+        options: {
+            pitchWithRotate: boolean;
+        },
+        mouseRotate: MouseRotateHandler,
+        mousePitch: MousePitchHandler
+    ) {
         this._pitchWithRotate = options.pitchWithRotate;
         this._mouseRotate = mouseRotate;
         this._mousePitch = mousePitch;

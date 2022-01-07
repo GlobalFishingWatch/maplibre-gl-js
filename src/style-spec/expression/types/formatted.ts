@@ -8,7 +8,13 @@ export class FormattedSection {
     fontStack: string | null;
     textColor: Color | null;
 
-    constructor(text: string, image: ResolvedImage | null, scale: number | null, fontStack: string | null, textColor: Color | null) {
+    constructor(
+        text: string,
+        image: ResolvedImage | null,
+        scale: number | null,
+        fontStack: string | null,
+        textColor: Color | null
+    ) {
         this.text = text;
         this.image = image;
         this.scale = scale;
@@ -30,8 +36,9 @@ export default class Formatted {
 
     isEmpty(): boolean {
         if (this.sections.length === 0) return true;
-        return !this.sections.some(section => section.text.length !== 0 ||
-                                             (section.image && section.image.name.length !== 0));
+        return !this.sections.some(
+            section => section.text.length !== 0 || (section.image && section.image.name.length !== 0)
+        );
     }
 
     static factory(text: Formatted | string): Formatted {

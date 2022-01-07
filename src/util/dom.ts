@@ -3,7 +3,8 @@ import Point from './point';
 import assert from 'assert';
 
 export default class DOM {
-    private static readonly docStyle = typeof window !== 'undefined' && window.document && window.document.documentElement.style;
+    private static readonly docStyle =
+        typeof window !== 'undefined' && window.document && window.document.documentElement.style;
 
     private static userSelect: string;
 
@@ -21,7 +22,11 @@ export default class DOM {
         return props[0];
     }
 
-    public static create<K extends keyof HTMLElementTagNameMap>(tagName: K, className?: string, container?: HTMLElement): HTMLElementTagNameMap[K] {
+    public static create<K extends keyof HTMLElementTagNameMap>(
+        tagName: K,
+        className?: string,
+        container?: HTMLElement
+    ): HTMLElementTagNameMap[K] {
         const el = window.document.createElement(tagName);
         if (className !== undefined) el.className = className;
         if (container) container.appendChild(el);
@@ -50,10 +55,15 @@ export default class DOM {
         el.style[DOM.transformProp] = value;
     }
 
-    public static addEventListener(target: any, type: any, callback: any, options: {
-        passive?: boolean;
-        capture?: boolean;
-      } = {}) {
+    public static addEventListener(
+        target: any,
+        type: any,
+        callback: any,
+        options: {
+            passive?: boolean;
+            capture?: boolean;
+        } = {}
+    ) {
         if ('passive' in options) {
             target.addEventListener(type, callback, options);
         } else {
@@ -61,10 +71,15 @@ export default class DOM {
         }
     }
 
-    public static removeEventListener(target: any, type: any, callback: any, options: {
-        passive?: boolean;
-        capture?: boolean;
-      } = {}) {
+    public static removeEventListener(
+        target: any,
+        type: any,
+        callback: any,
+        options: {
+            passive?: boolean;
+            capture?: boolean;
+        } = {}
+    ) {
         if ('passive' in options) {
             target.removeEventListener(type, callback, options);
         } else {
@@ -88,20 +103,16 @@ export default class DOM {
 
     public static mousePos(el: HTMLElement, e: MouseEvent | Touch) {
         const rect = el.getBoundingClientRect();
-        return new Point(
-            e.clientX - rect.left - el.clientLeft,
-            e.clientY - rect.top - el.clientTop
-        );
+        return new Point(e.clientX - rect.left - el.clientLeft, e.clientY - rect.top - el.clientTop);
     }
 
     public static touchPos(el: HTMLElement, touches: TouchList) {
         const rect = el.getBoundingClientRect();
         const points: Point[] = [];
         for (let i = 0; i < touches.length; i++) {
-            points.push(new Point(
-                touches[i].clientX - rect.left - el.clientLeft,
-                touches[i].clientY - rect.top - el.clientTop
-            ));
+            points.push(
+                new Point(touches[i].clientX - rect.left - el.clientLeft, touches[i].clientY - rect.top - el.clientTop)
+            );
         }
         return points;
     }

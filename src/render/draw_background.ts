@@ -1,10 +1,7 @@
 import StencilMode from '../gl/stencil_mode';
 import DepthMode from '../gl/depth_mode';
 import CullFaceMode from '../gl/cull_face_mode';
-import {
-    backgroundUniformValues,
-    backgroundPatternUniformValues
-} from './program/background_program';
+import {backgroundUniformValues, backgroundPatternUniformValues} from './program/background_program';
 
 import type Painter from './painter';
 import type SourceCache from '../source/source_cache';
@@ -25,7 +22,8 @@ function drawBackground(painter: Painter, sourceCache: SourceCache, layer: Backg
     const image = layer.paint.get('background-pattern');
     if (painter.isPatternMissing(image)) return;
 
-    const pass = (!image && color.a === 1 && opacity === 1 && painter.opaquePassEnabledForLayer()) ? 'opaque' : 'translucent';
+    const pass =
+        !image && color.a === 1 && opacity === 1 && painter.opaquePassEnabledForLayer() ? 'opaque' : 'translucent';
     if (painter.renderPass !== pass) return;
 
     const stencilMode = StencilMode.disabled;
@@ -44,12 +42,22 @@ function drawBackground(painter: Painter, sourceCache: SourceCache, layer: Backg
     const crossfade = layer.getCrossfadeParameters();
     for (const tileID of tileIDs) {
         const matrix = painter.transform.calculatePosMatrix(tileID.toUnwrapped());
-        const uniformValues = image ?
-            backgroundPatternUniformValues(matrix, opacity, painter, image, {tileID, tileSize}, crossfade) :
-            backgroundUniformValues(matrix, opacity, color);
+        const uniformValues = image
+            ? backgroundPatternUniformValues(matrix, opacity, painter, image, {tileID, tileSize}, crossfade)
+            : backgroundUniformValues(matrix, opacity, color);
 
-        program.draw(context, gl.TRIANGLES, depthMode, stencilMode, colorMode, CullFaceMode.disabled,
-            uniformValues, layer.id, painter.tileExtentBuffer,
-            painter.quadTriangleIndexBuffer, painter.tileExtentSegments);
+        program.draw(
+            context,
+            gl.TRIANGLES,
+            depthMode,
+            stencilMode,
+            colorMode,
+            CullFaceMode.disabled,
+            uniformValues,
+            layer.id,
+            painter.tileExtentBuffer,
+            painter.quadTriangleIndexBuffer,
+            painter.tileExtentSegments
+        );
     }
 }

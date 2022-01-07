@@ -1,12 +1,4 @@
-import {
-    NumberType,
-    ValueType,
-    FormattedType,
-    array,
-    StringType,
-    ColorType,
-    ResolvedImageType,
-} from '../types';
+import {NumberType, ValueType, FormattedType, array, StringType, ColorType, ResolvedImageType} from '../types';
 import Formatted, {FormattedSection} from '../types/formatted';
 import {toString, typeOf} from '../values';
 
@@ -16,12 +8,12 @@ import type ParsingContext from '../parsing_context';
 import type {Type} from '../types';
 
 type FormattedSectionExpression = {
-  // Content of a section may be Image expression or other
-  // type of expression that is coercable to 'string'.
-  content: Expression;
-  scale: Expression | null;
-  font: Expression | null;
-  textColor: Expression | null;
+    // Content of a section may be Image expression or other
+    // type of expression that is coercable to 'string'.
+    content: Expression;
+    scale: Expression | null;
+    font: Expression | null;
+    textColor: Expression | null;
 };
 
 export default class FormatExpression implements Expression {
@@ -39,14 +31,14 @@ export default class FormatExpression implements Expression {
         }
 
         const firstArg = args[1];
-        if (!Array.isArray(firstArg) && typeof firstArg === 'object')  {
+        if (!Array.isArray(firstArg) && typeof firstArg === 'object') {
             return context.error('First argument must be an image or text section.') as null;
         }
 
         const sections: Array<FormattedSectionExpression> = [];
         let nextTokenMayBeObject = false;
         for (let i = 1; i <= args.length - 1; ++i) {
-            const arg = (args[i] as any);
+            const arg = args[i] as any;
 
             if (nextTokenMayBeObject && typeof arg === 'object' && !Array.isArray(arg)) {
                 nextTokenMayBeObject = false;
@@ -79,7 +71,7 @@ export default class FormatExpression implements Expression {
 
                 const kind = content.type.kind;
                 if (kind !== 'string' && kind !== 'value' && kind !== 'null' && kind !== 'resolvedImage')
-                    return context.error('Formatted text type must be \'string\', \'value\', \'image\' or \'null\'.') as null;
+                    return context.error("Formatted text type must be 'string', 'value', 'image' or 'null'.") as null;
 
                 nextTokenMayBeObject = true;
                 sections.push({content, scale: null, font: null, textColor: null});
@@ -97,11 +89,11 @@ export default class FormatExpression implements Expression {
             }
 
             return new FormattedSection(
-                    toString(evaluatedContent),
-                    null,
-                    section.scale ? section.scale.evaluate(ctx) : null,
-                    section.font ? section.font.evaluate(ctx).join(',') : null,
-                    section.textColor ? section.textColor.evaluate(ctx) : null
+                toString(evaluatedContent),
+                null,
+                section.scale ? section.scale.evaluate(ctx) : null,
+                section.font ? section.font.evaluate(ctx).join(',') : null,
+                section.textColor ? section.textColor.evaluate(ctx) : null
             );
         };
 

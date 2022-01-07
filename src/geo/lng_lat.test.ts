@@ -40,7 +40,7 @@ describe('LngLat', () => {
     });
 
     test('#distanceTo', () => {
-        const newYork = new LngLat(-74.0060, 40.7128);
+        const newYork = new LngLat(-74.006, 40.7128);
         const losAngeles = new LngLat(-118.2437, 34.0522);
         const d = newYork.distanceTo(losAngeles); // 3935751.690893987, "true distance" is 3966km
         expect(d > 3935750).toBeTruthy();
@@ -48,7 +48,7 @@ describe('LngLat', () => {
     });
 
     test('#distanceTo to pole', () => {
-        const newYork = new LngLat(-74.0060, 40.7128);
+        const newYork = new LngLat(-74.006, 40.7128);
         const northPole = new LngLat(-135, 90);
         const d = newYork.distanceTo(northPole); // 5480494.158486183 , "true distance" is 5499km
         expect(d > 5480493).toBeTruthy();
@@ -56,7 +56,7 @@ describe('LngLat', () => {
     });
 
     test('#distanceTo to Null Island', () => {
-        const newYork = new LngLat(-74.0060, 40.7128);
+        const newYork = new LngLat(-74.006, 40.7128);
         const nullIsland = new LngLat(0, 0);
         const d = newYork.distanceTo(nullIsland); // 8667080.125666846 , "true distance" is 8661km
         expect(d > 8667079).toBeTruthy();
@@ -64,12 +64,17 @@ describe('LngLat', () => {
     });
 
     test('#toBounds', () => {
-        expect(new LngLat(0, 0).toBounds(10).toArray()).toEqual(
-            [[-0.00008983152770714982, -0.00008983152770714982], [0.00008983152770714982, 0.00008983152770714982]]
-        );
-        expect(new LngLat(-73.9749, 40.7736).toBounds(10).toArray()).toEqual(
-            [[-73.97501862141328, 40.77351016847229], [-73.97478137858673, 40.77368983152771]]
-        );
-        expect(new LngLat(-73.9749, 40.7736).toBounds().toArray()).toEqual([[-73.9749, 40.7736], [-73.9749, 40.7736]]);
+        expect(new LngLat(0, 0).toBounds(10).toArray()).toEqual([
+            [-0.00008983152770714982, -0.00008983152770714982],
+            [0.00008983152770714982, 0.00008983152770714982]
+        ]);
+        expect(new LngLat(-73.9749, 40.7736).toBounds(10).toArray()).toEqual([
+            [-73.97501862141328, 40.77351016847229],
+            [-73.97478137858673, 40.77368983152771]
+        ]);
+        expect(new LngLat(-73.9749, 40.7736).toBounds().toArray()).toEqual([
+            [-73.9749, 40.7736],
+            [-73.9749, 40.7736]
+        ]);
     });
 });

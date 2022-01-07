@@ -1,4 +1,3 @@
-
 import ValidationError from '../error/validation_error';
 import getType from '../util/get_type';
 import {parseCSSColor} from 'csscolorparser';

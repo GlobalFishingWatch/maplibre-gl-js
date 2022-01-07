@@ -6,4 +6,11 @@ import type HillshadeStyleLayer from './hillshade_style_layer';
 import type LineStyleLayer from './line_style_layer';
 import type SymbolStyleLayer from './symbol_style_layer';
 
-export type TypedStyleLayer = CircleStyleLayer | FillStyleLayer | FillExtrusionStyleLayer | HeatmapStyleLayer | HillshadeStyleLayer | LineStyleLayer | SymbolStyleLayer;
+export type TypedStyleLayer =
+    | CircleStyleLayer
+    | FillStyleLayer
+    | FillExtrusionStyleLayer
+    | HeatmapStyleLayer
+    | HillshadeStyleLayer
+    | LineStyleLayer
+    | SymbolStyleLayer;

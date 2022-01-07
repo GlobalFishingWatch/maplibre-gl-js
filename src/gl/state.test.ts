@@ -1,4 +1,31 @@
-import {ClearColor, ClearDepth, ClearStencil, ColorMask, DepthMask, StencilMask, StencilFunc, StencilOp, StencilTest, DepthRange, DepthTest, DepthFunc, Blend, BlendFunc, BlendColor, ProgramValue, ActiveTextureUnit, Viewport, BindFramebuffer, BindRenderbuffer, BindTexture, BindVertexBuffer, BindElementBuffer, BindVertexArrayOES, PixelStoreUnpack, PixelStoreUnpackPremultiplyAlpha} from './value';
+import {
+    ClearColor,
+    ClearDepth,
+    ClearStencil,
+    ColorMask,
+    DepthMask,
+    StencilMask,
+    StencilFunc,
+    StencilOp,
+    StencilTest,
+    DepthRange,
+    DepthTest,
+    DepthFunc,
+    Blend,
+    BlendFunc,
+    BlendColor,
+    ProgramValue,
+    ActiveTextureUnit,
+    Viewport,
+    BindFramebuffer,
+    BindRenderbuffer,
+    BindTexture,
+    BindVertexBuffer,
+    BindElementBuffer,
+    BindVertexArrayOES,
+    PixelStoreUnpack,
+    PixelStoreUnpackPremultiplyAlpha
+} from './value';
 import Context from './context';
 import Color from '../style-spec/util/color';
 import {deepEqual} from '../util/util';
@@ -6,7 +33,7 @@ import gl from 'gl';
 
 const context = new Context(gl(10, 10));
 
-const valueTest = (Constructor: new (...args:any[]) => any, options) => {
+const valueTest = (Constructor: new (...args: any[]) => any, options) => {
     test('#constructor', () => {
         const v = new Constructor(context);
         expect(v).toBeTruthy();
@@ -17,10 +44,9 @@ const valueTest = (Constructor: new (...args:any[]) => any, options) => {
     test('#set', () => {
         const v = new Constructor(context);
         v.set(options.setValue);
-        const equality = (options.equality) || ((a, b) => deepEqual(a, b));
+        const equality = options.equality || ((a, b) => deepEqual(a, b));
         expect(equality(v.get(), options.setValue)).toBeTruthy();
     });
-
 };
 
 describe('ClearColor', () => {
@@ -64,7 +90,7 @@ describe('StencilFunc', () => {
         setValue: {
             func: context.gl.LEQUAL,
             ref: 1,
-            mask: 0xFF
+            mask: 0xff
         }
     });
 });

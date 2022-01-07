@@ -45,29 +45,42 @@ describe('Actor', () => {
 
         const worker = workerFactory();
 
-        new Actor(worker, {
-            test () { done(); }
-        }, 1);
-        new Actor(worker, {
-            test () {
-                done('test failed');
-            }
-        }, 2);
+        new Actor(
+            worker,
+            {
+                test() {
+                    done();
+                }
+            },
+            1
+        );
+        new Actor(
+            worker,
+            {
+                test() {
+                    done('test failed');
+                }
+            },
+            2
+        );
 
         workerActor.send('test', {}, () => {}, 1);
     });
 
     test('#remove unbinds event listener', done => {
-        const actor = new Actor({
-            addEventListener (type, callback, useCapture) {
-                this._addEventListenerArgs = [type, callback, useCapture];
+        const actor = new Actor(
+            {
+                addEventListener(type, callback, useCapture) {
+                    this._addEventListenerArgs = [type, callback, useCapture];
+                },
+                removeEventListener(type, callback, useCapture) {
+                    expect([type, callback, useCapture]).toEqual(this._addEventListenerArgs);
+                    done();
+                }
             },
-            removeEventListener (type, callback, useCapture) {
-                expect([type, callback, useCapture]).toEqual(this._addEventListenerArgs);
-                done();
-            }
-        }, {}, null);
+            {},
+            null
+        );
         actor.remove();
     });
-
 });

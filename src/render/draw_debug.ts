@@ -43,11 +43,11 @@ function drawCrosshair(painter: Painter, x: number, y: number, color: Color) {
 }
 
 function drawHorizontalLine(painter: Painter, y: number, lineWidth: number, color: Color) {
-    drawDebugSSRect(painter, 0, y  + lineWidth / 2, painter.transform.width,  lineWidth, color);
+    drawDebugSSRect(painter, 0, y + lineWidth / 2, painter.transform.width, lineWidth, color);
 }
 
 function drawVerticalLine(painter: Painter, x: number, lineWidth: number, color: Color) {
-    drawDebugSSRect(painter, x - lineWidth / 2, 0, lineWidth,  painter.transform.height, color);
+    drawDebugSSRect(painter, x - lineWidth / 2, 0, lineWidth, painter.transform.height, color);
 }
 
 function drawDebugSSRect(painter: Painter, x: number, y: number, width: number, height: number, color: Color) {
@@ -82,15 +82,25 @@ function drawDebugTile(painter, sourceCache, coord: OverscaledTileID) {
     // Bind the empty texture for drawing outlines
     painter.emptyTexture.bind(gl.LINEAR, gl.CLAMP_TO_EDGE);
 
-    program.draw(context, gl.LINE_STRIP, depthMode, stencilMode, colorMode, CullFaceMode.disabled,
-        debugUniformValues(posMatrix, Color.red), id,
-        painter.debugBuffer, painter.tileBorderIndexBuffer, painter.debugSegments);
+    program.draw(
+        context,
+        gl.LINE_STRIP,
+        depthMode,
+        stencilMode,
+        colorMode,
+        CullFaceMode.disabled,
+        debugUniformValues(posMatrix, Color.red),
+        id,
+        painter.debugBuffer,
+        painter.tileBorderIndexBuffer,
+        painter.debugSegments
+    );
 
     const tileRawData = sourceCache.getTileByID(coord.key).latestRawTileData;
     const tileByteLength = (tileRawData && tileRawData.byteLength) || 0;
     const tileSizeKb = Math.floor(tileByteLength / 1024);
     const tileSize = sourceCache.getTile(coord).tileSize;
-    const scaleRatio = (512 / Math.min(tileSize, 512) * (coord.overscaledZ / painter.transform.zoom)) * 0.5;
+    const scaleRatio = (512 / Math.min(tileSize, 512)) * (coord.overscaledZ / painter.transform.zoom) * 0.5;
     let tileIdText = coord.canonical.toString();
     if (coord.overscaledZ !== coord.canonical.z) {
         tileIdText += ` => ${coord.overscaledZ}`;
@@ -98,9 +108,19 @@ function drawDebugTile(painter, sourceCache, coord: OverscaledTileID) {
     const tileLabel = `${tileIdText} ${tileSizeKb}kb`;
     drawTextToOverlay(painter, tileLabel);
 
-    program.draw(context, gl.TRIANGLES, depthMode, stencilMode, ColorMode.alphaBlended, CullFaceMode.disabled,
-        debugUniformValues(posMatrix, Color.transparent, scaleRatio), id,
-        painter.debugBuffer, painter.quadTriangleIndexBuffer, painter.debugSegments);
+    program.draw(
+        context,
+        gl.TRIANGLES,
+        depthMode,
+        stencilMode,
+        ColorMode.alphaBlended,
+        CullFaceMode.disabled,
+        debugUniformValues(posMatrix, Color.transparent, scaleRatio),
+        id,
+        painter.debugBuffer,
+        painter.quadTriangleIndexBuffer,
+        painter.debugSegments
+    );
 }
 
 function drawTextToOverlay(painter: Painter, text: string) {

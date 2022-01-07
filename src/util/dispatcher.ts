@@ -18,7 +18,7 @@ class Dispatcher {
 
     // exposed to allow stubbing in unit tests
     static Actor: {
-      new (...args: any): Actor;
+        new (...args: any): Actor;
     };
 
     constructor(workerPool: WorkerPool, parent: any) {
@@ -43,9 +43,13 @@ class Dispatcher {
     broadcast(type: string, data: unknown, cb?: (...args: any[]) => any) {
         assert(this.actors.length);
         cb = cb || function () {};
-        asyncAll(this.actors, (actor, done) => {
-            actor.send(type, data, done);
-        }, cb);
+        asyncAll(
+            this.actors,
+            (actor, done) => {
+                actor.send(type, data, done);
+            },
+            cb
+        );
     }
 
     /**
@@ -59,7 +63,9 @@ class Dispatcher {
     }
 
     remove() {
-        this.actors.forEach((actor) => { actor.remove(); });
+        this.actors.forEach(actor => {
+            actor.remove();
+        });
         this.actors = [];
         this.workerPool.release(this.id);
     }

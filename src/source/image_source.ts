@@ -15,10 +15,7 @@ import type Dispatcher from '../util/dispatcher';
 import type Tile from './tile';
 import type {Callback} from '../types/callback';
 import type VertexBuffer from '../gl/vertex_buffer';
-import type {
-    ImageSourceSpecification,
-    VideoSourceSpecification
-} from '../style-spec/types';
+import type {ImageSourceSpecification, VideoSourceSpecification} from '../style-spec/types';
 
 export type Coordinates = [[number, number], [number, number], [number, number], [number, number]];
 
@@ -85,7 +82,12 @@ class ImageSource extends Evented implements Source {
     /**
      * @private
      */
-    constructor(id: string, options: ImageSourceSpecification | VideoSourceSpecification | CanvasSourceSpecification, dispatcher: Dispatcher, eventedParent: Evented) {
+    constructor(
+        id: string,
+        options: ImageSourceSpecification | VideoSourceSpecification | CanvasSourceSpecification,
+        dispatcher: Dispatcher,
+        eventedParent: Evented
+    ) {
         super();
         this.id = id;
         this.dispatcher = dispatcher;
@@ -142,15 +144,14 @@ class ImageSource extends Evented implements Source {
      *   They do not have to represent a rectangle.
      * @returns {ImageSource} this
      */
-    updateImage(options: {
-      url: string;
-      coordinates?: Coordinates;
-    }) {
+    updateImage(options: {url: string; coordinates?: Coordinates}) {
         if (!this.image || !options.url) {
             return this;
         }
         this.options.url = options.url;
-        this.load(options.coordinates, () => { this.texture = null; });
+        this.load(options.coordinates, () => {
+            this.texture = null;
+        });
         return this;
     }
 
@@ -196,7 +197,7 @@ class ImageSource extends Evented implements Source {
 
         // Transform the corner coordinates into the coordinate space of our
         // tile.
-        const tileCoords = cornerCoords.map((coord) => this.tileID.getTilePoint(coord)._round());
+        const tileCoords = cornerCoords.map(coord => this.tileID.getTilePoint(coord)._round());
 
         this._boundsArray = new RasterBoundsArray();
         this._boundsArray.emplaceBack(tileCoords[0].x, tileCoords[0].y, 0, 0);
@@ -209,7 +210,7 @@ class ImageSource extends Evented implements Source {
             delete this.boundsBuffer;
         }
 
-        this.fire(new Event('data', {dataType:'source', sourceDataType: 'content'}));
+        this.fire(new Event('data', {dataType: 'source', sourceDataType: 'content'}));
         return this;
     }
 
@@ -299,9 +300,10 @@ export function getCoordinatesCenterTileID(coords: Array<MercatorCoordinate>) {
     const tilesAtZoom = Math.pow(2, zoom);
 
     return new CanonicalTileID(
-            zoom,
-            Math.floor((minX + maxX) / 2 * tilesAtZoom),
-            Math.floor((minY + maxY) / 2 * tilesAtZoom));
+        zoom,
+        Math.floor(((minX + maxX) / 2) * tilesAtZoom),
+        Math.floor(((minY + maxY) / 2) * tilesAtZoom)
+    );
 }
 
 export default ImageSource;

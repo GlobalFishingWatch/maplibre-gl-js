@@ -12,7 +12,6 @@ import type {HeatmapPaintProps} from './heatmap_style_layer_properties';
 import type {LayerSpecification} from '../../style-spec/types';
 
 class HeatmapStyleLayer extends StyleLayer {
-
     heatmapFbo: Framebuffer;
     colorRamp: RGBAImage;
     colorRampTexture: Texture;

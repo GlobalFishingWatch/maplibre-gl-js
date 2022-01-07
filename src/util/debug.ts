@@ -21,6 +21,5 @@ export const Debug = {
             if (overwrite) el.innerHTML = '';
             el.innerHTML += `<br>${message}`;
         }
-
     }
 };

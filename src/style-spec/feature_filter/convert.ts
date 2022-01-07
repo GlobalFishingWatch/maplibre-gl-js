@@ -62,26 +62,21 @@ export default function convertFilter(filter: FilterSpecification): unknown {
  * produce a `false` result.
  */
 function _convertFilter(filter: FilterSpecification, expectedTypes: ExpectedTypes): unknown {
-    if (isExpressionFilter(filter)) { return filter; }
+    if (isExpressionFilter(filter)) {
+        return filter;
+    }
 
     if (!filter) return true;
     const op = filter[0];
-    if (filter.length <= 1) return (op !== 'any');
+    if (filter.length <= 1) return op !== 'any';
 
     let converted;
 
-    if (
-        op === '==' ||
-        op === '!=' ||
-        op === '<' ||
-        op === '>' ||
-        op === '<=' ||
-        op === '>='
-    ) {
+    if (op === '==' || op === '!=' || op === '<' || op === '>' || op === '<=' || op === '>=') {
         const [, property, value] = filter;
         converted = convertComparisonOp(property as string, value, op, expectedTypes);
     } else if (op === 'any') {
-        const children = (filter).slice(1).map((f: FilterSpecification) => {
+        const children = filter.slice(1).map((f: FilterSpecification) => {
             const types = {};
             const child = _convertFilter(f, types);
             const typechecks = runtimeTypeChecks(types);
@@ -89,7 +84,7 @@ function _convertFilter(filter: FilterSpecification, expectedTypes: ExpectedType
         });
         return ['any'].concat(children as string[]);
     } else if (op === 'all') {
-        const children = (filter).slice(1).map(f => _convertFilter(f as FilterSpecification, expectedTypes));
+        const children = filter.slice(1).map(f => _convertFilter(f as FilterSpecification, expectedTypes));
         return children.length > 1 ? ['all'].concat(children as string[]) : [].concat(...children);
     } else if (op === 'none') {
         return ['!', _convertFilter(['any'].concat(filter.slice(1) as string[]) as string[], {})];
@@ -138,7 +133,7 @@ function convertComparisonOp(property: string, value: any, op: string, expectedT
     }
 
     if (expectedTypes && value !== null) {
-        const type = (typeof value as any);
+        const type = typeof value as any;
         expectedTypes[property] = type;
     }
 
@@ -190,9 +185,7 @@ function convertInOp(property: string, values: Array<any>, negate = false) {
         return ['match', get, uniqueValues, !negate, negate];
     }
 
-    return [ negate ? 'all' : 'any' as any].concat(
-        values.map(v => [negate ? '!=' : '==', get, v])
-    );
+    return [negate ? 'all' : ('any' as any)].concat(values.map(v => [negate ? '!=' : '==', get, v]));
 }
 
 function convertHasOp(property: string) {

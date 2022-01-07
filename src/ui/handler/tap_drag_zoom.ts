@@ -2,7 +2,6 @@ import {TapRecognizer, MAX_TAP_INTERVAL} from './tap_recognizer';
 import type Point from '../../util/point';
 
 export default class TapDragZoomHandler {
-
     _enabled: boolean;
     _active: boolean;
     _swipePoint: Point;
@@ -11,7 +10,6 @@ export default class TapDragZoomHandler {
     _tap: TapRecognizer;
 
     constructor() {
-
         this._tap = new TapRecognizer({
             numTouches: 1,
             numTaps: 1
@@ -41,7 +39,6 @@ export default class TapDragZoomHandler {
             this._swipePoint = points[0];
             this._swipeTouch = mapTouches[0].identifier;
         }
-
     }
 
     touchmove(e: TouchEvent, points: Array<Point>, mapTouches: Array<Touch>) {

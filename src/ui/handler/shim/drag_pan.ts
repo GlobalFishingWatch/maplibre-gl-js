@@ -2,10 +2,10 @@ import type {MousePanHandler} from '../mouse';
 import type TouchPanHandler from './../touch_pan';
 
 export type DragPanOptions = {
-  linearity?: number;
-  easing?: (t: number) => number;
-  deceleration?: number;
-  maxSpeed?: number;
+    linearity?: number;
+    easing?: (t: number) => number;
+    deceleration?: number;
+    maxSpeed?: number;
 };
 
 /**
@@ -13,7 +13,6 @@ export type DragPanOptions = {
  * the cursor.
  */
 export default class DragPanHandler {
-
     _el: HTMLElement;
     _mousePan: MousePanHandler;
     _touchPan: TouchPanHandler;
@@ -21,7 +20,7 @@ export default class DragPanHandler {
 
     /**
      * @private
-    */
+     */
     constructor(el: HTMLElement, mousePan: MousePanHandler, touchPan: TouchPanHandler) {
         this._el = el;
         this._mousePan = mousePan;

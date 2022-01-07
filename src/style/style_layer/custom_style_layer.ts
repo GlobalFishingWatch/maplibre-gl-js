@@ -75,15 +75,15 @@ export interface CustomLayerInterface {
     /**
      * @property {string} id A unique layer id.
      */
-  id: string;
+    id: string;
     /**
      * @property {string} type The layer's type. Must be `"custom"`.
      */
-  type: 'custom';
+    type: 'custom';
     /**
      * @property {string} renderingMode Either `"2d"` or `"3d"`. Defaults to `"2d"`.
      */
-  renderingMode: '2d' | '3d';
+    renderingMode: '2d' | '3d';
     /**
      * Called during a render frame allowing the layer to draw into the GL context.
      *
@@ -112,7 +112,7 @@ export interface CustomLayerInterface {
      * lengths in mercator units would be rendered as a cube. {@link MercatorCoordinate}.fromLngLat
      * can be used to project a `LngLat` to a mercator coordinate.
      */
-  render: CustomRenderMethod;
+    render: CustomRenderMethod;
     /**
      * Optional method called during a render frame to allow a layer to prepare resources or render into a texture.
      *
@@ -130,7 +130,7 @@ export interface CustomLayerInterface {
      * lengths in mercator units would be rendered as a cube. {@link MercatorCoordinate}.fromLngLat
      * can be used to project a `LngLat` to a mercator coordinate.
      */
-  prerender: CustomRenderMethod;
+    prerender: CustomRenderMethod;
     /**
      * Optional method called when the layer has been added to the Map with {@link Map#addLayer}. This
      * gives the layer a chance to initialize gl resources and register event listeners.
@@ -142,19 +142,19 @@ export interface CustomLayerInterface {
      * @param {Map} map The Map this custom layer was just added to.
      * @param {WebGLRenderingContext} gl The gl context for the map.
      */
-  onAdd(map: Map, gl: WebGLRenderingContext): void;
+    onAdd(map: Map, gl: WebGLRenderingContext): void;
     /**
-    * Optional method called when the layer has been removed from the Map with {@link Map#removeLayer}. This
-    * gives the layer a chance to clean up gl resources and event listeners.
-    *
-    * @function
-    * @memberof CustomLayerInterface
-    * @instance
-    * @name onRemove
-    * @param {Map} map The Map this custom layer was just added to.
-    * @param {WebGLRenderingContext} gl The gl context for the map.
-    */
-  onRemove(map: Map, gl: WebGLRenderingContext): void;
+     * Optional method called when the layer has been removed from the Map with {@link Map#removeLayer}. This
+     * gives the layer a chance to clean up gl resources and event listeners.
+     *
+     * @function
+     * @memberof CustomLayerInterface
+     * @instance
+     * @name onRemove
+     * @param {Map} map The Map this custom layer was just added to.
+     * @param {WebGLRenderingContext} gl The gl context for the map.
+     */
+    onRemove(map: Map, gl: WebGLRenderingContext): void;
 }
 
 export function validateCustomStyleLayer(layerObject: CustomLayerInterface) {
@@ -173,9 +173,7 @@ export function validateCustomStyleLayer(layerObject: CustomLayerInterface) {
         });
     }
 
-    if (layerObject.renderingMode &&
-        layerObject.renderingMode !== '2d' &&
-        layerObject.renderingMode !== '3d') {
+    if (layerObject.renderingMode && layerObject.renderingMode !== '2d' && layerObject.renderingMode !== '3d') {
         errors.push({
             message: `layers.${id}: property "renderingMode" must be either "2d" or "3d"`
         });
@@ -185,7 +183,6 @@ export function validateCustomStyleLayer(layerObject: CustomLayerInterface) {
 }
 
 class CustomStyleLayer extends StyleLayer {
-
     implementation: CustomLayerInterface;
 
     constructor(implementation: CustomLayerInterface) {
@@ -203,7 +200,9 @@ class CustomStyleLayer extends StyleLayer {
 
     recalculate() {}
     updateTransitions() {}
-    hasTransition() { return false; }
+    hasTransition() {
+        return false;
+    }
 
     serialize(): LayerSpecification {
         assert(false, 'Custom layers cannot be serialized');
@@ -213,13 +212,13 @@ class CustomStyleLayer extends StyleLayer {
         if (this.implementation.onAdd) {
             this.implementation.onAdd(map, map.painter.context.gl);
         }
-    }
+    };
 
     onRemove = (map: Map) => {
         if (this.implementation.onRemove) {
             this.implementation.onRemove(map, map.painter.context.gl);
         }
-    }
+    };
 }
 
 export default CustomStyleLayer;

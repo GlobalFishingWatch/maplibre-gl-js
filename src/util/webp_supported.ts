@@ -12,12 +12,12 @@ let webpImgTestOnloadComplete = false;
 
 if (typeof document !== 'undefined') {
     webpImgTest = document.createElement('img');
-    webpImgTest.onload = function() {
+    webpImgTest.onload = function () {
         if (glForTesting) testWebpTextureUpload(glForTesting);
         glForTesting = null;
         webpImgTestOnloadComplete = true;
     };
-    webpImgTest.onerror = function() {
+    webpImgTest.onerror = function () {
         webpCheckComplete = true;
         glForTesting = null;
     };
@@ -37,7 +37,6 @@ function testSupport(gl: WebGLRenderingContext) {
         testWebpTextureUpload(gl);
     } else {
         glForTesting = gl;
-
     }
 }
 

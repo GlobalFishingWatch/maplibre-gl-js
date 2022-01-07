@@ -7,7 +7,9 @@ describe('interpolate', () => {
     });
 
     test('interpolate.color', () => {
-        expect(interpolate.color(new Color(0, 0, 0, 0), new Color(1, 2, 3, 4), 0.5)).toEqual(new Color(0.5, 1, 3 / 2, 2));
+        expect(interpolate.color(new Color(0, 0, 0, 0), new Color(1, 2, 3, 4), 0.5)).toEqual(
+            new Color(0.5, 1, 3 / 2, 2)
+        );
     });
 
     test('interpolate.array', () => {

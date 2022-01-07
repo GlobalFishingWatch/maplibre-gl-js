@@ -4,7 +4,7 @@ import type Context from '../gl/context';
 import {mat4, vec2, vec3, vec4} from 'gl-matrix';
 
 type $ObjMap<T extends {}, F extends (v: any) => any> = {
-  [K in keyof T]: F extends (v: T[K]) => infer R ? R : never;
+    [K in keyof T]: F extends (v: T[K]) => infer R ? R : never;
 };
 
 export type UniformValues<Us extends any> = $ObjMap<Us, <V>(u: Uniform<V>) => V>;
@@ -86,8 +86,12 @@ class Uniform4f extends Uniform<vec4> {
     }
 
     set(v: vec4): void {
-        if (v[0] !== this.current[0] || v[1] !== this.current[1] ||
-            v[2] !== this.current[2] || v[3] !== this.current[3]) {
+        if (
+            v[0] !== this.current[0] ||
+            v[1] !== this.current[1] ||
+            v[2] !== this.current[2] ||
+            v[3] !== this.current[3]
+        ) {
             this.current = v;
             this.gl.uniform4f(this.location, v[0], v[1], v[2], v[3]);
         }
@@ -101,8 +105,7 @@ class UniformColor extends Uniform<Color> {
     }
 
     set(v: Color): void {
-        if (v.r !== this.current.r || v.g !== this.current.g ||
-            v.b !== this.current.b || v.a !== this.current.a) {
+        if (v.r !== this.current.r || v.g !== this.current.g || v.b !== this.current.b || v.a !== this.current.a) {
             this.current = v;
             this.gl.uniform4f(this.location, v.r, v.g, v.b, v.a);
         }
@@ -135,15 +138,6 @@ class UniformMatrix4f extends Uniform<mat4> {
     }
 }
 
-export {
-    Uniform,
-    Uniform1i,
-    Uniform1f,
-    Uniform2f,
-    Uniform3f,
-    Uniform4f,
-    UniformColor,
-    UniformMatrix4f
-};
+export {Uniform, Uniform1i, Uniform1f, Uniform2f, Uniform3f, Uniform4f, UniformColor, UniformMatrix4f};
 
 export type UniformBindings = {[_: string]: Uniform<any>};

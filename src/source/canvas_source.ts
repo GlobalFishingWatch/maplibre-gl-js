@@ -11,10 +11,10 @@ import type Dispatcher from '../util/dispatcher';
 import type {Evented} from '../util/evented';
 
 export type CanvasSourceSpecification = {
-  'type': 'canvas';
-  'coordinates': [[number, number], [number, number], [number, number], [number, number]];
-  'animate'?: boolean;
-  'canvas': string | HTMLCanvasElement;
+    type: 'canvas';
+    coordinates: [[number, number], [number, number], [number, number], [number, number]];
+    animate?: boolean;
+    canvas: string | HTMLCanvasElement;
 };
 
 /**
@@ -73,20 +73,45 @@ class CanvasSource extends ImageSource {
 
         // We build in some validation here, since canvas sources aren't included in the style spec:
         if (!options.coordinates) {
-            this.fire(new ErrorEvent(new ValidationError(`sources.${id}`, null, 'missing required property "coordinates"')));
-        } else if (!Array.isArray(options.coordinates) || options.coordinates.length !== 4 ||
-                options.coordinates.some(c => !Array.isArray(c) || c.length !== 2 || c.some(l => typeof l !== 'number'))) {
-            this.fire(new ErrorEvent(new ValidationError(`sources.${id}`, null, '"coordinates" property must be an array of 4 longitude/latitude array pairs')));
+            this.fire(
+                new ErrorEvent(new ValidationError(`sources.${id}`, null, 'missing required property "coordinates"'))
+            );
+        } else if (
+            !Array.isArray(options.coordinates) ||
+            options.coordinates.length !== 4 ||
+            options.coordinates.some(c => !Array.isArray(c) || c.length !== 2 || c.some(l => typeof l !== 'number'))
+        ) {
+            this.fire(
+                new ErrorEvent(
+                    new ValidationError(
+                        `sources.${id}`,
+                        null,
+                        '"coordinates" property must be an array of 4 longitude/latitude array pairs'
+                    )
+                )
+            );
         }
 
         if (options.animate && typeof options.animate !== 'boolean') {
-            this.fire(new ErrorEvent(new ValidationError(`sources.${id}`, null, 'optional "animate" property must be a boolean value')));
+            this.fire(
+                new ErrorEvent(
+                    new ValidationError(`sources.${id}`, null, 'optional "animate" property must be a boolean value')
+                )
+            );
         }
 
         if (!options.canvas) {
             this.fire(new ErrorEvent(new ValidationError(`sources.${id}`, null, 'missing required property "canvas"')));
         } else if (typeof options.canvas !== 'string' && !(options.canvas instanceof HTMLCanvasElement)) {
-            this.fire(new ErrorEvent(new ValidationError(`sources.${id}`, null, '"canvas" must be either a string representing the ID of the canvas element from which to read, or an HTMLCanvasElement instance')));
+            this.fire(
+                new ErrorEvent(
+                    new ValidationError(
+                        `sources.${id}`,
+                        null,
+                        '"canvas" must be either a string representing the ID of the canvas element from which to read, or an HTMLCanvasElement instance'
+                    )
+                )
+            );
         }
 
         this.options = options;
@@ -110,9 +135,10 @@ class CanvasSource extends ImageSource {
     load() {
         this._loaded = true;
         if (!this.canvas) {
-            this.canvas = (this.options.canvas instanceof HTMLCanvasElement) ?
-                this.options.canvas :
-                document.getElementById(this.options.canvas) as HTMLCanvasElement;
+            this.canvas =
+                this.options.canvas instanceof HTMLCanvasElement
+                    ? this.options.canvas
+                    : (document.getElementById(this.options.canvas) as HTMLCanvasElement);
             // cast to HTMLCanvasElement in else of ternary
             // should we do a safety check and throw if it's not actually HTMLCanvasElement?
         }
@@ -124,12 +150,12 @@ class CanvasSource extends ImageSource {
             return;
         }
 
-        this.play = function() {
+        this.play = function () {
             this._playing = true;
             this.map.triggerRepaint();
         };
 
-        this.pause = function() {
+        this.pause = function () {
             if (this._playing) {
                 this.prepare();
                 this._playing = false;

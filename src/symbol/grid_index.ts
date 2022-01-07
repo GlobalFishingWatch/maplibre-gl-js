@@ -52,9 +52,9 @@ class GridIndex<T> {
     boxUid: number;
     circleUid: number;
 
-    constructor (width: number, height: number, cellSize: number) {
-        const boxCells = this.boxCells = [];
-        const circleCells = this.circleCells = [];
+    constructor(width: number, height: number, cellSize: number) {
+        const boxCells = (this.boxCells = []);
+        const circleCells = (this.circleCells = []);
 
         // More cells -> fewer geometries to check per cell, but items tend
         // to be split across more cells.
@@ -106,11 +106,18 @@ class GridIndex<T> {
         this.boxCells[cellIndex].push(uid);
     }
 
-    private _insertCircleCell(x1: number, y1: number, x2: number, y2: number, cellIndex: number, uid: number)  {
+    private _insertCircleCell(x1: number, y1: number, x2: number, y2: number, cellIndex: number, uid: number) {
         this.circleCells[cellIndex].push(uid);
     }
 
-    private _query(x1: number, y1: number, x2: number, y2: number, hitTest: boolean, predicate?: (key: T) => boolean): Array<QueryResult<T>> {
+    private _query(
+        x1: number,
+        y1: number,
+        x2: number,
+        y2: number,
+        hitTest: boolean,
+        predicate?: (key: T) => boolean
+    ): Array<QueryResult<T>> {
         if (x2 < 0 || x1 > this.width || y2 < 0 || y1 > this.height) {
             return [];
         }
@@ -118,13 +125,15 @@ class GridIndex<T> {
         if (x1 <= 0 && y1 <= 0 && this.width <= x2 && this.height <= y2) {
             if (hitTest) {
                 // Covers the entire grid, so collides with everything
-                return [{
-                    key: null,
-                    x1,
-                    y1,
-                    x2,
-                    y2
-                }];
+                return [
+                    {
+                        key: null,
+                        x1,
+                        y1,
+                        x2,
+                        y2
+                    }
+                ];
             }
             for (let boxUid = 0; boxUid < this.boxKeys.length; boxUid++) {
                 result.push({
@@ -190,7 +199,16 @@ class GridIndex<T> {
         return result.length > 0;
     }
 
-    private _queryCell(x1: number, y1: number, x2: number, y2: number, cellIndex: number, result: Array<QueryResult<T>>, queryArgs: QueryArgs, predicate?: (key: T) => boolean): boolean {
+    private _queryCell(
+        x1: number,
+        y1: number,
+        x2: number,
+        y2: number,
+        cellIndex: number,
+        result: Array<QueryResult<T>>,
+        queryArgs: QueryArgs,
+        predicate?: (key: T) => boolean
+    ): boolean {
         const {seenUids, hitTest} = queryArgs;
         const boxCell = this.boxCells[cellIndex];
 
@@ -202,11 +220,13 @@ class GridIndex<T> {
                     const offset = boxUid * 4;
                     const key = this.boxKeys[boxUid];
 
-                    if ((x1 <= bboxes[offset + 2]) &&
-                        (y1 <= bboxes[offset + 3]) &&
-                        (x2 >= bboxes[offset + 0]) &&
-                        (y2 >= bboxes[offset + 1]) &&
-                        (!predicate || predicate(key))) {
+                    if (
+                        x1 <= bboxes[offset + 2] &&
+                        y1 <= bboxes[offset + 3] &&
+                        x2 >= bboxes[offset + 0] &&
+                        y2 >= bboxes[offset + 1] &&
+                        (!predicate || predicate(key))
+                    ) {
                         result.push({
                             key,
                             x1: bboxes[offset],
@@ -231,15 +251,18 @@ class GridIndex<T> {
                     const offset = circleUid * 3;
                     const key = this.circleKeys[circleUid];
 
-                    if (this._circleAndRectCollide(
-                        circles[offset],
-                        circles[offset + 1],
-                        circles[offset + 2],
-                        x1,
-                        y1,
-                        x2,
-                        y2) &&
-                        (!predicate || predicate(key))) {
+                    if (
+                        this._circleAndRectCollide(
+                            circles[offset],
+                            circles[offset + 1],
+                            circles[offset + 2],
+                            x1,
+                            y1,
+                            x2,
+                            y2
+                        ) &&
+                        (!predicate || predicate(key))
+                    ) {
                         const x = circles[offset];
                         const y = circles[offset + 1];
                         const radius = circles[offset + 2];
@@ -263,7 +286,16 @@ class GridIndex<T> {
         return false;
     }
 
-    private _queryCellCircle(x1: number, y1: number, x2: number, y2: number, cellIndex: number, result: Array<boolean>, queryArgs: QueryArgs, predicate?: (key:T) => boolean): boolean {
+    private _queryCellCircle(
+        x1: number,
+        y1: number,
+        x2: number,
+        y2: number,
+        cellIndex: number,
+        result: Array<boolean>,
+        queryArgs: QueryArgs,
+        predicate?: (key: T) => boolean
+    ): boolean {
         const {circle, seenUids} = queryArgs;
         const boxCell = this.boxCells[cellIndex];
 
@@ -274,15 +306,18 @@ class GridIndex<T> {
                     seenUids.box[boxUid] = true;
                     const offset = boxUid * 4;
                     const key = this.boxKeys[boxUid];
-                    if (this._circleAndRectCollide(
-                        circle.x,
-                        circle.y,
-                        circle.radius,
-                        bboxes[offset + 0],
-                        bboxes[offset + 1],
-                        bboxes[offset + 2],
-                        bboxes[offset + 3]) &&
-                        (!predicate || predicate(key))) {
+                    if (
+                        this._circleAndRectCollide(
+                            circle.x,
+                            circle.y,
+                            circle.radius,
+                            bboxes[offset + 0],
+                            bboxes[offset + 1],
+                            bboxes[offset + 2],
+                            bboxes[offset + 3]
+                        ) &&
+                        (!predicate || predicate(key))
+                    ) {
                         result.push(true);
                         return true;
                     }
@@ -298,14 +333,17 @@ class GridIndex<T> {
                     seenUids.circle[circleUid] = true;
                     const offset = circleUid * 3;
                     const key = this.circleKeys[circleUid];
-                    if (this._circlesCollide(
-                        circles[offset],
-                        circles[offset + 1],
-                        circles[offset + 2],
-                        circle.x,
-                        circle.y,
-                        circle.radius) &&
-                        (!predicate || predicate(key))) {
+                    if (
+                        this._circlesCollide(
+                            circles[offset],
+                            circles[offset + 1],
+                            circles[offset + 2],
+                            circle.x,
+                            circle.y,
+                            circle.radius
+                        ) &&
+                        (!predicate || predicate(key))
+                    ) {
                         result.push(true);
                         return true;
                     }
@@ -319,10 +357,20 @@ class GridIndex<T> {
         y1: number,
         x2: number,
         y2: number,
-        fn: (x1: number, y1: number, x2: number, y2: number, cellIndex: number, arg1: TArg, arg2?: QueryArgs, predicate?: (key: T) => boolean) => boolean | void,
+        fn: (
+            x1: number,
+            y1: number,
+            x2: number,
+            y2: number,
+            cellIndex: number,
+            arg1: TArg,
+            arg2?: QueryArgs,
+            predicate?: (key: T) => boolean
+        ) => boolean | void,
         arg1: TArg,
         arg2?: QueryArgs,
-        predicate?: (key: T) => boolean) {
+        predicate?: (key: T) => boolean
+    ) {
         const cx1 = this._convertToXCellCoord(x1);
         const cy1 = this._convertToYCellCoord(y1);
         const cx2 = this._convertToXCellCoord(x2);
@@ -348,27 +396,27 @@ class GridIndex<T> {
         const dx = x2 - x1;
         const dy = y2 - y1;
         const bothRadii = r1 + r2;
-        return (bothRadii * bothRadii) > (dx * dx + dy * dy);
+        return bothRadii * bothRadii > dx * dx + dy * dy;
     }
 
     private _circleAndRectCollide(
-      circleX: number,
-      circleY: number,
-      radius: number,
-      x1: number,
-      y1: number,
-      x2: number,
-      y2: number
+        circleX: number,
+        circleY: number,
+        radius: number,
+        x1: number,
+        y1: number,
+        x2: number,
+        y2: number
     ): boolean {
         const halfRectWidth = (x2 - x1) / 2;
         const distX = Math.abs(circleX - (x1 + halfRectWidth));
-        if (distX > (halfRectWidth + radius)) {
+        if (distX > halfRectWidth + radius) {
             return false;
         }
 
         const halfRectHeight = (y2 - y1) / 2;
         const distY = Math.abs(circleY - (y1 + halfRectHeight));
-        if (distY > (halfRectHeight + radius)) {
+        if (distY > halfRectHeight + radius) {
             return false;
         }
 
@@ -378,7 +426,7 @@ class GridIndex<T> {
 
         const dx = distX - halfRectWidth;
         const dy = distY - halfRectHeight;
-        return (dx * dx + dy * dy <= (radius * radius));
+        return dx * dx + dy * dy <= radius * radius;
     }
 }
 

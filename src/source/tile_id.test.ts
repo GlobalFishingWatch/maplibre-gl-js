@@ -45,11 +45,12 @@ describe('CanonicalTileID', () => {
         // Test case confirmed by quadkeytools package
         // https://bitbucket.org/steele/quadkeytools/rollup/build/tsc/src/master/test/quadkey.js?fileviewer=file-view-default#quadkey.js-57
         expect(new CanonicalTileID(6, 29, 3).url(['quadkey={quadkey}'])).toBe('quadkey=011123');
-
     });
 
     test('.url replaces {bbox-epsg-3857}', () => {
-        expect(new CanonicalTileID(1, 0, 0).url(['bbox={bbox-epsg-3857}'])).toBe('bbox=-20037508.342789244,0,0,20037508.342789244');
+        expect(new CanonicalTileID(1, 0, 0).url(['bbox={bbox-epsg-3857}'])).toBe(
+            'bbox=-20037508.342789244,0,0,20037508.342789244'
+        );
     });
 
     test('.url replaces {ratio}', () => {
@@ -63,7 +64,6 @@ describe('CanonicalTileID', () => {
     test('.url replaces {z}/{x}/{y}/{z}/{x}/{y}', () => {
         expect(new CanonicalTileID(2, 1, 0).url(['{z}/{x}/{y}/{z}/{x}/{y}.json'])).toBe('2/1/0/2/1/0.json');
     });
-
 });
 
 describe('OverscaledTileID', () => {
@@ -92,7 +92,8 @@ describe('OverscaledTileID', () => {
             new OverscaledTileID(1, 0, 1, 0, 0),
             new OverscaledTileID(1, 0, 1, 1, 0),
             new OverscaledTileID(1, 0, 1, 0, 1),
-            new OverscaledTileID(1, 0, 1, 1, 1)]);
+            new OverscaledTileID(1, 0, 1, 1, 1)
+        ]);
         expect(new OverscaledTileID(0, 0, 0, 0, 0).children(0)).toEqual([new OverscaledTileID(1, 0, 0, 0, 0)]);
     });
 
@@ -103,12 +104,7 @@ describe('OverscaledTileID', () => {
     });
 
     test('.isChildOf', () => {
-        expect(
-            new OverscaledTileID(2, 0, 2, 0, 0).isChildOf(new OverscaledTileID(0, 0, 0, 0, 0))
-        ).toBeTruthy();
-        expect(
-            new OverscaledTileID(2, 0, 2, 0, 0).isChildOf(new OverscaledTileID(0, 1, 0, 0, 0))
-        ).toBeFalsy();
+        expect(new OverscaledTileID(2, 0, 2, 0, 0).isChildOf(new OverscaledTileID(0, 0, 0, 0, 0))).toBeTruthy();
+        expect(new OverscaledTileID(2, 0, 2, 0, 0).isChildOf(new OverscaledTileID(0, 1, 0, 0, 0))).toBeFalsy();
     });
-
 });

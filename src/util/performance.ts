@@ -1,10 +1,10 @@
 import type {RequestParameters} from '../util/ajax';
 
 export type PerformanceMetrics = {
-  loadTime: number;
-  fullLoadTime: number;
-  fps: number;
-  percentDroppedFrames: number;
+    loadTime: number;
+    fullLoadTime: number;
+    fps: number;
+    percentDroppedFrames: number;
 };
 
 export enum PerformanceMarkers {
@@ -53,9 +53,9 @@ export const PerformanceUtils = {
 
         // count frames that missed our framerate target
         const droppedFrames = frameTimes
-            .filter((frameTime) => frameTime > frameTimeTarget)
+            .filter(frameTime => frameTime > frameTimeTarget)
             .reduce((acc, curr) => {
-                return acc + (curr -  frameTimeTarget) / frameTimeTarget;
+                return acc + (curr - frameTimeTarget) / frameTimeTarget;
             }, 0);
         const percentDroppedFrames = (droppedFrames / (totalFrames + droppedFrames)) * 100;
 
@@ -76,12 +76,12 @@ export const PerformanceUtils = {
  */
 export class RequestPerformance {
     _marks: {
-      start: string;
-      end: string;
-      measure: string;
+        start: string;
+        end: string;
+        measure: string;
     };
 
-    constructor (request: RequestParameters) {
+    constructor(request: RequestParameters) {
         this._marks = {
             start: [request.url, 'start'].join('#'),
             end: [request.url, 'end'].join('#'),

@@ -7,7 +7,7 @@ let globalWorkerPool;
  * to be shared across each Map
  * @private
  */
-export default function getGlobalWorkerPool () {
+export default function getGlobalWorkerPool() {
     if (!globalWorkerPool) {
         globalWorkerPool = new WorkerPool();
     }
@@ -27,7 +27,9 @@ export function clearPrewarmedResources() {
             pool.release(PRELOAD_POOL_ID);
             globalWorkerPool = null;
         } else {
-            console.warn('Could not clear WebWorkers since there are active Map instances that still reference it. The pre-warmed WebWorker pool can only be cleared when all map instances have been removed with map.remove()');
+            console.warn(
+                'Could not clear WebWorkers since there are active Map instances that still reference it. The pre-warmed WebWorker pool can only be cleared when all map instances have been removed with map.remove()'
+            );
         }
     }
 }

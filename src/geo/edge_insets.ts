@@ -19,10 +19,15 @@ class EdgeInsets {
     right: number;
 
     constructor(top: number = 0, bottom: number = 0, left: number = 0, right: number = 0) {
-        if (isNaN(top) || top < 0 ||
-            isNaN(bottom) || bottom < 0 ||
-            isNaN(left) || left < 0 ||
-            isNaN(right) || right < 0
+        if (
+            isNaN(top) ||
+            top < 0 ||
+            isNaN(bottom) ||
+            bottom < 0 ||
+            isNaN(left) ||
+            left < 0 ||
+            isNaN(right) ||
+            right < 0
         ) {
             throw new Error('Invalid value for edge-insets, top, bottom, left and right must all be numbers');
         }
@@ -69,10 +74,12 @@ class EdgeInsets {
     }
 
     equals(other: PaddingOptions): boolean {
-        return this.top === other.top &&
+        return (
+            this.top === other.top &&
             this.bottom === other.bottom &&
             this.left === other.left &&
-            this.right === other.right;
+            this.right === other.right
+        );
     }
 
     clone(): EdgeInsets {
@@ -116,8 +123,8 @@ class EdgeInsets {
  */
 export type PaddingOptions = {
     /**
-    * @property {number} top Padding in pixels from the top of the map canvas.
-    */
+     * @property {number} top Padding in pixels from the top of the map canvas.
+     */
     top: number;
     /**
      * @property {number} bottom Padding in pixels from the bottom of the map canvas.

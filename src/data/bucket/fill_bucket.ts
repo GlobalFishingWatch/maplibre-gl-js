@@ -15,13 +15,7 @@ import toEvaluationFeature from '../evaluation_feature';
 import EvaluationParameters from '../../style/evaluation_parameters';
 
 import type {CanonicalTileID} from '../../source/tile_id';
-import type {
-    Bucket,
-    BucketParameters,
-    BucketFeature,
-    IndexedFeature,
-    PopulateParameters
-} from '../bucket';
+import type {Bucket, BucketParameters, BucketFeature, IndexedFeature, PopulateParameters} from '../bucket';
 import type FillStyleLayer from '../../style/style_layer/fill_style_layer';
 import type Context from '../../gl/context';
 import type IndexBuffer from '../../gl/index_buffer';
@@ -71,7 +65,7 @@ class FillBucket implements Bucket {
         this.programConfigurations = new ProgramConfigurationSet(options.layers, options.zoom);
         this.segments = new SegmentVector();
         this.segments2 = new SegmentVector();
-        this.stateDependentLayerIds = this.layers.filter((l) => l.isStateDependent()).map((l) => l.id);
+        this.stateDependentLayerIds = this.layers.filter(l => l.isStateDependent()).map(l => l.id);
     }
 
     populate(features: Array<IndexedFeature>, options: PopulateParameters, canonical: CanonicalTileID) {
@@ -84,11 +78,14 @@ class FillBucket implements Bucket {
             const needGeometry = this.layers[0]._featureFilter.needGeometry;
             const evaluationFeature = toEvaluationFeature(feature, needGeometry);
 
-            if (!this.layers[0]._featureFilter.filter(new EvaluationParameters(this.zoom), evaluationFeature, canonical)) continue;
+            if (
+                !this.layers[0]._featureFilter.filter(new EvaluationParameters(this.zoom), evaluationFeature, canonical)
+            )
+                continue;
 
-            const sortKey = sortFeaturesByKey ?
-                fillSortKey.evaluate(evaluationFeature, {}, canonical, options.availableImages) :
-                undefined;
+            const sortKey = sortFeaturesByKey
+                ? fillSortKey.evaluate(evaluationFeature, {}, canonical, options.availableImages)
+                : undefined;
 
             const bucketFeature: BucketFeature = {
                 id,
@@ -125,16 +122,24 @@ class FillBucket implements Bucket {
         }
     }
 
-    update(states: FeatureStates, vtLayer: VectorTileLayer, imagePositions: {
-      [_: string]: ImagePosition;
-    }) {
+    update(
+        states: FeatureStates,
+        vtLayer: VectorTileLayer,
+        imagePositions: {
+            [_: string]: ImagePosition;
+        }
+    ) {
         if (!this.stateDependentLayers.length) return;
         this.programConfigurations.updatePaintArrays(states, vtLayer, this.stateDependentLayers, imagePositions);
     }
 
-    addFeatures(options: PopulateParameters, canonical: CanonicalTileID, imagePositions: {
-      [_: string]: ImagePosition;
-    }) {
+    addFeatures(
+        options: PopulateParameters,
+        canonical: CanonicalTileID,
+        imagePositions: {
+            [_: string]: ImagePosition;
+        }
+    ) {
         for (const feature of this.patternFeatures) {
             this.addFeature(feature, feature.geometry, feature.index, canonical, imagePositions);
         }
@@ -167,9 +172,15 @@ class FillBucket implements Bucket {
         this.segments2.destroy();
     }
 
-    addFeature(feature: BucketFeature, geometry: Array<Array<Point>>, index: number, canonical: CanonicalTileID, imagePositions: {
-      [_: string]: ImagePosition;
-    }) {
+    addFeature(
+        feature: BucketFeature,
+        geometry: Array<Array<Point>>,
+        index: number,
+        canonical: CanonicalTileID,
+        imagePositions: {
+            [_: string]: ImagePosition;
+        }
+    ) {
         for (const polygon of classifyRings(geometry, EARCUT_MAX_RINGS)) {
             let numVertices = 0;
             for (const ring of polygon) {
@@ -191,7 +202,11 @@ class FillBucket implements Bucket {
                     holeIndices.push(flattened.length / 2);
                 }
 
-                const lineSegment = this.segments2.prepareSegment(ring.length, this.layoutVertexArray, this.indexArray2);
+                const lineSegment = this.segments2.prepareSegment(
+                    ring.length,
+                    this.layoutVertexArray,
+                    this.indexArray2
+                );
                 const lineIndex = lineSegment.vertexLength;
 
                 this.layoutVertexArray.emplaceBack(ring[0].x, ring[0].y);
@@ -217,13 +232,20 @@ class FillBucket implements Bucket {
                 this.indexArray.emplaceBack(
                     triangleIndex + indices[i],
                     triangleIndex + indices[i + 1],
-                    triangleIndex + indices[i + 2]);
+                    triangleIndex + indices[i + 2]
+                );
             }
 
             triangleSegment.vertexLength += numVertices;
             triangleSegment.primitiveLength += indices.length / 3;
         }
-        this.programConfigurations.populatePaintArrays(this.layoutVertexArray.length, feature, index, imagePositions, canonical);
+        this.programConfigurations.populatePaintArrays(
+            this.layoutVertexArray.length,
+            feature,
+            index,
+            imagePositions,
+            canonical
+        );
     }
 }
 

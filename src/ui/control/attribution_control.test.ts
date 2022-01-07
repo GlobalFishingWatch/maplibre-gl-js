@@ -3,18 +3,20 @@ import {createMap as globalCreateMap, setWebGlContext, setPerformance, setMatchM
 import simulate from '../../../test/util/simulate_interaction';
 
 function createMap() {
-
-    return globalCreateMap({
-        attributionControl: false,
-        style: {
-            version: 8,
-            sources: {},
-            layers: [],
-            owner: 'mapblibre',
-            id: 'demotiles',
+    return globalCreateMap(
+        {
+            attributionControl: false,
+            style: {
+                version: 8,
+                sources: {},
+                layers: [],
+                owner: 'mapblibre',
+                id: 'demotiles'
+            },
+            hash: true
         },
-        hash: true
-    }, undefined);
+        undefined
+    );
 }
 
 let map;
@@ -35,16 +37,16 @@ describe('AttributionControl', () => {
         map.addControl(new AttributionControl());
 
         expect(
-        map.getContainer().querySelectorAll('.maplibregl-ctrl-bottom-right .maplibregl-ctrl-attrib')
+            map.getContainer().querySelectorAll('.maplibregl-ctrl-bottom-right .maplibregl-ctrl-attrib')
         ).toHaveLength(1);
     });
 
     test('appears in the position specified by the position option', () => {
         map.addControl(new AttributionControl(), 'top-left');
 
-        expect(
-        map.getContainer().querySelectorAll('.maplibregl-ctrl-top-left .maplibregl-ctrl-attrib')
-        ).toHaveLength(1);
+        expect(map.getContainer().querySelectorAll('.maplibregl-ctrl-top-left .maplibregl-ctrl-attrib')).toHaveLength(
+            1
+        );
     });
 
     test('appears in compact mode if compact option is used', () => {
@@ -57,9 +59,7 @@ describe('AttributionControl', () => {
 
         const container = map.getContainer();
 
-        expect(
-        container.querySelectorAll('.maplibregl-ctrl-attrib.maplibregl-compact')
-        ).toHaveLength(1);
+        expect(container.querySelectorAll('.maplibregl-ctrl-attrib.maplibregl-compact')).toHaveLength(1);
         map.removeControl(attributionControl);
 
         Object.defineProperty(map.getCanvasContainer(), 'offsetWidth', {value: 600, configurable: true});
@@ -68,9 +68,7 @@ describe('AttributionControl', () => {
         });
 
         map.addControl(attributionControl);
-        expect(
-        container.querySelectorAll('.maplibregl-ctrl-attrib:not(.maplibregl-compact)')
-        ).toHaveLength(1);
+        expect(container.querySelectorAll('.maplibregl-ctrl-attrib:not(.maplibregl-compact)')).toHaveLength(1);
     });
 
     test('appears in compact mode if container is less then 640 pixel wide', () => {
@@ -79,22 +77,20 @@ describe('AttributionControl', () => {
 
         const container = map.getContainer();
 
-        expect(
-        container.querySelectorAll('.maplibregl-ctrl-attrib:not(.maplibregl-compact)')
-        ).toHaveLength(1);
+        expect(container.querySelectorAll('.maplibregl-ctrl-attrib:not(.maplibregl-compact)')).toHaveLength(1);
 
         Object.defineProperty(map.getCanvasContainer(), 'offsetWidth', {value: 600, configurable: true});
         map.resize();
 
-        expect(
-        container.querySelectorAll('.maplibregl-ctrl-attrib.maplibregl-compact')
-        ).toHaveLength(1);
+        expect(container.querySelectorAll('.maplibregl-ctrl-attrib.maplibregl-compact')).toHaveLength(1);
     });
 
     test('compact mode control toggles attribution', () => {
-        map.addControl(new AttributionControl({
-            compact: true
-        }));
+        map.addControl(
+            new AttributionControl({
+                compact: true
+            })
+        );
 
         const container = map.getContainer();
         const toggle = container.querySelector('.maplibregl-ctrl-attrib-button');
@@ -115,13 +111,41 @@ describe('AttributionControl', () => {
         map.addControl(attribution);
 
         map.on('load', () => {
-            map.addSource('1', {type: 'geojson', data: {type: 'FeatureCollection', features: []}, attribution: 'World'});
-            map.addSource('2', {type: 'geojson', data: {type: 'FeatureCollection', features: []}, attribution: 'Hello World'});
-            map.addSource('3', {type: 'geojson', data: {type: 'FeatureCollection', features: []}, attribution: 'Another Source'});
-            map.addSource('4', {type: 'geojson', data: {type: 'FeatureCollection', features: []}, attribution: 'Hello'});
-            map.addSource('5', {type: 'geojson', data: {type: 'FeatureCollection', features: []}, attribution: 'Hello World'});
-            map.addSource('6', {type: 'geojson', data: {type: 'FeatureCollection', features: []}, attribution: 'Hello World'});
-            map.addSource('7', {type: 'geojson', data: {type: 'FeatureCollection', features: []}, attribution: 'GeoJSON Source'});
+            map.addSource('1', {
+                type: 'geojson',
+                data: {type: 'FeatureCollection', features: []},
+                attribution: 'World'
+            });
+            map.addSource('2', {
+                type: 'geojson',
+                data: {type: 'FeatureCollection', features: []},
+                attribution: 'Hello World'
+            });
+            map.addSource('3', {
+                type: 'geojson',
+                data: {type: 'FeatureCollection', features: []},
+                attribution: 'Another Source'
+            });
+            map.addSource('4', {
+                type: 'geojson',
+                data: {type: 'FeatureCollection', features: []},
+                attribution: 'Hello'
+            });
+            map.addSource('5', {
+                type: 'geojson',
+                data: {type: 'FeatureCollection', features: []},
+                attribution: 'Hello World'
+            });
+            map.addSource('6', {
+                type: 'geojson',
+                data: {type: 'FeatureCollection', features: []},
+                attribution: 'Hello World'
+            });
+            map.addSource('7', {
+                type: 'geojson',
+                data: {type: 'FeatureCollection', features: []},
+                attribution: 'GeoJSON Source'
+            });
             map.addLayer({id: '1', type: 'fill', source: '1'});
             map.addLayer({id: '2', type: 'fill', source: '2'});
             map.addLayer({id: '3', type: 'fill', source: '3'});
@@ -132,7 +156,7 @@ describe('AttributionControl', () => {
         });
 
         let times = 0;
-        map.on('data', (e) => {
+        map.on('data', e => {
             if (e.dataType === 'source' && e.sourceDataType === 'visibility') {
                 if (++times === 7) {
                     expect(attribution._innerContainer.innerHTML).toBe('Hello World | Another Source | GeoJSON Source');
@@ -156,7 +180,11 @@ describe('AttributionControl', () => {
             expect(attribution._innerContainer.innerHTML).toBe('');
             expect(container.querySelectorAll('.maplibregl-attrib-empty')).toHaveLength(1);
 
-            map.addSource('2', {type: 'geojson', data: {type: 'FeatureCollection', features: []}, attribution: 'Hello World'});
+            map.addSource('2', {
+                type: 'geojson',
+                data: {type: 'FeatureCollection', features: []},
+                attribution: 'Hello World'
+            });
             map.addLayer({id: '2', type: 'fill', source: '2'});
         };
 
@@ -167,7 +195,7 @@ describe('AttributionControl', () => {
         };
 
         let times = 0;
-        map.on('data', (e) => {
+        map.on('data', e => {
             if (e.dataType === 'source' && e.sourceDataType === 'visibility') {
                 times++;
                 if (times === 1) {
@@ -215,7 +243,9 @@ describe('AttributionControl', () => {
         });
         map.addControl(attributionControl);
 
-        expect(attributionControl._innerContainer.innerHTML).toBe('Custom string | Another custom string | Some very long custom string');
+        expect(attributionControl._innerContainer.innerHTML).toBe(
+            'Custom string | Another custom string | Some very long custom string'
+        );
     });
 
     test('hides attributions for sources that are not currently visible', done => {
@@ -224,14 +254,22 @@ describe('AttributionControl', () => {
 
         map.on('load', () => {
             map.addSource('1', {type: 'geojson', data: {type: 'FeatureCollection', features: []}, attribution: 'Used'});
-            map.addSource('2', {type: 'geojson', data: {type: 'FeatureCollection', features: []}, attribution: 'Not used'});
-            map.addSource('3', {type: 'geojson', data: {type: 'FeatureCollection', features: []}, attribution: 'Vibility none'});
+            map.addSource('2', {
+                type: 'geojson',
+                data: {type: 'FeatureCollection', features: []},
+                attribution: 'Not used'
+            });
+            map.addSource('3', {
+                type: 'geojson',
+                data: {type: 'FeatureCollection', features: []},
+                attribution: 'Vibility none'
+            });
             map.addLayer({id: '1', type: 'fill', source: '1'});
             map.addLayer({id: '3', type: 'fill', source: '3', layout: {visibility: 'none'}});
         });
 
         let times = 0;
-        map.on('data', (e) => {
+        map.on('data', e => {
             if (e.dataType === 'source' && e.sourceDataType === 'visibility') {
                 if (++times === 3) {
                     expect(attribution._innerContainer.innerHTML).toBe('Used');
@@ -250,7 +288,7 @@ describe('AttributionControl', () => {
             map.addLayer({id: '1', type: 'fill', source: '1', minzoom: 12});
         });
 
-        map.on('data', (e) => {
+        map.on('data', e => {
             if (e.dataType === 'source' && e.sourceDataType === 'metadata') {
                 expect(attribution._innerContainer.innerHTML).toBe('');
                 map.setZoom(13);
@@ -263,7 +301,6 @@ describe('AttributionControl', () => {
             }
         });
     });
-
 });
 
 describe('AttributionControl test regarding the HTML elements details and summary', () => {
@@ -309,8 +346,7 @@ describe('AttributionControl test regarding the HTML elements details and summar
     describe('Details is set correct for default view (compact === undefined)', () => {
         test('It should NOT contain the attribute open="" if offsetWidth <= 640.', () => {
             Object.defineProperty(map.getCanvasContainer(), 'offsetWidth', {value: 640, configurable: true});
-            const attributionControl = new AttributionControl({
-            });
+            const attributionControl = new AttributionControl({});
             map.addControl(attributionControl);
 
             expect(map.getContainer().querySelectorAll('.maplibregl-ctrl-attrib')[0].getAttribute('open')).toBeNull();
@@ -318,8 +354,7 @@ describe('AttributionControl test regarding the HTML elements details and summar
 
         test('It SHOULD contain the attribute open="" if offsetWidth > 640.', () => {
             Object.defineProperty(map.getCanvasContainer(), 'offsetWidth', {value: 641, configurable: true});
-            const attributionControl = new AttributionControl({
-            });
+            const attributionControl = new AttributionControl({});
             map.addControl(attributionControl);
 
             expect(map.getContainer().querySelectorAll('.maplibregl-ctrl-attrib')[0].getAttribute('open')).toBe('');
@@ -327,8 +362,7 @@ describe('AttributionControl test regarding the HTML elements details and summar
 
         test('The attribute open="" SHOULD change on resize from size > 640 to <= 640 and and vice versa.', () => {
             Object.defineProperty(map.getCanvasContainer(), 'offsetWidth', {value: 640, configurable: true});
-            const attributionControl = new AttributionControl({
-            });
+            const attributionControl = new AttributionControl({});
             map.addControl(attributionControl);
 
             expect(map.getContainer().querySelectorAll('.maplibregl-ctrl-attrib')[0].getAttribute('open')).toBeNull();
@@ -346,8 +380,7 @@ describe('AttributionControl test regarding the HTML elements details and summar
 
         test('The attribute open="" should NOT change on resize from > 640 to another > 640.', () => {
             Object.defineProperty(map.getCanvasContainer(), 'offsetWidth', {value: 641, configurable: true});
-            const attributionControl = new AttributionControl({
-            });
+            const attributionControl = new AttributionControl({});
             map.addControl(attributionControl);
 
             expect(map.getContainer().querySelectorAll('.maplibregl-ctrl-attrib')[0].getAttribute('open')).toBe('');
@@ -365,8 +398,7 @@ describe('AttributionControl test regarding the HTML elements details and summar
 
         test('The attribute open="" should NOT change on resize from <= 640 to another <= 640 if it is closed.', () => {
             Object.defineProperty(map.getCanvasContainer(), 'offsetWidth', {value: 640, configurable: true});
-            const attributionControl = new AttributionControl({
-            });
+            const attributionControl = new AttributionControl({});
             map.addControl(attributionControl);
 
             expect(map.getContainer().querySelectorAll('.maplibregl-ctrl-attrib')[0].getAttribute('open')).toBeNull();
@@ -384,8 +416,7 @@ describe('AttributionControl test regarding the HTML elements details and summar
 
         test('The attribute open="" should NOT change on resize from <= 640 to another <= 640 if it is open.', () => {
             Object.defineProperty(map.getCanvasContainer(), 'offsetWidth', {value: 640, configurable: true});
-            const attributionControl = new AttributionControl({
-            });
+            const attributionControl = new AttributionControl({});
             map.addControl(attributionControl);
             const toggle = map.getContainer().querySelector('.maplibregl-ctrl-attrib-button');
             simulate.click(toggle);

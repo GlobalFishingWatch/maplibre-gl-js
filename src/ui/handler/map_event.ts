@@ -4,14 +4,16 @@ import type Map from '../map';
 import type Point from '../../util/point';
 
 export class MapEventHandler implements Handler {
-
     _mousedownPos: Point;
     _clickTolerance: number;
     _map: Map;
 
-    constructor(map: Map, options: {
-      clickTolerance: number;
-    }) {
+    constructor(
+        map: Map,
+        options: {
+            clickTolerance: number;
+        }
+    ) {
         this._map = map;
         this._clickTolerance = options.clickTolerance;
     }

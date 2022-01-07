@@ -31,4 +31,3 @@ export default function createStyleLayer(layer: LayerSpecification | CustomLayer
         return new subclasses[layer.type](layer);
     }
 }
-

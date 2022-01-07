@@ -46,10 +46,10 @@ class SourceCache extends Evented {
     _prevLng: number;
     _cache: TileCache;
     _timers: {
-      [_ in any]: ReturnType<typeof setTimeout>;
+        [_ in any]: ReturnType<typeof setTimeout>;
     };
     _cacheTimers: {
-      [_ in any]: ReturnType<typeof setTimeout>;
+        [_ in any]: ReturnType<typeof setTimeout>;
     };
     _maxTileCacheSize: number;
     _paused: boolean;
@@ -68,7 +68,7 @@ class SourceCache extends Evented {
         this.id = id;
         this.dispatcher = dispatcher;
 
-        this.on('data', (e) => {
+        this.on('data', e => {
             // this._sourceLoaded signifies that the TileJSON is loaded if applicable.
             // if the source type does not come with a TileJSON, the flag signifies the
             // source data has loaded (i.e geojson has been tiled on the worker and is ready)
@@ -121,13 +121,18 @@ class SourceCache extends Evented {
      * @private
      */
     loaded(): boolean {
-        if (this._sourceErrored) { return true; }
-        if (!this._sourceLoaded) { return false; }
-        if (!this._source.loaded()) { return false; }
+        if (this._sourceErrored) {
+            return true;
+        }
+        if (!this._sourceLoaded) {
+            return false;
+        }
+        if (!this._source.loaded()) {
+            return false;
+        }
         for (const t in this._tiles) {
             const tile = this._tiles[t];
-            if (tile.state !== 'loaded' && tile.state !== 'errored')
-                return false;
+            if (tile.state !== 'loaded' && tile.state !== 'errored') return false;
         }
         return true;
     }
@@ -154,13 +159,11 @@ class SourceCache extends Evented {
     }
 
     _unloadTile(tile: Tile) {
-        if (this._source.unloadTile)
-            return this._source.unloadTile(tile, () => {});
+        if (this._source.unloadTile) return this._source.unloadTile(tile, () => {});
     }
 
     _abortTile(tile: Tile) {
-        if (this._source.abortTile)
-            return this._source.abortTile(tile, () => {});
+        if (this._source.abortTile) return this._source.abortTile(tile, () => {});
     }
 
     serialize() {
@@ -168,7 +171,7 @@ class SourceCache extends Evented {
     }
 
     prepare(context: Context) {
-        if  (this._source.prepare) {
+        if (this._source.prepare) {
             this._source.prepare();
         }
 
@@ -185,7 +188,10 @@ class SourceCache extends Evented {
      * @private
      */
     getIds(): Array<string> {
-        return (Object.values(this._tiles) as any).map((tile: Tile) => tile.tileID).sort(compareTileId).map(id => id.key);
+        return (Object.values(this._tiles) as any)
+            .map((tile: Tile) => tile.tileID)
+            .sort(compareTileId)
+            .map(id => id.key);
     }
 
     getRenderableIds(symbolLayer?: boolean): Array<string> {
@@ -194,15 +200,20 @@ class SourceCache extends Evented {
             if (this._isIdRenderable(id, symbolLayer)) renderables.push(this._tiles[id]);
         }
         if (symbolLayer) {
-            return renderables.sort((a_: Tile, b_: Tile) => {
-                const a = a_.tileID;
-                const b = b_.tileID;
-                const rotatedA = (new Point(a.canonical.x, a.canonical.y))._rotate(this.transform.angle);
-                const rotatedB = (new Point(b.canonical.x, b.canonical.y))._rotate(this.transform.angle);
-                return a.overscaledZ - b.overscaledZ || rotatedB.y - rotatedA.y || rotatedB.x - rotatedA.x;
-            }).map(tile => tile.tileID.key);
+            return renderables
+                .sort((a_: Tile, b_: Tile) => {
+                    const a = a_.tileID;
+                    const b = b_.tileID;
+                    const rotatedA = new Point(a.canonical.x, a.canonical.y)._rotate(this.transform.angle);
+                    const rotatedB = new Point(b.canonical.x, b.canonical.y)._rotate(this.transform.angle);
+                    return a.overscaledZ - b.overscaledZ || rotatedB.y - rotatedA.y || rotatedB.x - rotatedA.x;
+                })
+                .map(tile => tile.tileID.key);
         }
-        return renderables.map(tile => tile.tileID).sort(compareTileId).map(id => id.key);
+        return renderables
+            .map(tile => tile.tileID)
+            .sort(compareTileId)
+            .map(id => id.key);
     }
 
     hasRenderableParent(tileID: OverscaledTileID) {
@@ -214,8 +225,12 @@ class SourceCache extends Evented {
     }
 
     _isIdRenderable(id: string, symbolLayer?: boolean) {
-        return this._tiles[id] && this._tiles[id].hasData() &&
-            !this._coveredTiles[id] && (symbolLayer || !this._tiles[id].holdingForFade());
+        return (
+            this._tiles[id] &&
+            this._tiles[id].hasData() &&
+            !this._coveredTiles[id] &&
+            (symbolLayer || !this._tiles[id].holdingForFade())
+        );
     }
 
     reload() {
@@ -269,9 +284,9 @@ class SourceCache extends Evented {
     }
 
     /**
-    * For raster terrain source, backfill DEM to eliminate visible tile boundaries
-    * @private
-    */
+     * For raster terrain source, backfill DEM to eliminate visible tile boundaries
+     * @private
+     */
     _backfillDEM(tile: Tile) {
         const renderables = this.getRenderableIds();
         for (let i = 0; i < renderables.length; i++) {
@@ -331,23 +346,25 @@ class SourceCache extends Evented {
      */
     _retainLoadedChildren(
         idealTiles: {
-          [_ in any]: OverscaledTileID;
+            [_ in any]: OverscaledTileID;
         },
         zoom: number,
         maxCoveringZoom: number,
         retain: {
-          [_ in any]: OverscaledTileID;
+            [_ in any]: OverscaledTileID;
         }
     ) {
         for (const id in this._tiles) {
             let tile = this._tiles[id];
 
             // only consider renderable tiles up to maxCoveringZoom
-            if (retain[id] ||
+            if (
+                retain[id] ||
                 !tile.hasData() ||
                 tile.tileID.overscaledZ <= zoom ||
                 tile.tileID.overscaledZ > maxCoveringZoom
-            ) continue;
+            )
+                continue;
 
             // loop through parents and retain the topmost loaded one if found
             let topmostLoadedID = tile.tileID;
@@ -423,7 +440,10 @@ class SourceCache extends Evented {
         const commonZoomRange = 5;
 
         const viewDependentMaxSize = Math.floor(approxTilesInView * commonZoomRange);
-        const maxSize = typeof this._maxTileCacheSize === 'number' ? Math.min(this._maxTileCacheSize, viewDependentMaxSize) : viewDependentMaxSize;
+        const maxSize =
+            typeof this._maxTileCacheSize === 'number'
+                ? Math.min(this._maxTileCacheSize, viewDependentMaxSize)
+                : viewDependentMaxSize;
 
         this._cache.setMaxSize(maxSize);
     }
@@ -478,7 +498,9 @@ class SourceCache extends Evented {
      */
     update(transform: Transform) {
         this.transform = transform;
-        if (!this._sourceLoaded || this._paused) { return; }
+        if (!this._sourceLoaded || this._paused) {
+            return;
+        }
 
         this.updateCacheSize(transform);
         this.handleWrapJump(this.transform.center.lng);
@@ -491,8 +513,18 @@ class SourceCache extends Evented {
         if (!this.used) {
             idealTileIDs = [];
         } else if (this._source.tileID) {
-            idealTileIDs = transform.getVisibleUnwrappedCoordinates(this._source.tileID)
-                .map((unwrapped) => new OverscaledTileID(unwrapped.canonical.z, unwrapped.wrap, unwrapped.canonical.z, unwrapped.canonical.x, unwrapped.canonical.y));
+            idealTileIDs = transform
+                .getVisibleUnwrappedCoordinates(this._source.tileID)
+                .map(
+                    unwrapped =>
+                        new OverscaledTileID(
+                            unwrapped.canonical.z,
+                            unwrapped.wrap,
+                            unwrapped.canonical.z,
+                            unwrapped.canonical.x,
+                            unwrapped.canonical.y
+                        )
+                );
         } else {
             idealTileIDs = transform.coveringTiles({
                 tileSize: this._source.tileSize,
@@ -503,14 +535,14 @@ class SourceCache extends Evented {
             });
 
             if (this._source.hasTile) {
-                idealTileIDs = idealTileIDs.filter((coord) => (this._source.hasTile as any)(coord));
+                idealTileIDs = idealTileIDs.filter(coord => (this._source.hasTile as any)(coord));
             }
         }
 
         // Determine the overzooming/underzooming amounts.
         const zoom = transform.coveringZoomLevel(this._source);
         const minCoveringZoom = Math.max(zoom - SourceCache.maxOverzooming, this._source.minzoom);
-        const maxCoveringZoom = Math.max(zoom + SourceCache.maxUnderzooming,  this._source.minzoom);
+        const maxCoveringZoom = Math.max(zoom + SourceCache.maxUnderzooming, this._source.minzoom);
 
         // Retain is a list of tiles that we shouldn't delete, even if they are not
         // the most ideal tile for the current viewport. This may include tiles like
@@ -526,7 +558,7 @@ class SourceCache extends Evented {
                 assert(tileID.key === id);
 
                 const tile = this._tiles[id];
-                if (!tile || tile.fadeEndTime && tile.fadeEndTime <= browser.now()) continue;
+                if (!tile || (tile.fadeEndTime && tile.fadeEndTime <= browser.now())) continue;
 
                 // if the tile is loaded but still fading in, find parents to cross-fade with it
                 const parentTile = this.findLoadedParent(tileID, minCoveringZoom);
@@ -583,7 +615,7 @@ class SourceCache extends Evented {
         const retain: {[_: string]: OverscaledTileID} = {};
         const checked: {[_: string]: boolean} = {};
         const minCoveringZoom = Math.max(zoom - SourceCache.maxOverzooming, this._source.minzoom);
-        const maxCoveringZoom = Math.max(zoom + SourceCache.maxUnderzooming,  this._source.minzoom);
+        const maxCoveringZoom = Math.max(zoom + SourceCache.maxUnderzooming, this._source.minzoom);
 
         const missingTiles = {};
         for (const tileID of idealTileIDs) {
@@ -623,10 +655,13 @@ class SourceCache extends Evented {
                 // check if all 4 immediate children are loaded (i.e. the missing ideal tile is covered)
                 const children = tileID.children(this._source.maxzoom);
 
-                if (retain[children[0].key] &&
+                if (
+                    retain[children[0].key] &&
                     retain[children[1].key] &&
                     retain[children[2].key] &&
-                    retain[children[3].key]) continue; // tile is covered by children
+                    retain[children[3].key]
+                )
+                    continue; // tile is covered by children
             }
 
             // We couldn't find child tiles that entirely cover the ideal tile; look for parents now.
@@ -671,7 +706,6 @@ class SourceCache extends Evented {
             // Find the closest loaded ancestor by traversing the tile tree towards the root and
             // caching results along the way
             while (currentId.overscaledZ > 0) {
-
                 // Do we have a cached result from previous traversals?
                 if (currentId.key in this._loadedParentTiles) {
                     parentTile = this._loadedParentTiles[currentId.key];
@@ -703,8 +737,7 @@ class SourceCache extends Evented {
      */
     _addTile(tileID: OverscaledTileID): Tile {
         let tile = this._tiles[tileID.key];
-        if (tile)
-            return tile;
+        if (tile) return tile;
 
         tile = this._cache.getAndRemove(tileID);
         if (tile) {
@@ -756,8 +789,7 @@ class SourceCache extends Evented {
      */
     _removeTile(id: string) {
         const tile = this._tiles[id];
-        if (!tile)
-            return;
+        if (!tile) return;
 
         tile.uses--;
         delete this._tiles[id];
@@ -766,8 +798,7 @@ class SourceCache extends Evented {
             delete this._timers[id];
         }
 
-        if (tile.uses > 0)
-            return;
+        if (tile.uses > 0) return;
 
         if (tile.hasData() && tile.state !== 'reloading') {
             this._cache.add(tile.tileID, tile, tile.getExpiryTimeout());
@@ -785,8 +816,7 @@ class SourceCache extends Evented {
         this._shouldReloadOnResume = false;
         this._paused = false;
 
-        for (const id in this._tiles)
-            this._removeTile(id);
+        for (const id in this._tiles) this._removeTile(id);
 
         this._cache.reset();
     }
@@ -799,18 +829,17 @@ class SourceCache extends Evented {
      * @private
      */
     tilesIn(pointQueryGeometry: Array<Point>, maxPitchScaleFactor: number, has3DLayer: boolean) {
-
         const tileResults = [];
 
         const transform = this.transform;
         if (!transform) return tileResults;
 
-        const cameraPointQueryGeometry = has3DLayer ?
-            transform.getCameraQueryGeometry(pointQueryGeometry) :
-            pointQueryGeometry;
+        const cameraPointQueryGeometry = has3DLayer
+            ? transform.getCameraQueryGeometry(pointQueryGeometry)
+            : pointQueryGeometry;
 
-        const queryGeometry = pointQueryGeometry.map((p) => transform.pointCoordinate(p));
-        const cameraQueryGeometry = cameraPointQueryGeometry.map((p) => transform.pointCoordinate(p));
+        const queryGeometry = pointQueryGeometry.map(p => transform.pointCoordinate(p));
+        const cameraQueryGeometry = cameraPointQueryGeometry.map(p => transform.pointCoordinate(p));
 
         const ids = this.getIds();
 
@@ -834,18 +863,21 @@ class SourceCache extends Evented {
             }
             const tileID = tile.tileID;
             const scale = Math.pow(2, transform.zoom - tile.tileID.overscaledZ);
-            const queryPadding = maxPitchScaleFactor * tile.queryPadding * EXTENT / tile.tileSize / scale;
+            const queryPadding = (maxPitchScaleFactor * tile.queryPadding * EXTENT) / tile.tileSize / scale;
 
             const tileSpaceBounds = [
                 tileID.getTilePoint(new MercatorCoordinate(minX, minY)),
                 tileID.getTilePoint(new MercatorCoordinate(maxX, maxY))
             ];
 
-            if (tileSpaceBounds[0].x - queryPadding < EXTENT && tileSpaceBounds[0].y - queryPadding < EXTENT &&
-                tileSpaceBounds[1].x + queryPadding >= 0 && tileSpaceBounds[1].y + queryPadding >= 0) {
-
-                const tileSpaceQueryGeometry: Array<Point> = queryGeometry.map((c) => tileID.getTilePoint(c));
-                const tileSpaceCameraQueryGeometry = cameraQueryGeometry.map((c) => tileID.getTilePoint(c));
+            if (
+                tileSpaceBounds[0].x - queryPadding < EXTENT &&
+                tileSpaceBounds[0].y - queryPadding < EXTENT &&
+                tileSpaceBounds[1].x + queryPadding >= 0 &&
+                tileSpaceBounds[1].y + queryPadding >= 0
+            ) {
+                const tileSpaceQueryGeometry: Array<Point> = queryGeometry.map(c => tileID.getTilePoint(c));
+                const tileSpaceCameraQueryGeometry = cameraQueryGeometry.map(c => tileID.getTilePoint(c));
 
                 tileResults.push({
                     tile,
@@ -861,7 +893,7 @@ class SourceCache extends Evented {
     }
 
     getVisibleCoordinates(symbolLayer?: boolean): Array<OverscaledTileID> {
-        const coords = this.getRenderableIds(symbolLayer).map((id) => this._tiles[id].tileID);
+        const coords = this.getRenderableIds(symbolLayer).map(id => this._tiles[id].tileID);
         for (const coord of coords) {
             coord.posMatrix = this.transform.calculatePosMatrix(coord.toUnwrapped());
         }
@@ -948,7 +980,9 @@ function compareTileId(a: OverscaledTileID, b: OverscaledTileID): number {
     // with negative wrap and even numbers for copies with positive wrap.
     const aWrap = Math.abs(a.wrap * 2) - +(a.wrap < 0);
     const bWrap = Math.abs(b.wrap * 2) - +(b.wrap < 0);
-    return a.overscaledZ - b.overscaledZ || bWrap - aWrap || b.canonical.y - a.canonical.y || b.canonical.x - a.canonical.x;
+    return (
+        a.overscaledZ - b.overscaledZ || bWrap - aWrap || b.canonical.y - a.canonical.y || b.canonical.x - a.canonical.x
+    );
 }
 
 function isRasterType(type) {

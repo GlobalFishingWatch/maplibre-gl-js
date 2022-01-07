@@ -1,4 +1,3 @@
-
 import ValidationError from '../error/validation_error';
 import {unbundle} from '../util/unbundle_jsonlint';
 import validateObject from './validate_object';
@@ -27,13 +26,19 @@ export default function validateLayer(options) {
         for (let i = 0; i < options.arrayIndex; i++) {
             const otherLayer = style.layers[i];
             if (unbundle(otherLayer.id) === layerId) {
-                errors.push(new ValidationError(key, layer.id, `duplicate layer id "${layer.id}", previously used at line ${otherLayer.id.__line__}`));
+                errors.push(
+                    new ValidationError(
+                        key,
+                        layer.id,
+                        `duplicate layer id "${layer.id}", previously used at line ${otherLayer.id.__line__}`
+                    )
+                );
             }
         }
     }
 
     if ('ref' in layer) {
-        ['type', 'source', 'source-layer', 'filter', 'layout'].forEach((p) => {
+        ['type', 'source', 'source-layer', 'filter', 'layout'].forEach(p => {
             if (p in layer) {
                 errors.push(new ValidationError(key, layer[p], `"${p}" is prohibited for ref layers`));
             }
@@ -41,7 +46,7 @@ export default function validateLayer(options) {
 
         let parent;
 
-        style.layers.forEach((layer) => {
+        style.layers.forEach(layer => {
             if (unbundle(layer.id) === ref) parent = layer;
         });
 
@@ -67,68 +72,86 @@ export default function validateLayer(options) {
             } else if (sourceType === 'vector' && !layer['source-layer']) {
                 errors.push(new ValidationError(key, layer, `layer "${layer.id}" must specify a "source-layer"`));
             } else if (sourceType === 'raster-dem' && type !== 'hillshade') {
-                errors.push(new ValidationError(key, layer.source, 'raster-dem source can only be used with layer type \'hillshade\'.'));
-            } else if (type === 'line' && layer.paint && layer.paint['line-gradient'] &&
-                       (sourceType !== 'geojson' || !source.lineMetrics)) {
-                errors.push(new ValidationError(key, layer, `layer "${layer.id}" specifies a line-gradient, which requires a GeoJSON source with \`lineMetrics\` enabled.`));
+                errors.push(
+                    new ValidationError(
+                        key,
+                        layer.source,
+                        "raster-dem source can only be used with layer type 'hillshade'."
+                    )
+                );
+            } else if (
+                type === 'line' &&
+                layer.paint &&
+                layer.paint['line-gradient'] &&
+                (sourceType !== 'geojson' || !source.lineMetrics)
+            ) {
+                errors.push(
+                    new ValidationError(
+                        key,
+                        layer,
+                        `layer "${layer.id}" specifies a line-gradient, which requires a GeoJSON source with \`lineMetrics\` enabled.`
+                    )
+                );
             }
         }
     }
 
-    errors = errors.concat(validateObject({
-        key,
-        value: layer,
-        valueSpec: styleSpec.layer,
-        style: options.style,
-        styleSpec: options.styleSpec,
-        objectElementValidators: {
-            '*'() {
-                return [];
-            },
-            // We don't want to enforce the spec's `"requires": true` for backward compatibility with refs;
-            // the actual requirement is validated above. See https://github.com/mapbox/mapbox-gl-js/issues/5772.
-            type() {
-                return validateSpec({
-                    key: `${key}.type`,
-                    value: layer.type,
-                    valueSpec: styleSpec.layer.type,
-                    style: options.style,
-                    styleSpec: options.styleSpec,
-                    object: layer,
-                    objectKey: 'type'
-                });
-            },
-            filter: validateFilter,
-            layout(options) {
-                return validateObject({
-                    layer,
-                    key: options.key,
-                    value: options.value,
-                    style: options.style,
-                    styleSpec: options.styleSpec,
-                    objectElementValidators: {
-                        '*'(options) {
-                            return validateLayoutProperty(extend({layerType: type}, options));
+    errors = errors.concat(
+        validateObject({
+            key,
+            value: layer,
+            valueSpec: styleSpec.layer,
+            style: options.style,
+            styleSpec: options.styleSpec,
+            objectElementValidators: {
+                '*'() {
+                    return [];
+                },
+                // We don't want to enforce the spec's `"requires": true` for backward compatibility with refs;
+                // the actual requirement is validated above. See https://github.com/mapbox/mapbox-gl-js/issues/5772.
+                type() {
+                    return validateSpec({
+                        key: `${key}.type`,
+                        value: layer.type,
+                        valueSpec: styleSpec.layer.type,
+                        style: options.style,
+                        styleSpec: options.styleSpec,
+                        object: layer,
+                        objectKey: 'type'
+                    });
+                },
+                filter: validateFilter,
+                layout(options) {
+                    return validateObject({
+                        layer,
+                        key: options.key,
+                        value: options.value,
+                        style: options.style,
+                        styleSpec: options.styleSpec,
+                        objectElementValidators: {
+                            '*'(options) {
+                                return validateLayoutProperty(extend({layerType: type}, options));
+                            }
                         }
-                    }
-                });
-            },
-            paint(options) {
-                return validateObject({
-                    layer,
-                    key: options.key,
-                    value: options.value,
-                    style: options.style,
-                    styleSpec: options.styleSpec,
-                    objectElementValidators: {
-                        '*'(options) {
-                            return validatePaintProperty(extend({layerType: type}, options));
+                    });
+                },
+                paint(options) {
+                    return validateObject({
+                        layer,
+                        key: options.key,
+                        value: options.value,
+                        style: options.style,
+                        styleSpec: options.styleSpec,
+                        objectElementValidators: {
+                            '*'(options) {
+                                return validatePaintProperty(extend({layerType: type}, options));
+                            }
                         }
-                    }
-                });
+                    });
+                }
             }
-        }
-    }));
+        })
+    );
 
     return errors;
 }

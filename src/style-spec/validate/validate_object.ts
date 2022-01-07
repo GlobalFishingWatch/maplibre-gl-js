@@ -1,4 +1,3 @@
-
 import ValidationError from '../error/validation_error';
 import getType from '../util/get_type';
 import validateSpec from './validate';
@@ -35,15 +34,20 @@ export default function validateObject(options) {
             continue;
         }
 
-        errors = errors.concat(validateElement({
-            key: (key ? `${key}.` : key) + objectKey,
-            value: object[objectKey],
-            valueSpec: elementSpec,
-            style,
-            styleSpec,
-            object,
-            objectKey
-        }, object));
+        errors = errors.concat(
+            validateElement(
+                {
+                    key: (key ? `${key}.` : key) + objectKey,
+                    value: object[objectKey],
+                    valueSpec: elementSpec,
+                    style,
+                    styleSpec,
+                    object,
+                    objectKey
+                },
+                object
+            )
+        );
     }
 
     for (const elementSpecKey in elementSpecs) {
@@ -52,7 +56,11 @@ export default function validateObject(options) {
             continue;
         }
 
-        if (elementSpecs[elementSpecKey].required && elementSpecs[elementSpecKey]['default'] === undefined && object[elementSpecKey] === undefined) {
+        if (
+            elementSpecs[elementSpecKey].required &&
+            elementSpecs[elementSpecKey]['default'] === undefined &&
+            object[elementSpecKey] === undefined
+        ) {
             errors.push(new ValidationError(key, object, `missing required property "${elementSpecKey}"`));
         }
     }

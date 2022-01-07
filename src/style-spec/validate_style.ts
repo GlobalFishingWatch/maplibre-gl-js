@@ -1,4 +1,3 @@
-
 import validateStyleMin from './validate_style.min';
 import {v8} from './style-spec';
 import readStyle from './read_style';

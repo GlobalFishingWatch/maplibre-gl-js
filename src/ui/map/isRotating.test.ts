@@ -41,7 +41,9 @@ describe('Map#isRotating', () => {
 
     test('returns true when drag rotating', done => {
         // Prevent inertial rotation.
-        jest.spyOn(browser, 'now').mockImplementation(() => { return 0; });
+        jest.spyOn(browser, 'now').mockImplementation(() => {
+            return 0;
+        });
 
         map.on('rotatestart', () => {
             expect(map.isRotating()).toBe(true);
@@ -58,7 +60,7 @@ describe('Map#isRotating', () => {
         simulate.mousemove(map.getCanvas(), {buttons: 2, clientX: 10, clientY: 10});
         map._renderTaskQueue.run();
 
-        simulate.mouseup(map.getCanvas(),   {buttons: 0, button: 2});
+        simulate.mouseup(map.getCanvas(), {buttons: 0, button: 2});
         map._renderTaskQueue.run();
     });
 });

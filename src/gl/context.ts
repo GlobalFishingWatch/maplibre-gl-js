@@ -7,19 +7,48 @@ import StencilMode from './stencil_mode';
 import ColorMode from './color_mode';
 import CullFaceMode from './cull_face_mode';
 import {deepEqual} from '../util/util';
-import {ClearColor, ClearDepth, ClearStencil, ColorMask, DepthMask, StencilMask, StencilFunc, StencilOp, StencilTest, DepthRange, DepthTest, DepthFunc, Blend, BlendFunc, BlendColor, BlendEquation, CullFace, CullFaceSide, FrontFace, ProgramValue, ActiveTextureUnit, Viewport, BindFramebuffer, BindRenderbuffer, BindTexture, BindVertexBuffer, BindElementBuffer, BindVertexArrayOES, PixelStoreUnpack, PixelStoreUnpackPremultiplyAlpha, PixelStoreUnpackFlipY} from './value';
+import {
+    ClearColor,
+    ClearDepth,
+    ClearStencil,
+    ColorMask,
+    DepthMask,
+    StencilMask,
+    StencilFunc,
+    StencilOp,
+    StencilTest,
+    DepthRange,
+    DepthTest,
+    DepthFunc,
+    Blend,
+    BlendFunc,
+    BlendColor,
+    BlendEquation,
+    CullFace,
+    CullFaceSide,
+    FrontFace,
+    ProgramValue,
+    ActiveTextureUnit,
+    Viewport,
+    BindFramebuffer,
+    BindRenderbuffer,
+    BindTexture,
+    BindVertexBuffer,
+    BindElementBuffer,
+    BindVertexArrayOES,
+    PixelStoreUnpack,
+    PixelStoreUnpackPremultiplyAlpha,
+    PixelStoreUnpackFlipY
+} from './value';
 
 import type {TriangleIndexArray, LineIndexArray, LineStripIndexArray} from '../data/index_array_type';
-import type {
-    StructArray,
-    StructArrayMember
-} from '../util/struct_array';
+import type {StructArray, StructArrayMember} from '../util/struct_array';
 import type Color from '../style-spec/util/color';
 
 type ClearArgs = {
-  color?: Color;
-  depth?: number;
-  stencil?: number;
+    color?: Color;
+    depth?: number;
+    stencil?: number;
 };
 
 class Context {
@@ -102,13 +131,14 @@ class Context {
         this.pixelStoreUnpackPremultiplyAlpha = new PixelStoreUnpackPremultiplyAlpha(this);
         this.pixelStoreUnpackFlipY = new PixelStoreUnpackFlipY(this);
 
-        this.extTextureFilterAnisotropic = (
+        this.extTextureFilterAnisotropic =
             gl.getExtension('EXT_texture_filter_anisotropic') ||
             gl.getExtension('MOZ_EXT_texture_filter_anisotropic') ||
-            gl.getExtension('WEBKIT_EXT_texture_filter_anisotropic')
-        );
+            gl.getExtension('WEBKIT_EXT_texture_filter_anisotropic');
         if (this.extTextureFilterAnisotropic) {
-            this.extTextureFilterAnisotropicMax = gl.getParameter(this.extTextureFilterAnisotropic.MAX_TEXTURE_MAX_ANISOTROPY_EXT);
+            this.extTextureFilterAnisotropicMax = gl.getParameter(
+                this.extTextureFilterAnisotropic.MAX_TEXTURE_MAX_ANISOTROPY_EXT
+            );
         }
 
         this.extTextureHalfFloat = gl.getExtension('OES_texture_half_float');
@@ -210,10 +240,7 @@ class Context {
         return new Framebuffer(this, width, height, hasDepth);
     }
 
-    clear({
-        color,
-        depth
-    }: ClearArgs) {
+    clear({color, depth}: ClearArgs) {
         const gl = this.gl;
         let mask = 0;
 

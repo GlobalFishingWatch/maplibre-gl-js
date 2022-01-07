@@ -20,7 +20,9 @@ import glyphs from '../../../test/fixtures/fontstack-glyphs.json';
 import {StyleGlyph} from '../../style/style_glyph';
 
 // Load a point feature from fixture tile.
-const vt = new VectorTile(new Protobuf(fs.readFileSync(path.resolve(__dirname, '../../../test/fixtures/mbsv5-6-18-23.vector.pbf'))));
+const vt = new VectorTile(
+    new Protobuf(fs.readFileSync(path.resolve(__dirname, '../../../test/fixtures/mbsv5-6-18-23.vector.pbf')))
+);
 const feature = vt.layers.place_label.feature(10);
 
 /*eslint new-cap: 0*/
@@ -30,7 +32,7 @@ transform.width = 100;
 transform.height = 100;
 transform.cameraToCenterDistance = 100;
 
-const stacks = {'Test': glyphs} as any as {
+const stacks = {Test: glyphs} as any as {
     [_: string]: {
         [x: number]: StyleGlyph;
     };
@@ -49,7 +51,7 @@ function createIndexedFeature(id, index, iconId) {
             properties: {
                 icon: iconId
             },
-            loadGeometry () {
+            loadGeometry() {
                 return [[{x: 0, y: 0}]];
             }
         },
@@ -104,7 +106,7 @@ describe('SymbolBucket', () => {
     });
 
     test('SymbolBucket integer overflow', () => {
-        const spy = jest.spyOn(console, 'warn').mockImplementation(() => { });
+        const spy = jest.spyOn(console, 'warn').mockImplementation(() => {});
         SymbolBucket.MAX_GLYPHS = 5;
 
         const bucket = bucketSetup() as any as SymbolBucket;
@@ -112,14 +114,31 @@ describe('SymbolBucket', () => {
 
         bucket.populate([{feature} as IndexedFeature], options, undefined);
         const fakeGlyph = {rect: {w: 10, h: 10}, metrics: {left: 10, top: 10, advance: 10}};
-        performSymbolLayout(bucket, stacks, {'Test': {97: fakeGlyph, 98: fakeGlyph, 99: fakeGlyph, 100: fakeGlyph, 101: fakeGlyph, 102: fakeGlyph} as any}, undefined, undefined, undefined, undefined);
+        performSymbolLayout(
+            bucket,
+            stacks,
+            {
+                Test: {
+                    97: fakeGlyph,
+                    98: fakeGlyph,
+                    99: fakeGlyph,
+                    100: fakeGlyph,
+                    101: fakeGlyph,
+                    102: fakeGlyph
+                } as any
+            },
+            undefined,
+            undefined,
+            undefined,
+            undefined
+        );
 
         expect(spy).toHaveBeenCalledTimes(1);
         expect(spy.mock.calls[0][0].includes('Too many glyphs being rendered in a tile.')).toBeTruthy();
     });
 
     test('SymbolBucket image undefined sdf', () => {
-        const spy = jest.spyOn(console, 'warn').mockImplementation(() => { });
+        const spy = jest.spyOn(console, 'warn').mockImplementation(() => {});
         spy.mockReset();
 
         const imageMap = {
@@ -130,7 +149,7 @@ describe('SymbolBucket', () => {
                 data: new RGBAImage({width: 0, height: 0}),
                 sdf: false
             }
-        } as any as { [_: string]: StyleImage };
+        } as any as {[_: string]: StyleImage};
         const imagePos = {
             a: new ImagePosition({x: 0, y: 0, w: 10, h: 10}, 1 as any as StyleImage),
             b: new ImagePosition({x: 10, y: 0, w: 10, h: 10}, 1 as any as StyleImage)
@@ -139,12 +158,13 @@ describe('SymbolBucket', () => {
         const options = {iconDependencies: {}, glyphDependencies: {}} as PopulateParameters;
 
         bucket.populate(
-        [
-            createIndexedFeature(0, 0, 'a'),
-            createIndexedFeature(1, 1, 'b'),
-            createIndexedFeature(2, 2, 'a')
-        ] as any as IndexedFeature[],
-        options, undefined
+            [
+                createIndexedFeature(0, 0, 'a'),
+                createIndexedFeature(1, 1, 'b'),
+                createIndexedFeature(2, 2, 'a')
+            ] as any as IndexedFeature[],
+            options,
+            undefined
         );
 
         const icons = options.iconDependencies as any;
@@ -158,7 +178,7 @@ describe('SymbolBucket', () => {
     });
 
     test('SymbolBucket image mismatched sdf', () => {
-        const spy = jest.spyOn(console, 'warn').mockImplementation(() => { });
+        const spy = jest.spyOn(console, 'warn').mockImplementation(() => {});
         spy.mockReset();
 
         const imageMap = {
@@ -170,7 +190,7 @@ describe('SymbolBucket', () => {
                 data: new RGBAImage({width: 0, height: 0}),
                 sdf: false
             }
-        } as any as { [_: string]: StyleImage };
+        } as any as {[_: string]: StyleImage};
         const imagePos = {
             a: new ImagePosition({x: 0, y: 0, w: 10, h: 10}, 1 as any as StyleImage),
             b: new ImagePosition({x: 10, y: 0, w: 10, h: 10}, 1 as any as StyleImage)
@@ -179,12 +199,13 @@ describe('SymbolBucket', () => {
         const options = {iconDependencies: {}, glyphDependencies: {}} as PopulateParameters;
 
         bucket.populate(
-        [
-            createIndexedFeature(0, 0, 'a'),
-            createIndexedFeature(1, 1, 'b'),
-            createIndexedFeature(2, 2, 'a')
-        ] as any as IndexedFeature[],
-        options, undefined
+            [
+                createIndexedFeature(0, 0, 'a'),
+                createIndexedFeature(1, 1, 'b'),
+                createIndexedFeature(2, 2, 'a')
+            ] as any as IndexedFeature[],
+            options,
+            undefined
         );
 
         const icons = options.iconDependencies as any;

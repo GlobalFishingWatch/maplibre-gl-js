@@ -4,7 +4,6 @@ import Point from '../util/point';
 import {CollisionBoxArray} from '../data/array_types';
 
 describe('CollisionFeature', () => {
-
     const collisionBoxArray = new CollisionBoxArray();
 
     const shapedText = {

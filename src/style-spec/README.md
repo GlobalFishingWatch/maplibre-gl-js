@@ -15,8 +15,8 @@ If you install this package globally, you will have access to several CLI tools.
 
     npm install @maplibre/maplibre-gl-style-spec --global
 
-
 ### `gl-style-composite`
+
 ```bash
 $ gl-style-composite style.json
 ```
@@ -55,4 +55,3 @@ $ gl-style-validate style.json
 
 Will validate the given style JSON and print errors to stdout. Provide a
 `--json` flag to get JSON output.
-

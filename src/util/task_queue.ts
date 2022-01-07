@@ -3,9 +3,9 @@ import assert from 'assert';
 export type TaskID = number; // can't mark opaque due to https://github.com/flowtype/flow-remove-types/pull/61
 
 type Task = {
-  callback: (timeStamp: number) => void;
-  id: TaskID;
-  cancelled: boolean;
+    callback: (timeStamp: number) => void;
+    id: TaskID;
+    cancelled: boolean;
 };
 
 class TaskQueue {
@@ -14,7 +14,7 @@ class TaskQueue {
     _cleared: boolean;
     _currentlyRunning: Array<Task> | false;
 
-    constructor()  {
+    constructor() {
         this._queue = [];
         this._id = 0;
         this._cleared = false;
@@ -41,7 +41,7 @@ class TaskQueue {
 
     run(timeStamp: number = 0) {
         assert(!this._currentlyRunning);
-        const queue = this._currentlyRunning = this._queue;
+        const queue = (this._currentlyRunning = this._queue);
 
         // Tasks queued by callbacks in the current queue should be executed
         // on the next run, not the current run.

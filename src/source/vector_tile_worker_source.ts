@@ -6,12 +6,7 @@ import WorkerTile from './worker_tile';
 import {extend} from '../util/util';
 import {RequestPerformance} from '../util/performance';
 
-import type {
-    WorkerSource,
-    WorkerTileParameters,
-    WorkerTileCallback,
-    TileParameters
-} from '../source/worker_source';
+import type {WorkerSource, WorkerTileParameters, WorkerTileCallback, TileParameters} from '../source/worker_source';
 
 import type Actor from '../util/actor';
 import type StyleLayerIndex from '../style/style_layer_index';
@@ -19,11 +14,11 @@ import type {Callback} from '../types/callback';
 import type {VectorTile} from '@mapbox/vector-tile';
 
 export type LoadVectorTileResult = {
-  vectorTile: VectorTile;
-  rawData: ArrayBuffer;
-  expires?: any;
-  cacheControl?: any;
-  resourceTiming?: Array<PerformanceResourceTiming>;
+    vectorTile: VectorTile;
+    rawData: ArrayBuffer;
+    expires?: any;
+    cacheControl?: any;
+    resourceTiming?: Array<PerformanceResourceTiming>;
 };
 
 /**
@@ -41,18 +36,21 @@ export type LoadVectorData = (params: WorkerTileParameters, callback: LoadVector
  * @private
  */
 function loadVectorTile(params: WorkerTileParameters, callback: LoadVectorDataCallback) {
-    const request = getArrayBuffer(params.request, (err?: Error | null, data?: ArrayBuffer | null, cacheControl?: string | null, expires?: string | null) => {
-        if (err) {
-            callback(err);
-        } else if (data) {
-            callback(null, {
-                vectorTile: new vt.VectorTile(new Protobuf(data)),
-                rawData: data,
-                cacheControl,
-                expires
-            });
+    const request = getArrayBuffer(
+        params.request,
+        (err?: Error | null, data?: ArrayBuffer | null, cacheControl?: string | null, expires?: string | null) => {
+            if (err) {
+                callback(err);
+            } else if (data) {
+                callback(null, {
+                    vectorTile: new vt.VectorTile(new Protobuf(data)),
+                    rawData: data,
+                    cacheControl,
+                    expires
+                });
+            }
         }
-    });
+    );
     return () => {
         request.cancel();
         callback();
@@ -83,7 +81,12 @@ class VectorTileWorkerSource implements WorkerSource {
      * loads the pbf at `params.url`.
      * @private
      */
-    constructor(actor: Actor, layerIndex: StyleLayerIndex, availableImages: Array<string>, loadVectorData?: LoadVectorData | null) {
+    constructor(
+        actor: Actor,
+        layerIndex: StyleLayerIndex,
+        availableImages: Array<string>,
+        loadVectorData?: LoadVectorData | null
+    ) {
         this.actor = actor;
         this.layerIndex = layerIndex;
         this.availableImages = availableImages;
@@ -101,13 +104,14 @@ class VectorTileWorkerSource implements WorkerSource {
     loadTile(params: WorkerTileParameters, callback: WorkerTileCallback) {
         const uid = params.uid;
 
-        if (!this.loading)
-            this.loading = {};
+        if (!this.loading) this.loading = {};
 
-        const perf = (params && params.request && params.request.collectResourceTiming) ?
-            new RequestPerformance(params.request) : false;
+        const perf =
+            params && params.request && params.request.collectResourceTiming
+                ? new RequestPerformance(params.request)
+                : false;
 
-        const workerTile = this.loading[uid] = new WorkerTile(params);
+        const workerTile = (this.loading[uid] = new WorkerTile(params));
         workerTile.abort = this.loadVectorData(params, (err, response) => {
             delete this.loading[uid];
 
@@ -127,8 +131,7 @@ class VectorTileWorkerSource implements WorkerSource {
                 const resourceTimingData = perf.finish();
                 // it's necessary to eval the result of getEntriesByName() here via parse/stringify
                 // late evaluation in the main thread causes TypeError: illegal invocation
-                if (resourceTimingData)
-                    resourceTiming.resourceTiming = JSON.parse(JSON.stringify(resourceTimingData));
+                if (resourceTimingData) resourceTiming.resourceTiming = JSON.parse(JSON.stringify(resourceTimingData));
             }
 
             workerTile.vectorTile = response.vectorTile;
@@ -160,7 +163,13 @@ class VectorTileWorkerSource implements WorkerSource {
                 const reloadCallback = workerTile.reloadCallback;
                 if (reloadCallback) {
                     delete workerTile.reloadCallback;
-                    workerTile.parse(workerTile.vectorTile, vtSource.layerIndex, this.availableImages, vtSource.actor, reloadCallback);
+                    workerTile.parse(
+                        workerTile.vectorTile,
+                        vtSource.layerIndex,
+                        this.availableImages,
+                        vtSource.actor,
+                        reloadCallback
+                    );
                 }
                 callback(err, data);
             };

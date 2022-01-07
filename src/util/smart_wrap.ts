@@ -18,14 +18,14 @@ import type Transform from '../geo/transform';
  *
  * @private
  */
-export default function(lngLat: LngLat, priorPos: Point, transform: Transform): LngLat {
+export default function (lngLat: LngLat, priorPos: Point, transform: Transform): LngLat {
     lngLat = new LngLat(lngLat.lng, lngLat.lat);
 
     // First, try shifting one world in either direction, and see if either is closer to the
     // prior position. This preserves object constancy when the map center is auto-wrapped
     // during animations.
     if (priorPos) {
-        const left  = new LngLat(lngLat.lng - 360, lngLat.lat);
+        const left = new LngLat(lngLat.lng - 360, lngLat.lat);
         const right = new LngLat(lngLat.lng + 360, lngLat.lat);
         const delta = transform.locationPoint(lngLat).distSqr(priorPos);
         if (transform.locationPoint(left).distSqr(priorPos) < delta) {

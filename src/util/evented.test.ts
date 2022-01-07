@@ -1,7 +1,6 @@
 import {Event, Evented} from './evented';
 
 describe('Evented', () => {
-
     test('calls listeners added with "on"', () => {
         const evented = new Evented();
         const listener = jest.fn();
@@ -19,34 +18,30 @@ describe('Evented', () => {
         evented.fire(new Event('a'));
         expect(listener).toHaveBeenCalledTimes(1);
         expect(evented.listens('a')).toBeFalsy();
-
     });
 
     test('passes data to listeners', () => {
         const evented = new Evented();
-        evented.on('a', (data) => {
+        evented.on('a', data => {
             expect(data.foo).toBe('bar');
         });
         evented.fire(new Event('a', {foo: 'bar'}));
-
     });
 
     test('passes "target" to listeners', () => {
         const evented = new Evented();
-        evented.on('a', (data) => {
+        evented.on('a', data => {
             expect(data.target).toBe(evented);
         });
         evented.fire(new Event('a'));
-
     });
 
     test('passes "type" to listeners', () => {
         const evented = new Evented();
-        evented.on('a', (data) => {
+        evented.on('a', data => {
             expect(data.type).toBe('a');
         });
         evented.fire(new Event('a'));
-
     });
 
     test('removes listeners with "off"', () => {
@@ -83,7 +78,6 @@ describe('Evented', () => {
         evented.on('a', () => {});
         expect(evented.listens('a')).toBeTruthy();
         expect(evented.listens('b')).toBeFalsy();
-
     });
 
     test('does not report true to "listens" if all listeners have been removed', () => {
@@ -92,7 +86,6 @@ describe('Evented', () => {
         evented.on('a', listener);
         evented.off('a', listener);
         expect(evented.listens('a')).toBeFalsy();
-
     });
 
     test('does not immediately call listeners added within another listener', done => {
@@ -111,7 +104,6 @@ describe('Evented', () => {
         evented.fire('a' as any as Event, {foo: 'bar'});
         expect(listener).toHaveBeenCalledTimes(1);
         expect(listener.mock.calls[0][0].foo).toBe('bar');
-
     });
 
     test('on is idempotent', () => {
@@ -125,12 +117,10 @@ describe('Evented', () => {
         evented.fire(new Event('a'));
         expect(listenerA).toHaveBeenCalledTimes(1);
         expect(order).toEqual(['A', 'B']);
-
     });
 });
 
 describe('evented parents', () => {
-
     test('adds parents with "setEventedParent"', () => {
         const listener = jest.fn();
         const eventedSource = new Evented();
@@ -146,33 +136,30 @@ describe('evented parents', () => {
         const eventedSource = new Evented();
         const eventedSink = new Evented();
         eventedSource.setEventedParent(eventedSink);
-        eventedSink.on('a', (data) => {
+        eventedSink.on('a', data => {
             expect(data.foo).toBe('bar');
         });
         eventedSource.fire(new Event('a', {foo: 'bar'}));
-
     });
 
     test('attaches parent data to parent listeners', () => {
         const eventedSource = new Evented();
         const eventedSink = new Evented();
         eventedSource.setEventedParent(eventedSink, {foz: 'baz'});
-        eventedSink.on('a', (data) => {
+        eventedSink.on('a', data => {
             expect(data.foz).toBe('baz');
         });
         eventedSource.fire(new Event('a', {foo: 'bar'}));
-
     });
 
     test('attaches parent data from a function to parent listeners', () => {
         const eventedSource = new Evented();
         const eventedSink = new Evented();
         eventedSource.setEventedParent(eventedSink, () => ({foz: 'baz'}));
-        eventedSink.on('a', (data) => {
+        eventedSink.on('a', data => {
             expect(data.foz).toBe('baz');
         });
         eventedSource.fire(new Event('a', {foo: 'bar'}));
-
     });
 
     test('passes original "target" to parent listeners', () => {
@@ -180,11 +167,10 @@ describe('evented parents', () => {
         const eventedSink = new Evented();
         eventedSource.setEventedParent(eventedSink);
         eventedSource.setEventedParent(null);
-        eventedSink.on('a', (data) => {
+        eventedSink.on('a', data => {
             expect(data.target).toBe(eventedSource);
         });
         eventedSource.fire(new Event('a'));
-
     });
 
     test('removes parents with "setEventedParent(null)"', () => {
@@ -204,7 +190,6 @@ describe('evented parents', () => {
         eventedSink.on('a', () => {});
         eventedSource.setEventedParent(eventedSink);
         expect(eventedSink.listens('a')).toBeTruthy();
-
     });
 
     test('eventedParent data function is evaluated on every fire', () => {
@@ -217,6 +202,5 @@ describe('evented parents', () => {
         expect(i).toBe(1);
         eventedSource.fire(new Event('a'));
         expect(i).toBe(2);
-
     });
 });

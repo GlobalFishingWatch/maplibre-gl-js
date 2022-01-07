@@ -6,13 +6,12 @@ import type TapZoomHandler from './../tap_zoom';
  * double clicking or double tapping.
  */
 export default class DoubleClickZoomHandler {
-
     _clickZoom: ClickZoomHandler;
     _tapZoom: TapZoomHandler;
 
     /**
      * @private
-    */
+     */
     constructor(clickZoom: ClickZoomHandler, TapZoom: TapZoomHandler) {
         this._clickZoom = clickZoom;
         this._tapZoom = TapZoom;

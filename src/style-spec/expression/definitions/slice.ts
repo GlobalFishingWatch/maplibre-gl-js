@@ -1,12 +1,4 @@
-import {
-    ValueType,
-    NumberType,
-    StringType,
-    array,
-    toString,
-    isValidType,
-    isValidNativeType,
-} from '../types';
+import {ValueType, NumberType, StringType, array, toString, isValidType, isValidNativeType} from '../types';
 import RuntimeError from '../runtime_error';
 import {typeOf} from '../values';
 
@@ -26,11 +18,10 @@ class Slice implements Expression {
         this.input = input;
         this.beginIndex = beginIndex;
         this.endIndex = endIndex;
-
     }
 
     static parse(args: ReadonlyArray<unknown>, context: ParsingContext): Expression {
-        if (args.length <= 2 ||  args.length >= 5) {
+        if (args.length <= 2 || args.length >= 5) {
             return context.error(`Expected 3 or 4 arguments, but found ${args.length - 1} instead.`) as null;
         }
 
@@ -40,7 +31,9 @@ class Slice implements Expression {
         if (!input || !beginIndex) return null;
 
         if (!isValidType(input.type, [array(ValueType), StringType, ValueType])) {
-            return context.error(`Expected first argument to be of type array or string, but found ${toString(input.type)} instead`) as null;
+            return context.error(
+                `Expected first argument to be of type array or string, but found ${toString(input.type)} instead`
+            ) as null;
         }
 
         if (args.length === 4) {
@@ -53,15 +46,17 @@ class Slice implements Expression {
     }
 
     evaluate(ctx: EvaluationContext) {
-        const input = (this.input.evaluate(ctx) as any);
-        const beginIndex = (this.beginIndex.evaluate(ctx) as number);
+        const input = this.input.evaluate(ctx) as any;
+        const beginIndex = this.beginIndex.evaluate(ctx) as number;
 
         if (!isValidNativeType(input, ['string', 'array'])) {
-            throw new RuntimeError(`Expected first argument to be of type array or string, but found ${toString(typeOf(input))} instead.`);
+            throw new RuntimeError(
+                `Expected first argument to be of type array or string, but found ${toString(typeOf(input))} instead.`
+            );
         }
 
         if (this.endIndex) {
-            const endIndex = (this.endIndex.evaluate(ctx) as number);
+            const endIndex = this.endIndex.evaluate(ctx) as number;
             return input.slice(beginIndex, endIndex);
         }
 

@@ -18,13 +18,7 @@ import toEvaluationFeature from '../evaluation_feature';
 import EvaluationParameters from '../../style/evaluation_parameters';
 
 import type {CanonicalTileID} from '../../source/tile_id';
-import type {
-    Bucket,
-    BucketParameters,
-    BucketFeature,
-    IndexedFeature,
-    PopulateParameters
-} from '../bucket';
+import type {Bucket, BucketParameters, BucketFeature, IndexedFeature, PopulateParameters} from '../bucket';
 
 import type FillExtrusionStyleLayer from '../../style/style_layer/fill_extrusion_style_layer';
 import type Context from '../../gl/context';
@@ -84,8 +78,7 @@ class FillExtrusionBucket implements Bucket {
         this.indexArray = new TriangleIndexArray();
         this.programConfigurations = new ProgramConfigurationSet(options.layers, options.zoom);
         this.segments = new SegmentVector();
-        this.stateDependentLayerIds = this.layers.filter((l) => l.isStateDependent()).map((l) => l.id);
-
+        this.stateDependentLayerIds = this.layers.filter(l => l.isStateDependent()).map(l => l.id);
     }
 
     populate(features: Array<IndexedFeature>, options: PopulateParameters, canonical: CanonicalTileID) {
@@ -96,7 +89,10 @@ class FillExtrusionBucket implements Bucket {
             const needGeometry = this.layers[0]._featureFilter.needGeometry;
             const evaluationFeature = toEvaluationFeature(feature, needGeometry);
 
-            if (!this.layers[0]._featureFilter.filter(new EvaluationParameters(this.zoom), evaluationFeature, canonical)) continue;
+            if (
+                !this.layers[0]._featureFilter.filter(new EvaluationParameters(this.zoom), evaluationFeature, canonical)
+            )
+                continue;
 
             const bucketFeature: BucketFeature = {
                 id,
@@ -109,7 +105,9 @@ class FillExtrusionBucket implements Bucket {
             };
 
             if (this.hasPattern) {
-                this.features.push(addPatternDependencies('fill-extrusion', this.layers, bucketFeature, this.zoom, options));
+                this.features.push(
+                    addPatternDependencies('fill-extrusion', this.layers, bucketFeature, this.zoom, options)
+                );
             } else {
                 this.addFeature(bucketFeature, bucketFeature.geometry, index, canonical, {});
             }
@@ -155,7 +153,13 @@ class FillExtrusionBucket implements Bucket {
         this.segments.destroy();
     }
 
-    addFeature(feature: BucketFeature, geometry: Array<Array<Point>>, index: number, canonical: CanonicalTileID, imagePositions: {[_: string]: ImagePosition}) {
+    addFeature(
+        feature: BucketFeature,
+        geometry: Array<Array<Point>>,
+        index: number,
+        canonical: CanonicalTileID,
+        imagePositions: {[_: string]: ImagePosition}
+    ) {
         for (const polygon of classifyRings(geometry, EARCUT_MAX_RINGS)) {
             let numVertices = 0;
             for (const ring of polygon) {
@@ -220,8 +224,7 @@ class FillExtrusionBucket implements Bucket {
 
             //Only triangulate and draw the area of the feature if it is a polygon
             //Other feature types (e.g. LineString) do not have area, so triangulation is pointless / undefined
-            if (vectorTileFeatureTypes[feature.type] !== 'Polygon')
-                continue;
+            if (vectorTileFeatureTypes[feature.type] !== 'Polygon') continue;
 
             const flattened = [];
             const holeIndices = [];
@@ -254,14 +257,21 @@ class FillExtrusionBucket implements Bucket {
                 this.indexArray.emplaceBack(
                     triangleIndex + indices[j],
                     triangleIndex + indices[j + 2],
-                    triangleIndex + indices[j + 1]);
+                    triangleIndex + indices[j + 1]
+                );
             }
 
             segment.primitiveLength += indices.length / 3;
             segment.vertexLength += numVertices;
         }
 
-        this.programConfigurations.populatePaintArrays(this.layoutVertexArray.length, feature, index, imagePositions, canonical);
+        this.programConfigurations.populatePaintArrays(
+            this.layoutVertexArray.length,
+            feature,
+            index,
+            imagePositions,
+            canonical
+        );
     }
 }
 
@@ -270,13 +280,14 @@ register('FillExtrusionBucket', FillExtrusionBucket, {omit: ['layers', 'features
 export default FillExtrusionBucket;
 
 function isBoundaryEdge(p1, p2) {
-    return (p1.x === p2.x && (p1.x < 0 || p1.x > EXTENT)) ||
-        (p1.y === p2.y && (p1.y < 0 || p1.y > EXTENT));
+    return (p1.x === p2.x && (p1.x < 0 || p1.x > EXTENT)) || (p1.y === p2.y && (p1.y < 0 || p1.y > EXTENT));
 }
 
 function isEntirelyOutside(ring) {
-    return ring.every(p => p.x < 0) ||
+    return (
+        ring.every(p => p.x < 0) ||
         ring.every(p => p.x > EXTENT) ||
         ring.every(p => p.y < 0) ||
-        ring.every(p => p.y > EXTENT);
+        ring.every(p => p.y > EXTENT)
+    );
 }

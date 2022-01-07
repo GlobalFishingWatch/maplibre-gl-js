@@ -10,11 +10,11 @@ import type {FitBoundsOptions} from '../camera';
 import type {IControl} from './control';
 
 type GeolocateOptions = {
-  positionOptions?: PositionOptions;
-  fitBoundsOptions?: FitBoundsOptions;
-  trackUserLocation?: boolean;
-  showAccuracyCircle?: boolean;
-  showUserLocation?: boolean;
+    positionOptions?: PositionOptions;
+    fitBoundsOptions?: FitBoundsOptions;
+    trackUserLocation?: boolean;
+    showAccuracyCircle?: boolean;
+    showUserLocation?: boolean;
 };
 
 const defaultOptions: GeolocateOptions = {
@@ -36,17 +36,15 @@ let supportsGeolocation;
 function checkGeolocationSupport(callback) {
     if (supportsGeolocation !== undefined) {
         callback(supportsGeolocation);
-
     } else if (window.navigator.permissions !== undefined) {
         // navigator.permissions has incomplete browser support
         // http://caniuse.com/#feat=permissions-api
         // Test for the case where a browser disables Geolocation because of an
         // insecure origin
-        window.navigator.permissions.query({name: 'geolocation'}).then((p) => {
+        window.navigator.permissions.query({name: 'geolocation'}).then(p => {
             supportsGeolocation = p.state !== 'denied';
             callback(supportsGeolocation);
         });
-
     } else {
         supportsGeolocation = !!window.navigator.geolocation;
         callback(supportsGeolocation);
@@ -112,15 +110,7 @@ class GeolocateControl extends Evented implements IControl {
         super();
         this.options = extend({}, defaultOptions, options);
 
-        bindAll([
-            '_onSuccess',
-            '_onError',
-            '_onZoom',
-            '_finish',
-            '_setupUI',
-            '_updateCamera',
-            '_updateMarker'
-        ], this);
+        bindAll(['_onSuccess', '_onError', '_onZoom', '_finish', '_setupUI', '_updateCamera', '_updateMarker'], this);
     }
 
     onAdd(map: Map) {
@@ -163,39 +153,64 @@ class GeolocateControl extends Evented implements IControl {
         const bounds = this._map.getMaxBounds();
         const coordinates = position.coords;
 
-        return bounds && (
-            coordinates.longitude < bounds.getWest() ||
-            coordinates.longitude > bounds.getEast() ||
-            coordinates.latitude < bounds.getSouth() ||
-            coordinates.latitude > bounds.getNorth()
+        return (
+            bounds &&
+            (coordinates.longitude < bounds.getWest() ||
+                coordinates.longitude > bounds.getEast() ||
+                coordinates.latitude < bounds.getSouth() ||
+                coordinates.latitude > bounds.getNorth())
         );
     }
 
     _setErrorState() {
         switch (this._watchState) {
-        case 'WAITING_ACTIVE':
-            this._watchState = 'ACTIVE_ERROR';
-            this._geolocateButton.classList.remove('maplibregl-ctrl-geolocate-active', 'mapboxgl-ctrl-geolocate-active');
-            this._geolocateButton.classList.add('maplibregl-ctrl-geolocate-active-error', 'mapboxgl-ctrl-geolocate-active-error');
-            break;
-        case 'ACTIVE_LOCK':
-            this._watchState = 'ACTIVE_ERROR';
-            this._geolocateButton.classList.remove('maplibregl-ctrl-geolocate-active', 'mapboxgl-ctrl-geolocate-active');
-            this._geolocateButton.classList.add('maplibregl-ctrl-geolocate-active-error', 'mapboxgl-ctrl-geolocate-active-error');
-            this._geolocateButton.classList.add('maplibregl-ctrl-geolocate-waiting', 'mapboxgl-ctrl-geolocate-waiting');
-            // turn marker grey
-            break;
-        case 'BACKGROUND':
-            this._watchState = 'BACKGROUND_ERROR';
-            this._geolocateButton.classList.remove('maplibregl-ctrl-geolocate-background', 'mapboxgl-ctrl-geolocate-background');
-            this._geolocateButton.classList.add('maplibregl-ctrl-geolocate-background-error', 'mapboxgl-ctrl-geolocate-background-error');
-            this._geolocateButton.classList.add('maplibregl-ctrl-geolocate-waiting', 'mapboxgl-ctrl-geolocate-waiting');
-            // turn marker grey
-            break;
-        case 'ACTIVE_ERROR':
-            break;
-        default:
-            assert(false, `Unexpected watchState ${this._watchState}`);
+            case 'WAITING_ACTIVE':
+                this._watchState = 'ACTIVE_ERROR';
+                this._geolocateButton.classList.remove(
+                    'maplibregl-ctrl-geolocate-active',
+                    'mapboxgl-ctrl-geolocate-active'
+                );
+                this._geolocateButton.classList.add(
+                    'maplibregl-ctrl-geolocate-active-error',
+                    'mapboxgl-ctrl-geolocate-active-error'
+                );
+                break;
+            case 'ACTIVE_LOCK':
+                this._watchState = 'ACTIVE_ERROR';
+                this._geolocateButton.classList.remove(
+                    'maplibregl-ctrl-geolocate-active',
+                    'mapboxgl-ctrl-geolocate-active'
+                );
+                this._geolocateButton.classList.add(
+                    'maplibregl-ctrl-geolocate-active-error',
+                    'mapboxgl-ctrl-geolocate-active-error'
+                );
+                this._geolocateButton.classList.add(
+                    'maplibregl-ctrl-geolocate-waiting',
+                    'mapboxgl-ctrl-geolocate-waiting'
+                );
+                // turn marker grey
+                break;
+            case 'BACKGROUND':
+                this._watchState = 'BACKGROUND_ERROR';
+                this._geolocateButton.classList.remove(
+                    'maplibregl-ctrl-geolocate-background',
+                    'mapboxgl-ctrl-geolocate-background'
+                );
+                this._geolocateButton.classList.add(
+                    'maplibregl-ctrl-geolocate-background-error',
+                    'mapboxgl-ctrl-geolocate-background-error'
+                );
+                this._geolocateButton.classList.add(
+                    'maplibregl-ctrl-geolocate-waiting',
+                    'mapboxgl-ctrl-geolocate-waiting'
+                );
+                // turn marker grey
+                break;
+            case 'ACTIVE_ERROR':
+                break;
+            default:
+                assert(false, `Unexpected watchState ${this._watchState}`);
         }
     }
 
@@ -228,23 +243,41 @@ class GeolocateControl extends Evented implements IControl {
             this._lastKnownPosition = position;
 
             switch (this._watchState) {
-            case 'WAITING_ACTIVE':
-            case 'ACTIVE_LOCK':
-            case 'ACTIVE_ERROR':
-                this._watchState = 'ACTIVE_LOCK';
-                this._geolocateButton.classList.remove('maplibregl-ctrl-geolocate-waiting', 'mapboxgl-ctrl-geolocate-waiting');
-                this._geolocateButton.classList.remove('maplibregl-ctrl-geolocate-active-error', 'mapboxgl-ctrl-geolocate-active-error');
-                this._geolocateButton.classList.add('maplibregl-ctrl-geolocate-active', 'mapboxgl-ctrl-geolocate-active');
-                break;
-            case 'BACKGROUND':
-            case 'BACKGROUND_ERROR':
-                this._watchState = 'BACKGROUND';
-                this._geolocateButton.classList.remove('maplibregl-ctrl-geolocate-waiting', 'mapboxgl-ctrl-geolocate-waiting');
-                this._geolocateButton.classList.remove('maplibregl-ctrl-geolocate-background-error', 'mapboxgl-ctrl-geolocate-background-error');
-                this._geolocateButton.classList.add('maplibregl-ctrl-geolocate-background', 'mapboxgl-ctrl-geolocate-background');
-                break;
-            default:
-                assert(false, `Unexpected watchState ${this._watchState}`);
+                case 'WAITING_ACTIVE':
+                case 'ACTIVE_LOCK':
+                case 'ACTIVE_ERROR':
+                    this._watchState = 'ACTIVE_LOCK';
+                    this._geolocateButton.classList.remove(
+                        'maplibregl-ctrl-geolocate-waiting',
+                        'mapboxgl-ctrl-geolocate-waiting'
+                    );
+                    this._geolocateButton.classList.remove(
+                        'maplibregl-ctrl-geolocate-active-error',
+                        'mapboxgl-ctrl-geolocate-active-error'
+                    );
+                    this._geolocateButton.classList.add(
+                        'maplibregl-ctrl-geolocate-active',
+                        'mapboxgl-ctrl-geolocate-active'
+                    );
+                    break;
+                case 'BACKGROUND':
+                case 'BACKGROUND_ERROR':
+                    this._watchState = 'BACKGROUND';
+                    this._geolocateButton.classList.remove(
+                        'maplibregl-ctrl-geolocate-waiting',
+                        'mapboxgl-ctrl-geolocate-waiting'
+                    );
+                    this._geolocateButton.classList.remove(
+                        'maplibregl-ctrl-geolocate-background-error',
+                        'mapboxgl-ctrl-geolocate-background-error'
+                    );
+                    this._geolocateButton.classList.add(
+                        'maplibregl-ctrl-geolocate-background',
+                        'mapboxgl-ctrl-geolocate-background'
+                    );
+                    break;
+                default:
+                    assert(false, `Unexpected watchState ${this._watchState}`);
             }
         }
 
@@ -311,7 +344,7 @@ class GeolocateControl extends Evented implements IControl {
         const a = this._map.unproject([0, y]);
         const b = this._map.unproject([1, y]);
         const metersPerPixel = a.distanceTo(b);
-        const circleDiameter = Math.ceil(2.0 * this._accuracy / metersPerPixel);
+        const circleDiameter = Math.ceil((2.0 * this._accuracy) / metersPerPixel);
         this._circleElement.style.width = `${circleDiameter}px`;
         this._circleElement.style.height = `${circleDiameter}px`;
     }
@@ -332,11 +365,26 @@ class GeolocateControl extends Evented implements IControl {
             if (error.code === 1) {
                 // PERMISSION_DENIED
                 this._watchState = 'OFF';
-                this._geolocateButton.classList.remove('maplibregl-ctrl-geolocate-waiting', 'mapboxgl-ctrl-geolocate-waiting');
-                this._geolocateButton.classList.remove('maplibregl-ctrl-geolocate-active', 'mapboxgl-ctrl-geolocate-active');
-                this._geolocateButton.classList.remove('maplibregl-ctrl-geolocate-active-error', 'mapboxgl-ctrl-geolocate-active-error');
-                this._geolocateButton.classList.remove('maplibregl-ctrl-geolocate-background', 'mapboxgl-ctrl-geolocate-background');
-                this._geolocateButton.classList.remove('maplibregl-ctrl-geolocate-background-error', 'mapboxgl-ctrl-geolocate-background-error');
+                this._geolocateButton.classList.remove(
+                    'maplibregl-ctrl-geolocate-waiting',
+                    'mapboxgl-ctrl-geolocate-waiting'
+                );
+                this._geolocateButton.classList.remove(
+                    'maplibregl-ctrl-geolocate-active',
+                    'mapboxgl-ctrl-geolocate-active'
+                );
+                this._geolocateButton.classList.remove(
+                    'maplibregl-ctrl-geolocate-active-error',
+                    'mapboxgl-ctrl-geolocate-active-error'
+                );
+                this._geolocateButton.classList.remove(
+                    'maplibregl-ctrl-geolocate-background',
+                    'mapboxgl-ctrl-geolocate-background'
+                );
+                this._geolocateButton.classList.remove(
+                    'maplibregl-ctrl-geolocate-background-error',
+                    'mapboxgl-ctrl-geolocate-background-error'
+                );
                 this._geolocateButton.disabled = true;
                 const title = this._map._getUIString('GeolocateControl.LocationNotAvailable');
                 this._geolocateButton.title = title;
@@ -366,14 +414,23 @@ class GeolocateControl extends Evented implements IControl {
     }
 
     _finish() {
-        if (this._timeoutId) { clearTimeout(this._timeoutId); }
+        if (this._timeoutId) {
+            clearTimeout(this._timeoutId);
+        }
         this._timeoutId = undefined;
     }
 
     _setupUI(supported: boolean) {
         this._container.addEventListener('contextmenu', (e: MouseEvent) => e.preventDefault());
-        this._geolocateButton = DOM.create('button', 'maplibregl-ctrl-geolocate mapboxgl-ctrl-geolocate', this._container);
-        DOM.create('span', 'maplibregl-ctrl-icon mapboxgl-ctrl-icon', this._geolocateButton).setAttribute('aria-hidden', 'true');
+        this._geolocateButton = DOM.create(
+            'button',
+            'maplibregl-ctrl-geolocate mapboxgl-ctrl-geolocate',
+            this._container
+        );
+        DOM.create('span', 'maplibregl-ctrl-icon mapboxgl-ctrl-icon', this._geolocateButton).setAttribute(
+            'aria-hidden',
+            'true'
+        );
         this._geolocateButton.type = 'button';
 
         if (supported === false) {
@@ -399,7 +456,10 @@ class GeolocateControl extends Evented implements IControl {
 
             this._userLocationDotMarker = new Marker(this._dotElement);
 
-            this._circleElement = DOM.create('div', 'maplibregl-user-location-accuracy-circle mapboxgl-user-location-accuracy-circle');
+            this._circleElement = DOM.create(
+                'div',
+                'maplibregl-user-location-accuracy-circle mapboxgl-user-location-accuracy-circle'
+            );
             this._accuracyCircleMarker = new Marker({element: this._circleElement, pitchAlignment: 'map'});
 
             if (this.options.trackUserLocation) this._watchState = 'OFF';
@@ -407,8 +467,7 @@ class GeolocateControl extends Evented implements IControl {
             this._map.on('zoom', this._onZoom);
         }
 
-        this._geolocateButton.addEventListener('click',
-            this.trigger.bind(this));
+        this._geolocateButton.addEventListener('click', this.trigger.bind(this));
 
         this._setup = true;
 
@@ -419,8 +478,14 @@ class GeolocateControl extends Evented implements IControl {
                 const fromResize = event.originalEvent && event.originalEvent.type === 'resize';
                 if (!event.geolocateSource && this._watchState === 'ACTIVE_LOCK' && !fromResize) {
                     this._watchState = 'BACKGROUND';
-                    this._geolocateButton.classList.add('maplibregl-ctrl-geolocate-background', 'mapboxgl-ctrl-geolocate-background');
-                    this._geolocateButton.classList.remove('maplibregl-ctrl-geolocate-active', 'mapboxgl-ctrl-geolocate-active');
+                    this._geolocateButton.classList.add(
+                        'maplibregl-ctrl-geolocate-background',
+                        'mapboxgl-ctrl-geolocate-background'
+                    );
+                    this._geolocateButton.classList.remove(
+                        'maplibregl-ctrl-geolocate-active',
+                        'mapboxgl-ctrl-geolocate-active'
+                    );
 
                     this.fire(new Event('trackuserlocationend'));
                 }
@@ -429,23 +494,23 @@ class GeolocateControl extends Evented implements IControl {
     }
 
     /**
-    * Programmatically request and move the map to the user's location.
-    *
-    * @returns {boolean} Returns `false` if called before control was added to a map, otherwise returns `true`.
-    * @example
-    * // Initialize the geolocate control.
-    * var geolocate = new maplibregl.GeolocateControl({
-    *  positionOptions: {
-    *    enableHighAccuracy: true
-    *  },
-    *  trackUserLocation: true
-    * });
-    * // Add the control to the map.
-    * map.addControl(geolocate);
-    * map.on('load', function() {
-    *   geolocate.trigger();
-    * });
-    */
+     * Programmatically request and move the map to the user's location.
+     *
+     * @returns {boolean} Returns `false` if called before control was added to a map, otherwise returns `true`.
+     * @example
+     * // Initialize the geolocate control.
+     * var geolocate = new maplibregl.GeolocateControl({
+     *  positionOptions: {
+     *    enableHighAccuracy: true
+     *  },
+     *  trackUserLocation: true
+     * });
+     * // Add the control to the map.
+     * map.addControl(geolocate);
+     * map.on('load', function() {
+     *   geolocate.trigger();
+     * });
+     */
     trigger() {
         if (!this._setup) {
             warnOnce('Geolocate control triggered before added to a map');
@@ -454,53 +519,80 @@ class GeolocateControl extends Evented implements IControl {
         if (this.options.trackUserLocation) {
             // update watchState and do any outgoing state cleanup
             switch (this._watchState) {
-            case 'OFF':
-                // turn on the Geolocate Control
-                this._watchState = 'WAITING_ACTIVE';
+                case 'OFF':
+                    // turn on the Geolocate Control
+                    this._watchState = 'WAITING_ACTIVE';
 
-                this.fire(new Event('trackuserlocationstart'));
-                break;
-            case 'WAITING_ACTIVE':
-            case 'ACTIVE_LOCK':
-            case 'ACTIVE_ERROR':
-            case 'BACKGROUND_ERROR':
-                // turn off the Geolocate Control
-                numberOfWatches--;
-                noTimeout = false;
-                this._watchState = 'OFF';
-                this._geolocateButton.classList.remove('maplibregl-ctrl-geolocate-waiting', 'mapboxgl-ctrl-geolocate-waiting');
-                this._geolocateButton.classList.remove('maplibregl-ctrl-geolocate-active', 'mapboxgl-ctrl-geolocate-active');
-                this._geolocateButton.classList.remove('maplibregl-ctrl-geolocate-active-error', 'mapboxgl-ctrl-geolocate-active-error');
-                this._geolocateButton.classList.remove('maplibregl-ctrl-geolocate-background', 'mapboxgl-ctrl-geolocate-background');
-                this._geolocateButton.classList.remove('maplibregl-ctrl-geolocate-background-error', 'mapboxgl-ctrl-geolocate-background-error');
+                    this.fire(new Event('trackuserlocationstart'));
+                    break;
+                case 'WAITING_ACTIVE':
+                case 'ACTIVE_LOCK':
+                case 'ACTIVE_ERROR':
+                case 'BACKGROUND_ERROR':
+                    // turn off the Geolocate Control
+                    numberOfWatches--;
+                    noTimeout = false;
+                    this._watchState = 'OFF';
+                    this._geolocateButton.classList.remove(
+                        'maplibregl-ctrl-geolocate-waiting',
+                        'mapboxgl-ctrl-geolocate-waiting'
+                    );
+                    this._geolocateButton.classList.remove(
+                        'maplibregl-ctrl-geolocate-active',
+                        'mapboxgl-ctrl-geolocate-active'
+                    );
+                    this._geolocateButton.classList.remove(
+                        'maplibregl-ctrl-geolocate-active-error',
+                        'mapboxgl-ctrl-geolocate-active-error'
+                    );
+                    this._geolocateButton.classList.remove(
+                        'maplibregl-ctrl-geolocate-background',
+                        'mapboxgl-ctrl-geolocate-background'
+                    );
+                    this._geolocateButton.classList.remove(
+                        'maplibregl-ctrl-geolocate-background-error',
+                        'mapboxgl-ctrl-geolocate-background-error'
+                    );
 
-                this.fire(new Event('trackuserlocationend'));
-                break;
-            case 'BACKGROUND':
-                this._watchState = 'ACTIVE_LOCK';
-                this._geolocateButton.classList.remove('maplibregl-ctrl-geolocate-background', 'mapboxgl-ctrl-geolocate-background');
-                // set camera to last known location
-                if (this._lastKnownPosition) this._updateCamera(this._lastKnownPosition);
+                    this.fire(new Event('trackuserlocationend'));
+                    break;
+                case 'BACKGROUND':
+                    this._watchState = 'ACTIVE_LOCK';
+                    this._geolocateButton.classList.remove(
+                        'maplibregl-ctrl-geolocate-background',
+                        'mapboxgl-ctrl-geolocate-background'
+                    );
+                    // set camera to last known location
+                    if (this._lastKnownPosition) this._updateCamera(this._lastKnownPosition);
 
-                this.fire(new Event('trackuserlocationstart'));
-                break;
-            default:
-                assert(false, `Unexpected watchState ${this._watchState}`);
+                    this.fire(new Event('trackuserlocationstart'));
+                    break;
+                default:
+                    assert(false, `Unexpected watchState ${this._watchState}`);
             }
 
             // incoming state setup
             switch (this._watchState) {
-            case 'WAITING_ACTIVE':
-                this._geolocateButton.classList.add('maplibregl-ctrl-geolocate-waiting', 'mapboxgl-ctrl-geolocate-waiting');
-                this._geolocateButton.classList.add('maplibregl-ctrl-geolocate-active', 'mapboxgl-ctrl-geolocate-active');
-                break;
-            case 'ACTIVE_LOCK':
-                this._geolocateButton.classList.add('maplibregl-ctrl-geolocate-active', 'mapboxgl-ctrl-geolocate-active');
-                break;
-            case 'OFF':
-                break;
-            default:
-                assert(false, `Unexpected watchState ${this._watchState}`);
+                case 'WAITING_ACTIVE':
+                    this._geolocateButton.classList.add(
+                        'maplibregl-ctrl-geolocate-waiting',
+                        'mapboxgl-ctrl-geolocate-waiting'
+                    );
+                    this._geolocateButton.classList.add(
+                        'maplibregl-ctrl-geolocate-active',
+                        'mapboxgl-ctrl-geolocate-active'
+                    );
+                    break;
+                case 'ACTIVE_LOCK':
+                    this._geolocateButton.classList.add(
+                        'maplibregl-ctrl-geolocate-active',
+                        'mapboxgl-ctrl-geolocate-active'
+                    );
+                    break;
+                case 'OFF':
+                    break;
+                default:
+                    assert(false, `Unexpected watchState ${this._watchState}`);
             }
 
             // manage geolocation.watchPosition / geolocation.clearWatch
@@ -510,13 +602,16 @@ class GeolocateControl extends Evented implements IControl {
             } else if (this._geolocationWatchID === undefined) {
                 // enable watchPosition since watchState is not OFF and there is no watchPosition already running
 
-                this._geolocateButton.classList.add('maplibregl-ctrl-geolocate-waiting', 'mapboxgl-ctrl-geolocate-waiting');
+                this._geolocateButton.classList.add(
+                    'maplibregl-ctrl-geolocate-waiting',
+                    'mapboxgl-ctrl-geolocate-waiting'
+                );
                 this._geolocateButton.setAttribute('aria-pressed', 'true');
 
                 numberOfWatches++;
                 let positionOptions;
                 if (numberOfWatches > 1) {
-                    positionOptions = {maximumAge:600000, timeout:0};
+                    positionOptions = {maximumAge: 600000, timeout: 0};
                     noTimeout = true;
                 } else {
                     positionOptions = this.options.positionOptions;
@@ -524,11 +619,17 @@ class GeolocateControl extends Evented implements IControl {
                 }
 
                 this._geolocationWatchID = window.navigator.geolocation.watchPosition(
-                    this._onSuccess, this._onError, positionOptions);
+                    this._onSuccess,
+                    this._onError,
+                    positionOptions
+                );
             }
         } else {
             window.navigator.geolocation.getCurrentPosition(
-                this._onSuccess, this._onError, this.options.positionOptions);
+                this._onSuccess,
+                this._onError,
+                this.options.positionOptions
+            );
 
             // This timeout ensures that we still call finish() even if
             // the user declines to share their location in Firefox

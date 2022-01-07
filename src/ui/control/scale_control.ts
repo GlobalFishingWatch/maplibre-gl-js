@@ -7,8 +7,8 @@ import type {ControlPosition, IControl} from './control';
 export type Unit = 'imperial' | 'metric' | 'nautical';
 
 type ScaleOptions = {
-  maxWidth?: number;
-  unit?: Unit;
+    maxWidth?: number;
+    unit?: Unit;
 };
 
 const defaultOptions: ScaleOptions = {
@@ -40,10 +40,7 @@ class ScaleControl implements IControl {
     constructor(options: ScaleOptions) {
         this.options = extend({}, defaultOptions, options);
 
-        bindAll([
-            '_onMove',
-            'setUnit'
-        ], this);
+        bindAll(['_onMove', 'setUnit'], this);
     }
 
     getDefaultPosition(): ControlPosition {
@@ -56,7 +53,11 @@ class ScaleControl implements IControl {
 
     onAdd(map: Map) {
         this._map = map;
-        this._container = DOM.create('div', 'maplibregl-ctrl maplibregl-ctrl-scale mapboxgl-ctrl mapboxgl-ctrl-scale', map.getContainer());
+        this._container = DOM.create(
+            'div',
+            'maplibregl-ctrl maplibregl-ctrl-scale mapboxgl-ctrl mapboxgl-ctrl-scale',
+            map.getContainer()
+        );
 
         this._map.on('move', this._onMove);
         this._onMove();
@@ -88,7 +89,7 @@ function updateScale(map, container, options) {
     // container with maximum length (Default) as 100px.
     // Using spherical law of cosines approximation, the real distance is
     // found between the two coordinates.
-    const maxWidth = options && options.maxWidth || 100;
+    const maxWidth = (options && options.maxWidth) || 100;
 
     const y = map._container.clientHeight / 2;
     const left = map.unproject([0, y]);
@@ -128,14 +129,10 @@ function getDecimalRoundNum(d) {
 }
 
 function getRoundNum(num) {
-    const pow10 = Math.pow(10, (`${Math.floor(num)}`).length - 1);
+    const pow10 = Math.pow(10, `${Math.floor(num)}`.length - 1);
     let d = num / pow10;
 
-    d = d >= 10 ? 10 :
-        d >= 5 ? 5 :
-        d >= 3 ? 3 :
-        d >= 2 ? 2 :
-        d >= 1 ? 1 : getDecimalRoundNum(d);
+    d = d >= 10 ? 10 : d >= 5 ? 5 : d >= 3 ? 3 : d >= 2 ? 2 : d >= 1 ? 1 : getDecimalRoundNum(d);
 
     return pow10 * d;
 }

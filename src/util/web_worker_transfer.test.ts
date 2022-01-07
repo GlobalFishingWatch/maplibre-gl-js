@@ -39,7 +39,7 @@ describe('web worker transfer', () => {
     });
 
     test('anonymous class', () => {
-        const Klass = (() => (class {}))();
+        const Klass = (() => class {})();
         expect(!Klass.name).toBeTruthy();
         register('Anon', Klass);
         const x = new Klass();

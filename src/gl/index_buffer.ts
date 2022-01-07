@@ -9,7 +9,11 @@ class IndexBuffer {
     buffer: WebGLBuffer;
     dynamicDraw: boolean;
 
-    constructor(context: Context, array: TriangleIndexArray | LineIndexArray | LineStripIndexArray, dynamicDraw?: boolean) {
+    constructor(
+        context: Context,
+        array: TriangleIndexArray | LineIndexArray | LineStripIndexArray,
+        dynamicDraw?: boolean
+    ) {
         this.context = context;
         const gl = context.gl;
         this.buffer = gl.createBuffer();

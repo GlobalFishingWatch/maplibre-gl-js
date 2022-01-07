@@ -5,7 +5,9 @@ import {VectorTile} from '@mapbox/vector-tile';
 import loadGeometry from './load_geometry';
 
 // Load a line feature from fixture tile.
-const vt = new VectorTile(new Protobuf(fs.readFileSync(path.resolve(__dirname, '../../test/fixtures/mbsv5-6-18-23.vector.pbf'))));
+const vt = new VectorTile(
+    new Protobuf(fs.readFileSync(path.resolve(__dirname, '../../test/fixtures/mbsv5-6-18-23.vector.pbf')))
+);
 
 describe('loadGeometry', () => {
     test('loadGeometry', () => {
@@ -24,7 +26,7 @@ describe('loadGeometry', () => {
 
         // Use a custom console.warn to count warnings
         const warn = console.warn;
-        console.warn = function(warning) {
+        console.warn = function (warning) {
             if (warning.match(/Geometry exceeds allowed extent, reduce your vector tile buffer size/)) {
                 numWarnings++;
             }
@@ -44,6 +46,5 @@ describe('loadGeometry', () => {
 
         // Put it back
         console.warn = warn;
-
     });
 });

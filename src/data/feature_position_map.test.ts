@@ -15,11 +15,13 @@ describe('FeaturePositionMap', () => {
 
         const compareIndex = (a, b) => a.index - b.index;
 
-        expect(featureMap2.getPositions(7).sort(compareIndex)).toEqual([
-            {index: 1, start: 0, end: 1},
-            {index: 3, start: 2, end: 3},
-            {index: 6, start: 5, end: 7}
-        ].sort(compareIndex));
+        expect(featureMap2.getPositions(7).sort(compareIndex)).toEqual(
+            [
+                {index: 1, start: 0, end: 1},
+                {index: 3, start: 2, end: 3},
+                {index: 6, start: 5, end: 7}
+            ].sort(compareIndex)
+        );
     });
 
     test('Can not be queried before serialization/deserialization', () => {

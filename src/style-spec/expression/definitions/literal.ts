@@ -3,7 +3,7 @@ import {isValue, typeOf, Color} from '../values';
 import Formatted from '../types/formatted';
 
 import type {Type} from '../types';
-import type {Value}  from '../values';
+import type {Value} from '../values';
 import type {Expression} from '../expression';
 import type ParsingContext from '../parsing_context';
 
@@ -18,12 +18,13 @@ class Literal implements Expression {
 
     static parse(args: ReadonlyArray<unknown>, context: ParsingContext): Expression {
         if (args.length !== 2)
-            return context.error(`'literal' expression requires exactly one argument, but found ${args.length - 1} instead.`) as null;
+            return context.error(
+                `'literal' expression requires exactly one argument, but found ${args.length - 1} instead.`
+            ) as null;
 
-        if (!isValue(args[1]))
-            return context.error('invalid value') as null;
+        if (!isValue(args[1])) return context.error('invalid value') as null;
 
-        const value = (args[1] as any);
+        const value = args[1] as any;
         let type = typeOf(value);
 
         // special case: infer the item type if possible for zero-length arrays
@@ -63,10 +64,12 @@ class Literal implements Expression {
             // Same as Color
             return this.value.serialize();
         } else {
-            assert(this.value === null ||
-                typeof this.value === 'string' ||
-                typeof this.value === 'number' ||
-                typeof this.value === 'boolean');
+            assert(
+                this.value === null ||
+                    typeof this.value === 'string' ||
+                    typeof this.value === 'number' ||
+                    typeof this.value === 'boolean'
+            );
             return this.value as any;
         }
     }

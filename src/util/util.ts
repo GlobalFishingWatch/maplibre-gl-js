@@ -36,7 +36,7 @@ export function easeCubicInOut(t: number): number {
  */
 export function bezier(p1x: number, p1y: number, p2x: number, p2y: number): (t: number) => number {
     const bezier = new UnitBezier(p1x, p1y, p2x, p2y);
-    return function(t: number) {
+    return function (t: number) {
         return bezier.solve(t);
     };
 }
@@ -73,8 +73,8 @@ export function clamp(n: number, min: number, max: number): number {
  */
 export function wrap(n: number, min: number, max: number): number {
     const d = max - min;
-    const w = ((n - min) % d + d) % d + min;
-    return (w === min) ? max : w;
+    const w = ((((n - min) % d) + d) % d) + min;
+    return w === min ? max : w;
 }
 
 /*
@@ -88,18 +88,20 @@ export function wrap(n: number, min: number, max: number): number {
  * @private
  */
 export function asyncAll<Item, Result>(
-  array: Array<Item>,
-  fn: (item: Item, fnCallback: Callback<Result>) => void,
-  callback: Callback<Array<Result>>
+    array: Array<Item>,
+    fn: (item: Item, fnCallback: Callback<Result>) => void,
+    callback: Callback<Array<Result>>
 ) {
-    if (!array.length) { return callback(null, []); }
+    if (!array.length) {
+        return callback(null, []);
+    }
     let remaining = array.length;
     const results = new Array(array.length);
     let error = null;
     array.forEach((item, i) => {
         fn(item, (err, result) => {
             if (err) error = err;
-            results[i] = (result as any as Result); // https://github.com/facebook/flow/issues/2123
+            results[i] = result as any as Result; // https://github.com/facebook/flow/issues/2123
             if (--remaining === 0) callback(error, results);
         });
     });
@@ -112,10 +114,7 @@ export function asyncAll<Item, Result>(
  * @returns keys difference
  * @private
  */
-export function keysDifference<S, T>(
-  obj: {[key: string]: S},
-  other: {[key: string]: T}
-): Array<string> {
+export function keysDifference<S, T>(obj: {[key: string]: S}, other: {[key: string]: T}): Array<string> {
     const difference = [];
     for (const i in obj) {
         if (!(i in other)) {
@@ -221,8 +220,10 @@ export function nextPowerOfTwo(value: number): number {
  * @private
  */
 export function bindAll(fns: Array<string>, context: any): void {
-    fns.forEach((fn) => {
-        if (!context[fn]) { return; }
+    fns.forEach(fn => {
+        if (!context[fn]) {
+            return;
+        }
         context[fn] = context[fn].bind(context);
     });
 }
@@ -341,14 +342,12 @@ export function calculateSignedArea(ring: Array<Point>): number {
 export function isClosedPolygon(points: Array<Point>): boolean {
     // If it is 2 points that are the same then it is a point
     // If it is 3 points with start and end the same then it is a line
-    if (points.length < 4)
-        return false;
+    if (points.length < 4) return false;
 
     const p1 = points[0];
     const p2 = points[points.length - 1];
 
-    if (Math.abs(p1.x - p2.x) > 0 ||
-        Math.abs(p1.y - p2.y) > 0) {
+    if (Math.abs(p1.x - p2.x) > 0 || Math.abs(p1.y - p2.y) > 0) {
         return false;
     }
 
@@ -365,9 +364,9 @@ export function isClosedPolygon(points: Array<Point>): boolean {
  */
 
 export function sphericalToCartesian([r, azimuthal, polar]: [number, number, number]): {
-  x: number;
-  y: number;
-  z: number;
+    x: number;
+    y: number;
+    z: number;
 } {
     // We abstract "north"/"up" (compass-wise) to be 0° when really this is 90° (π/2):
     // correct for that here
@@ -392,8 +391,7 @@ export function sphericalToCartesian([r, azimuthal, polar]: [number, number, num
  * @returns {boolean}
  */
 export function isWorker(): boolean {
-    return typeof WorkerGlobalScope !== 'undefined' && typeof self !== 'undefined' &&
-           self instanceof WorkerGlobalScope;
+    return typeof WorkerGlobalScope !== 'undefined' && typeof self !== 'undefined' && self instanceof WorkerGlobalScope;
 }
 
 /**
@@ -406,7 +404,8 @@ export function isWorker(): boolean {
 
 export function parseCacheControl(cacheControl: string): any {
     // Taken from [Wreck](https://github.com/hapijs/wreck)
-    const re = /(?:^|(?:\s*\,\s*))([^\x00-\x20\(\)<>@\,;\:\\"\/\[\]\?\=\{\}\x7F]+)(?:\=(?:([^\x00-\x20\(\)<>@\,;\:\\"\/\[\]\?\=\{\}\x7F]+)|(?:\"((?:[^"\\]|\\.)*)\")))?/g;
+    const re =
+        /(?:^|(?:\s*\,\s*))([^\x00-\x20\(\)<>@\,;\:\\"\/\[\]\?\=\{\}\x7F]+)(?:\=(?:([^\x00-\x20\(\)<>@\,;\:\\"\/\[\]\?\=\{\}\x7F]+)|(?:\"((?:[^"\\]|\\.)*)\")))?/g;
 
     const header = {};
     cacheControl.replace(re, ($0, $1, $2, $3) => {
@@ -442,8 +441,13 @@ let _isSafari = null;
 export function isSafari(scope: any): boolean {
     if (_isSafari == null) {
         const userAgent = scope.navigator ? scope.navigator.userAgent : null;
-        _isSafari = !!scope.safari ||
-        !!(userAgent && (/\b(iPad|iPhone|iPod)\b/.test(userAgent) || (!!userAgent.match('Safari') && !userAgent.match('Chrome'))));
+        _isSafari =
+            !!scope.safari ||
+            !!(
+                userAgent &&
+                (/\b(iPad|iPhone|iPod)\b/.test(userAgent) ||
+                    (!!userAgent.match('Safari') && !userAgent.match('Chrome')))
+            );
     }
     return _isSafari;
 }
@@ -463,19 +467,22 @@ export function storageAvailable(type: string): boolean {
 //Unicode compliant base64 encoder for strings
 export function b64EncodeUnicode(str: string) {
     return btoa(
-        encodeURIComponent(str).replace(/%([0-9A-F]{2})/g,
-            (match, p1) => {
-                return String.fromCharCode(Number('0x' + p1)); //eslint-disable-line
-            }
-        )
+        encodeURIComponent(str).replace(/%([0-9A-F]{2})/g, (match, p1) => {
+            return String.fromCharCode(Number('0x' + p1)); //eslint-disable-line
+        })
     );
 }
 
 // Unicode compliant decoder for base64-encoded strings
 export function b64DecodeUnicode(str: string) {
-    return decodeURIComponent(atob(str).split('').map((c) => {
-        return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2); //eslint-disable-line
-    }).join(''));
+    return decodeURIComponent(
+        atob(str)
+            .split('')
+            .map(c => {
+                return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2); //eslint-disable-line
+            })
+            .join('')
+    );
 }
 
 export function isImageBitmap(image: any): image is ImageBitmap {

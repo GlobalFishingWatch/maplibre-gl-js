@@ -7,7 +7,7 @@ function createMap(clickTolerance?, dragPan?) {
     return new Map({
         container: DOM.create('div', '', window.document.body),
         clickTolerance: clickTolerance || 0,
-        dragPan: dragPan || true,
+        dragPan: dragPan || true
     } as any as MapOptions);
 }
 
@@ -21,17 +21,16 @@ beforeEach(() => {
 const buttons = 1;
 
 describe('drag_pan', () => {
-
     test('DragPanHandler fires dragstart, drag, and dragend events at appropriate times in response to a mouse-triggered drag', () => {
         const map = createMap();
 
         const dragstart = jest.fn();
-        const drag      = jest.fn();
-        const dragend   = jest.fn();
+        const drag = jest.fn();
+        const dragend = jest.fn();
 
         map.on('dragstart', dragstart);
-        map.on('drag',      drag);
-        map.on('dragend',   dragend);
+        map.on('drag', drag);
+        map.on('dragend', dragend);
 
         simulate.mousedown(map.getCanvas());
         map._renderTaskQueue.run();
@@ -58,12 +57,12 @@ describe('drag_pan', () => {
         const map = createMap();
 
         const dragstart = jest.fn();
-        const drag      = jest.fn();
-        const dragend   = jest.fn();
+        const drag = jest.fn();
+        const dragend = jest.fn();
 
         map.on('dragstart', dragstart);
-        map.on('drag',      drag);
-        map.on('dragend',   dragend);
+        map.on('drag', drag);
+        map.on('dragend', dragend);
 
         simulate.mousedown(map.getCanvas());
         map._renderTaskQueue.run();
@@ -91,12 +90,12 @@ describe('drag_pan', () => {
         const target = map.getCanvas();
 
         const dragstart = jest.fn();
-        const drag      = jest.fn();
-        const dragend   = jest.fn();
+        const drag = jest.fn();
+        const dragend = jest.fn();
 
         map.on('dragstart', dragstart);
-        map.on('drag',      drag);
-        map.on('dragend',   dragend);
+        map.on('drag', drag);
+        map.on('dragend', dragend);
 
         simulate.touchstart(map.getCanvas(), {touches: [{target, clientX: 0, clientY: 0}]});
         map._renderTaskQueue.run();
@@ -195,16 +194,16 @@ describe('drag_pan', () => {
     });
 
     test('DragPanHandler can interleave with another handler', () => {
-    // https://github.com/mapbox/mapbox-gl-js/issues/6106
+        // https://github.com/mapbox/mapbox-gl-js/issues/6106
         const map = createMap();
 
         const dragstart = jest.fn();
-        const drag      = jest.fn();
-        const dragend   = jest.fn();
+        const drag = jest.fn();
+        const dragend = jest.fn();
 
         map.on('dragstart', dragstart);
-        map.on('drag',      drag);
-        map.on('dragend',   dragend);
+        map.on('drag', drag);
+        map.on('dragend', dragend);
 
         simulate.mousedown(map.getCanvas());
         map._renderTaskQueue.run();
@@ -240,18 +239,18 @@ describe('drag_pan', () => {
         map.remove();
     });
 
-    ['ctrl', 'shift'].forEach((modifier) => {
+    ['ctrl', 'shift'].forEach(modifier => {
         test(`DragPanHandler does not begin a drag if the ${modifier} key is down on mousedown`, () => {
             const map = createMap();
             expect(map.dragRotate.isEnabled()).toBeTruthy();
 
             const dragstart = jest.fn();
-            const drag      = jest.fn();
-            const dragend   = jest.fn();
+            const drag = jest.fn();
+            const dragend = jest.fn();
 
             map.on('dragstart', dragstart);
-            map.on('drag',      drag);
-            map.on('dragend',   dragend);
+            map.on('drag', drag);
+            map.on('dragend', dragend);
 
             simulate.mousedown(map.getCanvas(), {buttons, [`${modifier}Key`]: true});
             map._renderTaskQueue.run();
@@ -279,12 +278,12 @@ describe('drag_pan', () => {
             expect(map.dragRotate.isEnabled()).toBeTruthy();
 
             const dragstart = jest.fn();
-            const drag      = jest.fn();
-            const dragend   = jest.fn();
+            const drag = jest.fn();
+            const dragend = jest.fn();
 
             map.on('dragstart', dragstart);
-            map.on('drag',      drag);
-            map.on('dragend',   dragend);
+            map.on('drag', drag);
+            map.on('dragend', dragend);
 
             simulate.mousedown(map.getCanvas());
             map._renderTaskQueue.run();
@@ -313,12 +312,12 @@ describe('drag_pan', () => {
         map.dragRotate.disable();
 
         const dragstart = jest.fn();
-        const drag      = jest.fn();
-        const dragend   = jest.fn();
+        const drag = jest.fn();
+        const dragend = jest.fn();
 
         map.on('dragstart', dragstart);
-        map.on('drag',      drag);
-        map.on('dragend',   dragend);
+        map.on('drag', drag);
+        map.on('dragend', dragend);
 
         simulate.mousedown(map.getCanvas(), {buttons: 2, button: 2});
         map._renderTaskQueue.run();
@@ -332,7 +331,7 @@ describe('drag_pan', () => {
         expect(drag).toHaveBeenCalledTimes(0);
         expect(dragend).toHaveBeenCalledTimes(0);
 
-        simulate.mouseup(map.getCanvas(),   {buttons: 0, button: 2});
+        simulate.mouseup(map.getCanvas(), {buttons: 0, button: 2});
         map._renderTaskQueue.run();
         expect(dragstart).toHaveBeenCalledTimes(0);
         expect(drag).toHaveBeenCalledTimes(0);
@@ -346,12 +345,12 @@ describe('drag_pan', () => {
         map.dragRotate.disable();
 
         const dragstart = jest.fn();
-        const drag      = jest.fn();
-        const dragend   = jest.fn();
+        const drag = jest.fn();
+        const dragend = jest.fn();
 
         map.on('dragstart', dragstart);
-        map.on('drag',      drag);
-        map.on('dragend',   dragend);
+        map.on('drag', drag);
+        map.on('dragend', dragend);
 
         simulate.mousedown(map.getCanvas());
         map._renderTaskQueue.run();
@@ -398,12 +397,12 @@ describe('drag_pan', () => {
         map.on('mousedown', e => e.preventDefault());
 
         const dragstart = jest.fn();
-        const drag      = jest.fn();
-        const dragend   = jest.fn();
+        const drag = jest.fn();
+        const dragend = jest.fn();
 
         map.on('dragstart', dragstart);
-        map.on('drag',      drag);
-        map.on('dragend',   dragend);
+        map.on('drag', drag);
+        map.on('dragend', dragend);
 
         simulate.mousedown(map.getCanvas());
         map._renderTaskQueue.run();
@@ -428,12 +427,12 @@ describe('drag_pan', () => {
         map.on('touchstart', e => e.preventDefault());
 
         const dragstart = jest.fn();
-        const drag      = jest.fn();
-        const dragend   = jest.fn();
+        const drag = jest.fn();
+        const dragend = jest.fn();
 
         map.on('dragstart', dragstart);
-        map.on('drag',      drag);
-        map.on('dragend',   dragend);
+        map.on('drag', drag);
+        map.on('dragend', dragend);
 
         simulate.touchstart(map.getCanvas(), {touches: [{target, clientX: 0, clientY: 0}]});
         map._renderTaskQueue.run();
@@ -458,17 +457,17 @@ describe('drag_pan', () => {
         jest.spyOn(map, 'getLayer').mockReturnValue(true as any);
         jest.spyOn(map, 'queryRenderedFeatures').mockReturnValue([{}]);
 
-        map.on('touchstart', 'point', (e) => {
+        map.on('touchstart', 'point', e => {
             e.preventDefault();
         });
 
         const dragstart = jest.fn();
-        const drag      = jest.fn();
-        const dragend   = jest.fn();
+        const drag = jest.fn();
+        const dragend = jest.fn();
 
         map.on('dragstart', dragstart);
-        map.on('drag',      drag);
-        map.on('dragend',   dragend);
+        map.on('drag', drag);
+        map.on('dragend', dragend);
 
         simulate.touchstart(map.getCanvas(), {touches: [{target, clientX: 0, clientY: 0}]});
         map._renderTaskQueue.run();

@@ -32,36 +32,23 @@ describe('marker', () => {
 
     test('Marker uses a default marker element with custom scale', () => {
         const map = createMap();
-        const defaultMarker = new Marker()
-            .setLngLat([0, 0])
-            .addTo(map);
+        const defaultMarker = new Marker().setLngLat([0, 0]).addTo(map);
         // scale smaller than default
-        const smallerMarker = new Marker({scale: 0.8})
-            .setLngLat([0, 0])
-            .addTo(map);
+        const smallerMarker = new Marker({scale: 0.8}).setLngLat([0, 0]).addTo(map);
         // scale larger than default
-        const largerMarker = new Marker({scale: 2})
-            .setLngLat([0, 0])
-            .addTo(map);
+        const largerMarker = new Marker({scale: 2}).setLngLat([0, 0]).addTo(map);
 
         // initial dimensions of svg element
-        expect(
-        defaultMarker.getElement().children[0].getAttribute('height').includes('41')
-        ).toBeTruthy();
+        expect(defaultMarker.getElement().children[0].getAttribute('height').includes('41')).toBeTruthy();
         expect(defaultMarker.getElement().children[0].getAttribute('width').includes('27')).toBeTruthy();
 
         // (41 * 0.8) = 32.8, (27 * 0.8) = 21.6
-        expect(
-        smallerMarker.getElement().children[0].getAttribute('height').includes('32.8')
-        ).toBeTruthy();
-        expect(
-        smallerMarker.getElement().children[0].getAttribute('width').includes('21.6')
-        ).toBeTruthy();
+        expect(smallerMarker.getElement().children[0].getAttribute('height').includes('32.8')).toBeTruthy();
+        expect(smallerMarker.getElement().children[0].getAttribute('width').includes('21.6')).toBeTruthy();
 
         // (41 * 2) = 82, (27 * 2) = 54
         expect(largerMarker.getElement().children[0].getAttribute('height').includes('82')).toBeTruthy();
         expect(largerMarker.getElement().children[0].getAttribute('width').includes('54')).toBeTruthy();
-
     });
 
     test('Marker uses a default marker with custom offset', () => {
@@ -78,9 +65,7 @@ describe('marker', () => {
 
     test('Marker#addTo adds the marker element to the canvas container', () => {
         const map = createMap();
-        new Marker()
-            .setLngLat([-77.01866, 38.888])
-            .addTo(map);
+        new Marker().setLngLat([-77.01866, 38.888]).addTo(map);
 
         expect(map.getCanvasContainer().querySelectorAll('.maplibregl-marker')).toHaveLength(1);
 
@@ -95,7 +80,6 @@ describe('marker', () => {
 
         expect(new Marker().setLngLat(new LngLat(1, 2)).getLngLat() instanceof LngLat).toBeTruthy();
         expect(new Marker().setLngLat(new LngLat(1, 2)).getLngLat()).toEqual(new LngLat(1, 2));
-
     });
 
     test('Marker provides offset accessors', () => {
@@ -104,30 +88,22 @@ describe('marker', () => {
 
         expect(new Marker().setOffset(new Point(1, 2)).getOffset() instanceof Point).toBeTruthy();
         expect(new Marker().setOffset(new Point(1, 2)).getOffset()).toEqual(new Point(1, 2));
-
     });
 
     test('Marker#setPopup binds a popup', () => {
         const popup = new Popup();
-        const marker = new Marker()
-            .setPopup(popup);
+        const marker = new Marker().setPopup(popup);
         expect(marker.getPopup()).toBe(popup);
     });
 
     test('Marker#setPopup unbinds a popup', () => {
-        const marker = new Marker()
-            .setPopup(new Popup())
-            .setPopup();
+        const marker = new Marker().setPopup(new Popup()).setPopup();
         expect(!marker.getPopup()).toBeTruthy();
     });
 
     test('Marker#togglePopup opens a popup that was closed', () => {
         const map = createMap();
-        const marker = new Marker()
-            .setLngLat([0, 0])
-            .addTo(map)
-            .setPopup(new Popup())
-            .togglePopup();
+        const marker = new Marker().setLngLat([0, 0]).addTo(map).setPopup(new Popup()).togglePopup();
 
         expect(marker.getPopup().isOpen()).toBeTruthy();
 
@@ -136,12 +112,7 @@ describe('marker', () => {
 
     test('Marker#togglePopup closes a popup that was open', () => {
         const map = createMap();
-        const marker = new Marker()
-            .setLngLat([0, 0])
-            .addTo(map)
-            .setPopup(new Popup())
-            .togglePopup()
-            .togglePopup();
+        const marker = new Marker().setLngLat([0, 0]).addTo(map).setPopup(new Popup()).togglePopup().togglePopup();
 
         expect(!marker.getPopup().isOpen()).toBeTruthy();
 
@@ -150,10 +121,7 @@ describe('marker', () => {
 
     test('Enter key on Marker opens a popup that was closed', () => {
         const map = createMap();
-        const marker = new Marker()
-            .setLngLat([0, 0])
-            .addTo(map)
-            .setPopup(new Popup());
+        const marker = new Marker().setLngLat([0, 0]).addTo(map).setPopup(new Popup());
 
         // popup not initially open
         expect(marker.getPopup().isOpen()).toBeFalsy();
@@ -168,10 +136,7 @@ describe('marker', () => {
 
     test('Space key on Marker opens a popup that was closed', () => {
         const map = createMap();
-        const marker = new Marker()
-            .setLngLat([0, 0])
-            .addTo(map)
-            .setPopup(new Popup());
+        const marker = new Marker().setLngLat([0, 0]).addTo(map).setPopup(new Popup());
 
         // popup not initially open
         expect(marker.getPopup().isOpen()).toBeFalsy();
@@ -186,16 +151,13 @@ describe('marker', () => {
 
     test('Marker#setPopup sets a tabindex', () => {
         const popup = new Popup();
-        const marker = new Marker()
-            .setPopup(popup);
+        const marker = new Marker().setPopup(popup);
         expect(marker.getElement().getAttribute('tabindex')).toBe('0');
     });
 
     test('Marker#setPopup removes tabindex when unset', () => {
         const popup = new Popup();
-        const marker = new Marker()
-            .setPopup(popup)
-            .setPopup();
+        const marker = new Marker().setPopup(popup).setPopup();
         expect(marker.getElement().getAttribute('tabindex')).toBeFalsy();
     });
 
@@ -203,16 +165,13 @@ describe('marker', () => {
         const element = window.document.createElement('div');
         element.setAttribute('tabindex', '5');
         const popup = new Popup();
-        const marker = new Marker({element})
-            .setPopup(popup);
+        const marker = new Marker({element}).setPopup(popup);
         expect(marker.getElement().getAttribute('tabindex')).toBe('5');
     });
 
     test('Marker anchor defaults to center', () => {
         const map = createMap();
-        const marker = new Marker()
-            .setLngLat([0, 0])
-            .addTo(map);
+        const marker = new Marker().setLngLat([0, 0]).addTo(map);
 
         expect(marker.getElement().classList.contains('maplibregl-marker-anchor-center')).toBeTruthy();
         expect(marker.getElement().style.transform).toMatch(/translate\(-50%,-50%\)/);
@@ -222,9 +181,7 @@ describe('marker', () => {
 
     test('Marker anchors as specified by the anchor option', () => {
         const map = createMap();
-        const marker = new Marker({anchor: 'top'})
-            .setLngLat([0, 0])
-            .addTo(map);
+        const marker = new Marker({anchor: 'top'}).setLngLat([0, 0]).addTo(map);
 
         expect(marker.getElement().classList.contains('maplibregl-marker-anchor-top')).toBeTruthy();
         expect(marker.getElement().style.transform).toMatch(/translate\(-50%,0\)/);
@@ -246,10 +203,7 @@ describe('marker', () => {
     test('Popup offsets around default Marker', () => {
         const map = createMap();
 
-        const marker = new Marker()
-            .setLngLat([0, 0])
-            .setPopup(new Popup().setText('Test'))
-            .addTo(map);
+        const marker = new Marker().setLngLat([0, 0]).setPopup(new Popup().setText('Test')).addTo(map);
 
         expect(marker.getPopup().options.offset['bottom'][1] < 0).toBeTruthy();
         expect(marker.getPopup().options.offset['top'][1] === 0).toBeTruthy();
@@ -263,16 +217,12 @@ describe('marker', () => {
 
         expect(marker.getPopup().options.offset['top-left']).toEqual([0, 0]);
         expect(marker.getPopup().options.offset['top-right']).toEqual([0, 0]);
-
     });
 
     test('Popup anchors around default Marker', () => {
         const map = createMap();
 
-        const marker = new Marker()
-            .setLngLat([0, 0])
-            .setPopup(new Popup().setText('Test'))
-            .addTo(map);
+        const marker = new Marker().setLngLat([0, 0]).setPopup(new Popup().setText('Test')).addTo(map);
 
         // open the popup
         marker.togglePopup();
@@ -286,59 +236,40 @@ describe('marker', () => {
         Object.defineProperty(marker.getPopup()._container, 'offsetHeight', {value: 100});
 
         // marker should default to above since it has enough space
-        expect(
-        marker.getPopup()._container.classList.contains('maplibregl-popup-anchor-bottom')
-        ).toBeTruthy();
+        expect(marker.getPopup()._container.classList.contains('maplibregl-popup-anchor-bottom')).toBeTruthy();
 
         // move marker to the top forcing the popup to below
         marker.setLngLat(map.unproject([mapHeight / 2, markerTop]));
-        expect(
-        marker.getPopup()._container.classList.contains('maplibregl-popup-anchor-top')
-        ).toBeTruthy();
+        expect(marker.getPopup()._container.classList.contains('maplibregl-popup-anchor-top')).toBeTruthy();
 
         // move marker to the right forcing the popup to the left
         marker.setLngLat(map.unproject([mapHeight - markerRight, mapHeight / 2]));
-        expect(
-        marker.getPopup()._container.classList.contains('maplibregl-popup-anchor-right')
-        ).toBeTruthy();
+        expect(marker.getPopup()._container.classList.contains('maplibregl-popup-anchor-right')).toBeTruthy();
 
         // move marker to the left forcing the popup to the right
         marker.setLngLat(map.unproject([markerRight, mapHeight / 2]));
-        expect(
-        marker.getPopup()._container.classList.contains('maplibregl-popup-anchor-left')
-        ).toBeTruthy();
+        expect(marker.getPopup()._container.classList.contains('maplibregl-popup-anchor-left')).toBeTruthy();
 
         // move marker to the top left forcing the popup to the bottom right
         marker.setLngLat(map.unproject([markerRight, markerTop]));
-        expect(
-        marker.getPopup()._container.classList.contains('maplibregl-popup-anchor-top-left')
-        ).toBeTruthy();
+        expect(marker.getPopup()._container.classList.contains('maplibregl-popup-anchor-top-left')).toBeTruthy();
 
         // move marker to the top right forcing the popup to the bottom left
         marker.setLngLat(map.unproject([mapHeight - markerRight, markerTop]));
-        expect(
-        marker.getPopup()._container.classList.contains('maplibregl-popup-anchor-top-right')
-        ).toBeTruthy();
+        expect(marker.getPopup()._container.classList.contains('maplibregl-popup-anchor-top-right')).toBeTruthy();
 
         // move marker to the bottom left forcing the popup to the top right
         marker.setLngLat(map.unproject([markerRight, mapHeight]));
-        expect(
-        marker.getPopup()._container.classList.contains('maplibregl-popup-anchor-bottom-left')
-        ).toBeTruthy();
+        expect(marker.getPopup()._container.classList.contains('maplibregl-popup-anchor-bottom-left')).toBeTruthy();
 
         // move marker to the bottom right forcing the popup to the top left
         marker.setLngLat(map.unproject([mapHeight - markerRight, mapHeight]));
-        expect(
-        marker.getPopup()._container.classList.contains('maplibregl-popup-anchor-bottom-right')
-        ).toBeTruthy();
-
+        expect(marker.getPopup()._container.classList.contains('maplibregl-popup-anchor-bottom-right')).toBeTruthy();
     });
 
     test('Marker drag functionality can be added with drag option', () => {
         const map = createMap();
-        const marker = new Marker({draggable: true})
-            .setLngLat([0, 0])
-            .addTo(map);
+        const marker = new Marker({draggable: true}).setLngLat([0, 0]).addTo(map);
 
         expect(marker.isDraggable()).toBe(true);
 
@@ -347,10 +278,7 @@ describe('marker', () => {
 
     test('Marker#setDraggable adds drag functionality', () => {
         const map = createMap();
-        const marker = new Marker()
-            .setLngLat([0, 0])
-            .setDraggable(true)
-            .addTo(map);
+        const marker = new Marker().setLngLat([0, 0]).setDraggable(true).addTo(map);
 
         expect(marker.isDraggable()).toBe(true);
 
@@ -359,9 +287,7 @@ describe('marker', () => {
 
     test('Marker#setDraggable turns off drag functionality', () => {
         const map = createMap();
-        const marker = new Marker({draggable: true})
-            .setLngLat([0, 0])
-            .addTo(map);
+        const marker = new Marker({draggable: true}).setLngLat([0, 0]).addTo(map);
 
         expect(marker.isDraggable()).toBe(true);
 
@@ -374,18 +300,16 @@ describe('marker', () => {
 
     test('Marker with draggable:true fires dragstart, drag, and dragend events at appropriate times in response to mouse-triggered drag with map-inherited clickTolerance', () => {
         const map = createMap();
-        const marker = new Marker({draggable: true})
-            .setLngLat([0, 0])
-            .addTo(map);
+        const marker = new Marker({draggable: true}).setLngLat([0, 0]).addTo(map);
         const el = marker.getElement();
 
         const dragstart = jest.fn();
-        const drag      = jest.fn();
-        const dragend   = jest.fn();
+        const drag = jest.fn();
+        const dragend = jest.fn();
 
         marker.on('dragstart', dragstart);
-        marker.on('drag',      drag);
-        marker.on('dragend',   dragend);
+        marker.on('drag', drag);
+        marker.on('dragend', dragend);
 
         simulate.mousedown(el, {clientX: 0, clientY: 0});
         expect(dragstart).not.toHaveBeenCalled();
@@ -423,18 +347,16 @@ describe('marker', () => {
 
     test('Marker with draggable:true fires dragstart, drag, and dragend events at appropriate times in response to mouse-triggered drag with marker-specific clickTolerance', () => {
         const map = createMap();
-        const marker = new Marker({draggable: true, clickTolerance: 4})
-            .setLngLat([0, 0])
-            .addTo(map);
+        const marker = new Marker({draggable: true, clickTolerance: 4}).setLngLat([0, 0]).addTo(map);
         const el = marker.getElement();
 
         const dragstart = jest.fn();
-        const drag      = jest.fn();
-        const dragend   = jest.fn();
+        const drag = jest.fn();
+        const dragend = jest.fn();
 
         marker.on('dragstart', dragstart);
-        marker.on('drag',      drag);
-        marker.on('dragend',   dragend);
+        marker.on('drag', drag);
+        marker.on('dragend', dragend);
 
         simulate.mousedown(el, {clientX: 0, clientY: 0});
         expect(dragstart).not.toHaveBeenCalled();
@@ -472,18 +394,16 @@ describe('marker', () => {
 
     test('Marker with draggable:false does not fire dragstart, drag, and dragend events in response to a mouse-triggered drag', () => {
         const map = createMap();
-        const marker = new Marker({})
-            .setLngLat([0, 0])
-            .addTo(map);
+        const marker = new Marker({}).setLngLat([0, 0]).addTo(map);
         const el = marker.getElement();
 
         const dragstart = jest.fn();
-        const drag      = jest.fn();
-        const dragend   = jest.fn();
+        const drag = jest.fn();
+        const dragend = jest.fn();
 
         marker.on('dragstart', dragstart);
-        marker.on('drag',      drag);
-        marker.on('dragend',   dragend);
+        marker.on('drag', drag);
+        marker.on('dragend', dragend);
 
         simulate.mousedown(el, {clientX: 0, clientY: 0});
         expect(dragstart).not.toHaveBeenCalled();
@@ -505,18 +425,16 @@ describe('marker', () => {
 
     test('Marker with draggable:true fires dragstart, drag, and dragend events at appropriate times in response to a touch-triggered drag with map-inherited clickTolerance', () => {
         const map = createMap();
-        const marker = new Marker({draggable: true})
-            .setLngLat([0, 0])
-            .addTo(map);
+        const marker = new Marker({draggable: true}).setLngLat([0, 0]).addTo(map);
         const el = marker.getElement();
 
         const dragstart = jest.fn();
-        const drag      = jest.fn();
-        const dragend   = jest.fn();
+        const drag = jest.fn();
+        const dragend = jest.fn();
 
         marker.on('dragstart', dragstart);
-        marker.on('drag',      drag);
-        marker.on('dragend',   dragend);
+        marker.on('drag', drag);
+        marker.on('dragend', dragend);
 
         simulate.touchstart(el, {touches: [{clientX: 0, clientY: 0}]});
         expect(dragstart).not.toHaveBeenCalled();
@@ -554,18 +472,16 @@ describe('marker', () => {
 
     test('Marker with draggable:true fires dragstart, drag, and dragend events at appropriate times in response to a touch-triggered drag with marker-specific clickTolerance', () => {
         const map = createMap();
-        const marker = new Marker({draggable: true, clickTolerance: 4})
-            .setLngLat([0, 0])
-            .addTo(map);
+        const marker = new Marker({draggable: true, clickTolerance: 4}).setLngLat([0, 0]).addTo(map);
         const el = marker.getElement();
 
         const dragstart = jest.fn();
-        const drag      = jest.fn();
-        const dragend   = jest.fn();
+        const drag = jest.fn();
+        const dragend = jest.fn();
 
         marker.on('dragstart', dragstart);
-        marker.on('drag',      drag);
-        marker.on('dragend',   dragend);
+        marker.on('drag', drag);
+        marker.on('dragend', dragend);
 
         simulate.touchstart(el, {touches: [{clientX: 0, clientY: 0}]});
         expect(dragstart).not.toHaveBeenCalled();
@@ -603,18 +519,16 @@ describe('marker', () => {
 
     test('Marker with draggable:false does not fire dragstart, drag, and dragend events in response to a touch-triggered drag', () => {
         const map = createMap();
-        const marker = new Marker({})
-            .setLngLat([0, 0])
-            .addTo(map);
+        const marker = new Marker({}).setLngLat([0, 0]).addTo(map);
         const el = marker.getElement();
 
         const dragstart = jest.fn();
-        const drag      = jest.fn();
-        const dragend   = jest.fn();
+        const drag = jest.fn();
+        const dragend = jest.fn();
 
         marker.on('dragstart', dragstart);
-        marker.on('drag',      drag);
-        marker.on('dragend',   dragend);
+        marker.on('drag', drag);
+        marker.on('dragend', dragend);
 
         simulate.touchstart(el, {touches: [{clientX: 0, clientY: 0}]});
         expect(dragstart).not.toHaveBeenCalled();
@@ -636,9 +550,7 @@ describe('marker', () => {
 
     test('Marker with draggable:true moves to new position in response to a mouse-triggered drag', () => {
         const map = createMap();
-        const marker = new Marker({draggable: true})
-            .setLngLat([0, 0])
-            .addTo(map);
+        const marker = new Marker({draggable: true}).setLngLat([0, 0]).addTo(map);
         const el = marker.getElement();
         const startPos = map.project(marker.getLngLat());
         simulate.mousedown(el);
@@ -654,9 +566,7 @@ describe('marker', () => {
 
     test('Marker with draggable:false does not move to new position in response to a mouse-triggered drag', () => {
         const map = createMap();
-        const marker = new Marker({})
-            .setLngLat([0, 0])
-            .addTo(map);
+        const marker = new Marker({}).setLngLat([0, 0]).addTo(map);
         const el = marker.getElement();
         const startPos = map.project(marker.getLngLat());
 
@@ -674,9 +584,7 @@ describe('marker', () => {
 
     test('Marker with draggable:true does not error if removed on mousedown', () => {
         const map = createMap();
-        const marker = new Marker({draggable: true})
-            .setLngLat([0, 0])
-            .addTo(map);
+        const marker = new Marker({draggable: true}).setLngLat([0, 0]).addTo(map);
         const el = marker.getElement();
         simulate.mousedown(el);
         simulate.mousemove(el, {clientX: 10, clientY: 10});
@@ -687,9 +595,7 @@ describe('marker', () => {
 
     test('Marker can set rotationAlignment and pitchAlignment', () => {
         const map = createMap();
-        const marker = new Marker({rotationAlignment: 'map', pitchAlignment: 'map'})
-            .setLngLat([0, 0])
-            .addTo(map);
+        const marker = new Marker({rotationAlignment: 'map', pitchAlignment: 'map'}).setLngLat([0, 0]).addTo(map);
 
         expect(marker.getRotationAlignment()).toBe('map');
         expect(marker.getPitchAlignment()).toBe('map');
@@ -699,9 +605,7 @@ describe('marker', () => {
 
     test('Marker can set and update rotation', () => {
         const map = createMap();
-        const marker = new Marker({rotation: 45})
-            .setLngLat([0, 0])
-            .addTo(map);
+        const marker = new Marker({rotation: 45}).setLngLat([0, 0]).addTo(map);
 
         expect(marker.getRotation()).toBe(45);
 
@@ -713,9 +617,7 @@ describe('marker', () => {
 
     test('Marker transforms rotation with the map', () => {
         const map = createMap();
-        const marker = new Marker({rotationAlignment: 'map'})
-            .setLngLat([0, 0])
-            .addTo(map);
+        const marker = new Marker({rotationAlignment: 'map'}).setLngLat([0, 0]).addTo(map);
 
         const rotationRegex = /rotateZ\(-?([0-9]+)deg\)/;
         const initialRotation = marker.getElement().style.transform.match(rotationRegex)[1];
@@ -730,9 +632,7 @@ describe('marker', () => {
 
     test('Marker transforms pitch with the map', () => {
         const map = createMap();
-        const marker = new Marker({pitchAlignment: 'map'})
-            .setLngLat([0, 0])
-            .addTo(map);
+        const marker = new Marker({pitchAlignment: 'map'}).setLngLat([0, 0]).addTo(map);
 
         map.setPitch(0);
 
@@ -749,9 +649,7 @@ describe('marker', () => {
 
     test('Marker pitchAlignment when set to auto defaults to rotationAlignment', () => {
         const map = createMap();
-        const marker = new Marker({rotationAlignment: 'map', pitchAlignment: 'auto'})
-            .setLngLat([0, 0])
-            .addTo(map);
+        const marker = new Marker({rotationAlignment: 'map', pitchAlignment: 'auto'}).setLngLat([0, 0]).addTo(map);
 
         expect(marker.getRotationAlignment()).toBe(marker.getPitchAlignment());
 
@@ -760,9 +658,7 @@ describe('marker', () => {
 
     test('Marker pitchAlignment when set to auto defaults to rotationAlignment (setter/getter)', () => {
         const map = createMap();
-        const marker = new Marker({pitchAlignment: 'map'})
-            .setLngLat([0, 0])
-            .addTo(map);
+        const marker = new Marker({pitchAlignment: 'map'}).setLngLat([0, 0]).addTo(map);
 
         expect(marker.getPitchAlignment()).toBe('map');
         marker.setRotationAlignment('viewport');

@@ -13,7 +13,7 @@ export type LayerFeatureStates = {[layer: string]: FeatureStates};
  * list of changes, such that coalesce() can apply the proper state changes while agnostic to the order of operations.
  * In deletedStates, all null's denote complete removal of state at that scope
  * @private
-*/
+ */
 class SourceFeatureState {
     state: LayerFeatureStates;
     stateChanges: LayerFeatureStates;
@@ -37,7 +37,8 @@ class SourceFeatureState {
                 if (ft !== feature) this.deletedStates[sourceLayer][ft] = null;
             }
         } else {
-            const featureDeletionQueued = this.deletedStates[sourceLayer] && this.deletedStates[sourceLayer][feature] === null;
+            const featureDeletionQueued =
+                this.deletedStates[sourceLayer] && this.deletedStates[sourceLayer][feature] === null;
             if (featureDeletionQueued) {
                 this.deletedStates[sourceLayer][feature] = {};
                 for (const prop in this.state[sourceLayer][feature]) {
@@ -45,7 +46,10 @@ class SourceFeatureState {
                 }
             } else {
                 for (const key in newState) {
-                    const deletionInQueue = this.deletedStates[sourceLayer] && this.deletedStates[sourceLayer][feature] && this.deletedStates[sourceLayer][feature][key] === null;
+                    const deletionInQueue =
+                        this.deletedStates[sourceLayer] &&
+                        this.deletedStates[sourceLayer][feature] &&
+                        this.deletedStates[sourceLayer][feature][key] === null;
                     if (deletionInQueue) delete this.deletedStates[sourceLayer][feature][key];
                 }
             }
@@ -69,15 +73,14 @@ class SourceFeatureState {
             const updateInQueue = this.stateChanges[sourceLayer] && this.stateChanges[sourceLayer][feature];
             if (updateInQueue) {
                 this.deletedStates[sourceLayer][feature] = {};
-                for (key in this.stateChanges[sourceLayer][feature]) this.deletedStates[sourceLayer][feature][key] = null;
-
+                for (key in this.stateChanges[sourceLayer][feature])
+                    this.deletedStates[sourceLayer][feature][key] = null;
             } else {
                 this.deletedStates[sourceLayer][feature] = null;
             }
         } else {
             this.deletedStates[sourceLayer] = null;
         }
-
     }
 
     getState(sourceLayer: string, featureId: number | string) {
@@ -101,14 +104,17 @@ class SourceFeatureState {
         tile.setFeatureState(this.state, painter);
     }
 
-    coalesceChanges(tiles: {
-      [_ in any]: Tile;
-    }, painter: any) {
+    coalesceChanges(
+        tiles: {
+            [_ in any]: Tile;
+        },
+        painter: any
+    ) {
         //track changes with full state objects, but only for features that got modified
         const featuresChanged: LayerFeatureStates = {};
 
         for (const sourceLayer in this.stateChanges) {
-            this.state[sourceLayer]  = this.state[sourceLayer] || {};
+            this.state[sourceLayer] = this.state[sourceLayer] || {};
             const layerStates = {};
             for (const feature in this.stateChanges[sourceLayer]) {
                 if (!this.state[sourceLayer][feature]) this.state[sourceLayer][feature] = {};
@@ -119,7 +125,7 @@ class SourceFeatureState {
         }
 
         for (const sourceLayer in this.deletedStates) {
-            this.state[sourceLayer]  = this.state[sourceLayer] || {};
+            this.state[sourceLayer] = this.state[sourceLayer] || {};
             const layerStates = {};
 
             if (this.deletedStates[sourceLayer] === null) {

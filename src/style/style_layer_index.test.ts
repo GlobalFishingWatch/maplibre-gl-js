@@ -19,7 +19,6 @@ describe('StyleLayerIndex', () => {
 
         index.replace([]);
         expect(index.familiesBySource).toEqual({});
-
     });
 
     test('StyleLayerIndex#update', () => {
@@ -29,11 +28,14 @@ describe('StyleLayerIndex', () => {
             {id: '3', type: 'circle', source: 'foo', 'source-layer': 'layer', paint: {'circle-color': 'blue'}}
         ]);
 
-        index.update([
-            {id: '1', type: 'fill', source: 'bar', 'source-layer': 'layer', paint: {'fill-color': 'cyan'}},
-            {id: '2', type: 'circle', source: 'bar', 'source-layer': 'layer', paint: {'circle-color': 'magenta'}},
-            {id: '3', type: 'circle', source: 'bar', 'source-layer': 'layer', paint: {'circle-color': 'yellow'}}
-        ], []);
+        index.update(
+            [
+                {id: '1', type: 'fill', source: 'bar', 'source-layer': 'layer', paint: {'fill-color': 'cyan'}},
+                {id: '2', type: 'circle', source: 'bar', 'source-layer': 'layer', paint: {'circle-color': 'magenta'}},
+                {id: '3', type: 'circle', source: 'bar', 'source-layer': 'layer', paint: {'circle-color': 'yellow'}}
+            ],
+            []
+        );
 
         const families = index.familiesBySource['bar']['layer'];
         expect(families).toHaveLength(2);
@@ -44,56 +46,63 @@ describe('StyleLayerIndex', () => {
         expect(families[1][0].source).toBe('bar');
         expect(families[1][1].getPaintProperty('circle-color')).toBe('yellow');
         expect(families[1][1].source).toBe('bar');
-
     });
 
     test('StyleLayerIndex#familiesBySource', () => {
         const index = new StyleLayerIndex([
-            {id: '0', type: 'fill', 'source': 'A', 'source-layer': 'foo'},
-            {id: '1', type: 'fill', 'source': 'A', 'source-layer': 'foo'},
-            {id: '2', type: 'fill', 'source': 'A', 'source-layer': 'foo', 'minzoom': 1},
-            {id: '3', type: 'fill', 'source': 'A', 'source-layer': 'bar'},
-            {id: '4', type: 'fill', 'source': 'B', 'source-layer': 'foo'},
-            {id: '5', type: 'fill', 'source': 'geojson'},
+            {id: '0', type: 'fill', source: 'A', 'source-layer': 'foo'},
+            {id: '1', type: 'fill', source: 'A', 'source-layer': 'foo'},
+            {id: '2', type: 'fill', source: 'A', 'source-layer': 'foo', minzoom: 1},
+            {id: '3', type: 'fill', source: 'A', 'source-layer': 'bar'},
+            {id: '4', type: 'fill', source: 'B', 'source-layer': 'foo'},
+            {id: '5', type: 'fill', source: 'geojson'},
             {id: '6', type: 'background'}
         ]);
 
-        const ids = mapObject(index.familiesBySource, (bySource) => {
-            return mapObject(bySource, (families) => {
-                return families.map((family) => {
-                    return family.map((layer) => layer.id);
+        const ids = mapObject(index.familiesBySource, bySource => {
+            return mapObject(bySource, families => {
+                return families.map(family => {
+                    return family.map(layer => layer.id);
                 });
             });
         });
 
         expect(ids).toEqual({
-            'A': {
-                'foo': [['0', '1'], ['2']],
-                'bar': [['3']]
+            A: {
+                foo: [['0', '1'], ['2']],
+                bar: [['3']]
             },
-            'B': {
-                'foo': [['4']]
+            B: {
+                foo: [['4']]
             },
-            'geojson': {
-                '_geojsonTileLayer': [['5']]
+            geojson: {
+                _geojsonTileLayer: [['5']]
             },
             '': {
-                '_geojsonTileLayer': [['6']]
+                _geojsonTileLayer: [['6']]
             }
         });
-
     });
 
     test('StyleLayerIndex groups families even if layout key order differs', () => {
         const index = new StyleLayerIndex([
-            {id: '0', type: 'line', 'source': 'source', 'source-layer': 'layer',
-                'layout': {'line-cap': 'butt', 'line-join': 'miter'}},
-            {id: '1', type: 'line', 'source': 'source', 'source-layer': 'layer',
-                'layout': {'line-join': 'miter', 'line-cap': 'butt'}}
+            {
+                id: '0',
+                type: 'line',
+                source: 'source',
+                'source-layer': 'layer',
+                layout: {'line-cap': 'butt', 'line-join': 'miter'}
+            },
+            {
+                id: '1',
+                type: 'line',
+                source: 'source',
+                'source-layer': 'layer',
+                layout: {'line-join': 'miter', 'line-cap': 'butt'}
+            }
         ]);
 
         const families = index.familiesBySource['source']['layer'];
         expect(families[0]).toHaveLength(2);
-
     });
 });

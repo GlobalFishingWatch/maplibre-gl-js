@@ -27,27 +27,37 @@ import type Point from '../../util/point';
 import type {CanonicalTileID} from '../../source/tile_id';
 
 export type Feature = {
-  readonly type: 1 | 2 | 3 | 'Unknown' | 'Point' | 'MultiPoint' | 'LineString' | 'MultiLineString' | 'Polygon' | 'MultiPolygon';
-  readonly id?: any;
-  readonly properties: {[_: string]: any};
-  readonly patterns?: {
-    [_: string]: {
-      'min': string;
-      'mid': string;
-      'max': string;
+    readonly type:
+        | 1
+        | 2
+        | 3
+        | 'Unknown'
+        | 'Point'
+        | 'MultiPoint'
+        | 'LineString'
+        | 'MultiLineString'
+        | 'Polygon'
+        | 'MultiPolygon';
+    readonly id?: any;
+    readonly properties: {[_: string]: any};
+    readonly patterns?: {
+        [_: string]: {
+            min: string;
+            mid: string;
+            max: string;
+        };
     };
-  };
-  readonly geometry?: Array<Array<Point>>;
+    readonly geometry?: Array<Array<Point>>;
 };
 
 export type FeatureState = {[_: string]: any};
 
 export type GlobalProperties = Readonly<{
-  zoom: number;
-  heatmapDensity?: number;
-  lineProgress?: number;
-  isSupportedScript?: (_: string) => boolean;
-  accumulated?: Value;
+    zoom: number;
+    heatmapDensity?: number;
+    lineProgress?: number;
+    isSupportedScript?: (_: string) => boolean;
+    accumulated?: Value;
 }>;
 
 export class StyleExpression {
@@ -67,12 +77,12 @@ export class StyleExpression {
     }
 
     evaluateWithoutErrorHandling(
-      globals: GlobalProperties,
-      feature?: Feature,
-      featureState?: FeatureState,
-      canonical?: CanonicalTileID,
-      availableImages?: Array<string>,
-      formattedSection?: FormattedSection
+        globals: GlobalProperties,
+        feature?: Feature,
+        featureState?: FeatureState,
+        canonical?: CanonicalTileID,
+        availableImages?: Array<string>,
+        formattedSection?: FormattedSection
     ): any {
         this._evaluator.globals = globals;
         this._evaluator.feature = feature;
@@ -85,12 +95,12 @@ export class StyleExpression {
     }
 
     evaluate(
-      globals: GlobalProperties,
-      feature?: Feature,
-      featureState?: FeatureState,
-      canonical?: CanonicalTileID,
-      availableImages?: Array<string>,
-      formattedSection?: FormattedSection
+        globals: GlobalProperties,
+        feature?: Feature,
+        featureState?: FeatureState,
+        canonical?: CanonicalTileID,
+        availableImages?: Array<string>,
+        formattedSection?: FormattedSection
     ): any {
         this._evaluator.globals = globals;
         this._evaluator.feature = feature || null;
@@ -106,7 +116,11 @@ export class StyleExpression {
                 return this._defaultValue;
             }
             if (this._enumValues && !(val in this._enumValues)) {
-                throw new RuntimeError(`Expected value to be one of ${Object.keys(this._enumValues).map(v => JSON.stringify(v)).join(', ')}, but found ${JSON.stringify(val)} instead.`);
+                throw new RuntimeError(
+                    `Expected value to be one of ${Object.keys(this._enumValues)
+                        .map(v => JSON.stringify(v))
+                        .join(', ')}, but found ${JSON.stringify(val)} instead.`
+                );
             }
             return val;
         } catch (e) {
@@ -122,8 +136,12 @@ export class StyleExpression {
 }
 
 export function isExpression(expression: unknown) {
-    return Array.isArray(expression) && expression.length > 0 &&
-        typeof expression[0] === 'string' && expression[0] in definitions;
+    return (
+        Array.isArray(expression) &&
+        expression.length > 0 &&
+        typeof expression[0] === 'string' &&
+        expression[0] in definitions
+    );
 }
 
 /**
@@ -135,12 +153,20 @@ export function isExpression(expression: unknown) {
  *
  * @private
  */
-export function createExpression(expression: unknown, propertySpec?: StylePropertySpecification | null): Result<StyleExpression, Array<ParsingError>> {
+export function createExpression(
+    expression: unknown,
+    propertySpec?: StylePropertySpecification | null
+): Result<StyleExpression, Array<ParsingError>> {
     const parser = new ParsingContext(definitions, [], propertySpec ? getExpectedType(propertySpec) : undefined);
 
     // For string-valued properties, coerce to string at the top level rather than asserting.
-    const parsed = parser.parse(expression, undefined, undefined, undefined,
-        propertySpec && propertySpec.type === 'string' ? {typeAnnotation: 'coerce'} : undefined);
+    const parsed = parser.parse(
+        expression,
+        undefined,
+        undefined,
+        undefined,
+        propertySpec && propertySpec.type === 'string' ? {typeAnnotation: 'coerce'} : undefined
+    );
 
     if (!parsed) {
         assert(parser.errors.length > 0);
@@ -158,29 +184,44 @@ export class ZoomConstantExpression<Kind extends EvaluationKind> {
     constructor(kind: Kind, expression: StyleExpression) {
         this.kind = kind;
         this._styleExpression = expression;
-        this.isStateDependent = kind !== ('constant' as EvaluationKind) && !isConstant.isStateConstant(expression.expression);
+        this.isStateDependent =
+            kind !== ('constant' as EvaluationKind) && !isConstant.isStateConstant(expression.expression);
     }
 
     evaluateWithoutErrorHandling(
-      globals: GlobalProperties,
-      feature?: Feature,
-      featureState?: FeatureState,
-      canonical?: CanonicalTileID,
-      availableImages?: Array<string>,
-      formattedSection?: FormattedSection
+        globals: GlobalProperties,
+        feature?: Feature,
+        featureState?: FeatureState,
+        canonical?: CanonicalTileID,
+        availableImages?: Array<string>,
+        formattedSection?: FormattedSection
     ): any {
-        return this._styleExpression.evaluateWithoutErrorHandling(globals, feature, featureState, canonical, availableImages, formattedSection);
+        return this._styleExpression.evaluateWithoutErrorHandling(
+            globals,
+            feature,
+            featureState,
+            canonical,
+            availableImages,
+            formattedSection
+        );
     }
 
     evaluate(
-      globals: GlobalProperties,
-      feature?: Feature,
-      featureState?: FeatureState,
-      canonical?: CanonicalTileID,
-      availableImages?: Array<string>,
-      formattedSection?: FormattedSection
+        globals: GlobalProperties,
+        feature?: Feature,
+        featureState?: FeatureState,
+        canonical?: CanonicalTileID,
+        availableImages?: Array<string>,
+        formattedSection?: FormattedSection
     ): any {
-        return this._styleExpression.evaluate(globals, feature, featureState, canonical, availableImages, formattedSection);
+        return this._styleExpression.evaluate(
+            globals,
+            feature,
+            featureState,
+            canonical,
+            availableImages,
+            formattedSection
+        );
     }
 }
 
@@ -192,34 +233,54 @@ export class ZoomDependentExpression<Kind extends EvaluationKind> {
     _styleExpression: StyleExpression;
     interpolationType: InterpolationType;
 
-    constructor(kind: Kind, expression: StyleExpression, zoomStops: Array<number>, interpolationType?: InterpolationType) {
+    constructor(
+        kind: Kind,
+        expression: StyleExpression,
+        zoomStops: Array<number>,
+        interpolationType?: InterpolationType
+    ) {
         this.kind = kind;
         this.zoomStops = zoomStops;
         this._styleExpression = expression;
-        this.isStateDependent = kind !== ('camera' as EvaluationKind) && !isConstant.isStateConstant(expression.expression);
+        this.isStateDependent =
+            kind !== ('camera' as EvaluationKind) && !isConstant.isStateConstant(expression.expression);
         this.interpolationType = interpolationType;
     }
 
     evaluateWithoutErrorHandling(
-      globals: GlobalProperties,
-      feature?: Feature,
-      featureState?: FeatureState,
-      canonical?: CanonicalTileID,
-      availableImages?: Array<string>,
-      formattedSection?: FormattedSection
+        globals: GlobalProperties,
+        feature?: Feature,
+        featureState?: FeatureState,
+        canonical?: CanonicalTileID,
+        availableImages?: Array<string>,
+        formattedSection?: FormattedSection
     ): any {
-        return this._styleExpression.evaluateWithoutErrorHandling(globals, feature, featureState, canonical, availableImages, formattedSection);
+        return this._styleExpression.evaluateWithoutErrorHandling(
+            globals,
+            feature,
+            featureState,
+            canonical,
+            availableImages,
+            formattedSection
+        );
     }
 
     evaluate(
-      globals: GlobalProperties,
-      feature?: Feature,
-      featureState?: FeatureState,
-      canonical?: CanonicalTileID,
-      availableImages?: Array<string>,
-      formattedSection?: FormattedSection
+        globals: GlobalProperties,
+        feature?: Feature,
+        featureState?: FeatureState,
+        canonical?: CanonicalTileID,
+        availableImages?: Array<string>,
+        formattedSection?: FormattedSection
     ): any {
-        return this._styleExpression.evaluate(globals, feature, featureState, canonical, availableImages, formattedSection);
+        return this._styleExpression.evaluate(
+            globals,
+            feature,
+            featureState,
+            canonical,
+            availableImages,
+            formattedSection
+        );
     }
 
     interpolationFactor(input: number, lower: number, upper: number): number {
@@ -232,62 +293,65 @@ export class ZoomDependentExpression<Kind extends EvaluationKind> {
 }
 
 export type ConstantExpression = {
-  kind: 'constant';
-  readonly evaluate: (
-    globals: GlobalProperties,
-    feature?: Feature,
-    featureState?: FeatureState,
-    canonical?: CanonicalTileID,
-    availableImages?: Array<string>
-  ) => any;
+    kind: 'constant';
+    readonly evaluate: (
+        globals: GlobalProperties,
+        feature?: Feature,
+        featureState?: FeatureState,
+        canonical?: CanonicalTileID,
+        availableImages?: Array<string>
+    ) => any;
 };
 
 export type SourceExpression = {
-  kind: 'source';
-  isStateDependent: boolean;
-  readonly evaluate: (
-    globals: GlobalProperties,
-    feature?: Feature,
-    featureState?: FeatureState,
-    canonical?: CanonicalTileID,
-    availableImages?: Array<string>,
-    formattedSection?: FormattedSection
-  ) => any;
+    kind: 'source';
+    isStateDependent: boolean;
+    readonly evaluate: (
+        globals: GlobalProperties,
+        feature?: Feature,
+        featureState?: FeatureState,
+        canonical?: CanonicalTileID,
+        availableImages?: Array<string>,
+        formattedSection?: FormattedSection
+    ) => any;
 };
 
 export type CameraExpression = {
-  kind: 'camera';
-  readonly evaluate: (
-    globals: GlobalProperties,
-    feature?: Feature,
-    featureState?: FeatureState,
-    canonical?: CanonicalTileID,
-    availableImages?: Array<string>
-  ) => any;
-  readonly interpolationFactor: (input: number, lower: number, upper: number) => number;
-  zoomStops: Array<number>;
-  interpolationType: InterpolationType;
+    kind: 'camera';
+    readonly evaluate: (
+        globals: GlobalProperties,
+        feature?: Feature,
+        featureState?: FeatureState,
+        canonical?: CanonicalTileID,
+        availableImages?: Array<string>
+    ) => any;
+    readonly interpolationFactor: (input: number, lower: number, upper: number) => number;
+    zoomStops: Array<number>;
+    interpolationType: InterpolationType;
 };
 
 export type CompositeExpression = {
-  kind: 'composite';
-  isStateDependent: boolean;
-  readonly evaluate: (
-    globals: GlobalProperties,
-    feature?: Feature,
-    featureState?: FeatureState,
-    canonical?: CanonicalTileID,
-    availableImages?: Array<string>,
-    formattedSection?: FormattedSection
-  ) => any;
-  readonly interpolationFactor: (input: number, lower: number, upper: number) => number;
-  zoomStops: Array<number>;
-  interpolationType: InterpolationType;
+    kind: 'composite';
+    isStateDependent: boolean;
+    readonly evaluate: (
+        globals: GlobalProperties,
+        feature?: Feature,
+        featureState?: FeatureState,
+        canonical?: CanonicalTileID,
+        availableImages?: Array<string>,
+        formattedSection?: FormattedSection
+    ) => any;
+    readonly interpolationFactor: (input: number, lower: number, upper: number) => number;
+    zoomStops: Array<number>;
+    interpolationType: InterpolationType;
 };
 
 export type StylePropertyExpression = ConstantExpression | SourceExpression | CameraExpression | CompositeExpression;
 
-export function createPropertyExpression(expressionInput: unknown, propertySpec: StylePropertySpecification): Result<StylePropertyExpression, Array<ParsingError>> {
+export function createPropertyExpression(
+    expressionInput: unknown,
+    propertySpec: StylePropertySpecification
+): Result<StylePropertyExpression, Array<ParsingError>> {
     const expression = createExpression(expressionInput, propertySpec);
     if (expression.result === 'error') {
         return expression;
@@ -307,7 +371,12 @@ export function createPropertyExpression(expressionInput: unknown, propertySpec:
 
     const zoomCurve = findZoomCurve(parsed);
     if (!zoomCurve && !isZoomConstant) {
-        return error([new ParsingError('', '"zoom" expression may only be used as input to a top-level "step" or "interpolate" expression.')]);
+        return error([
+            new ParsingError(
+                '',
+                '"zoom" expression may only be used as input to a top-level "step" or "interpolate" expression.'
+            )
+        ]);
     } else if (zoomCurve instanceof ParsingError) {
         return error([zoomCurve]);
     } else if (zoomCurve instanceof Interpolate && !supportsInterpolation(propertySpec)) {
@@ -315,16 +384,30 @@ export function createPropertyExpression(expressionInput: unknown, propertySpec:
     }
 
     if (!zoomCurve) {
-        return success(isFeatureConstant ?
-            (new ZoomConstantExpression('constant', expression.value) as ConstantExpression) :
-            (new ZoomConstantExpression('source', expression.value) as SourceExpression));
+        return success(
+            isFeatureConstant
+                ? (new ZoomConstantExpression('constant', expression.value) as ConstantExpression)
+                : (new ZoomConstantExpression('source', expression.value) as SourceExpression)
+        );
     }
 
     const interpolationType = zoomCurve instanceof Interpolate ? zoomCurve.interpolation : undefined;
 
-    return success(isFeatureConstant ?
-        (new ZoomDependentExpression('camera', expression.value, zoomCurve.labels, interpolationType) as CameraExpression) :
-        (new ZoomDependentExpression('composite', expression.value, zoomCurve.labels, interpolationType) as CompositeExpression));
+    return success(
+        isFeatureConstant
+            ? (new ZoomDependentExpression(
+                  'camera',
+                  expression.value,
+                  zoomCurve.labels,
+                  interpolationType
+              ) as CameraExpression)
+            : (new ZoomDependentExpression(
+                  'composite',
+                  expression.value,
+                  zoomCurve.labels,
+                  interpolationType
+              ) as CompositeExpression)
+    );
 }
 
 import {isFunction, createFunction} from '../function';
@@ -338,7 +421,7 @@ export class StylePropertyFunction<T> {
 
     kind: EvaluationKind;
     evaluate: (globals: GlobalProperties, feature?: Feature) => any;
-    interpolationFactor: ((input: number, lower: number, upper: number) => number);
+    interpolationFactor: (input: number, lower: number, upper: number) => number;
     zoomStops: Array<number>;
 
     constructor(parameters: PropertyValueSpecification<T>, specification: StylePropertySpecification) {
@@ -348,8 +431,8 @@ export class StylePropertyFunction<T> {
     }
 
     static deserialize<T>(serialized: {
-      _parameters: PropertyValueSpecification<T>;
-      _specification: StylePropertySpecification;
+        _parameters: PropertyValueSpecification<T>;
+        _specification: StylePropertySpecification;
     }) {
         return new StylePropertyFunction(serialized._parameters, serialized._specification) as StylePropertyFunction<T>;
     }
@@ -363,12 +446,11 @@ export class StylePropertyFunction<T> {
 }
 
 export function normalizePropertyExpression<T>(
-  value: PropertyValueSpecification<T>,
-  specification: StylePropertySpecification
+    value: PropertyValueSpecification<T>,
+    specification: StylePropertySpecification
 ): StylePropertyExpression {
     if (isFunction(value)) {
         return new StylePropertyFunction(value, specification) as any;
-
     } else if (isExpression(value)) {
         const expression = createPropertyExpression(value, specification);
         if (expression.result === 'error') {
@@ -376,7 +458,6 @@ export function normalizePropertyExpression<T>(
             throw new Error(expression.value.map(err => `${err.key}: ${err.message}`).join(', '));
         }
         return expression.value;
-
     } else {
         let constant: any = value;
         if (typeof value === 'string' && specification.type === 'color') {
@@ -396,7 +477,6 @@ function findZoomCurve(expression: Expression): Step | Interpolate | ParsingErro
     let result = null;
     if (expression instanceof Let) {
         result = findZoomCurve(expression.result);
-
     } else if (expression instanceof Coalesce) {
         for (const arg of expression.args) {
             result = findZoomCurve(arg);
@@ -404,11 +484,11 @@ function findZoomCurve(expression: Expression): Step | Interpolate | ParsingErro
                 break;
             }
         }
-
-    } else if ((expression instanceof Step || expression instanceof Interpolate) &&
+    } else if (
+        (expression instanceof Step || expression instanceof Interpolate) &&
         expression.input instanceof CompoundExpression &&
-        expression.input.name === 'zoom') {
-
+        expression.input.name === 'zoom'
+    ) {
         result = expression;
     }
 
@@ -416,21 +496,36 @@ function findZoomCurve(expression: Expression): Step | Interpolate | ParsingErro
         return result;
     }
 
-    expression.eachChild((child) => {
+    expression.eachChild(child => {
         const childResult = findZoomCurve(child);
         if (childResult instanceof ParsingError) {
             result = childResult;
         } else if (!result && childResult) {
-            result = new ParsingError('', '"zoom" expression may only be used as input to a top-level "step" or "interpolate" expression.');
+            result = new ParsingError(
+                '',
+                '"zoom" expression may only be used as input to a top-level "step" or "interpolate" expression.'
+            );
         } else if (result && childResult && result !== childResult) {
-            result = new ParsingError('', 'Only one zoom-based "step" or "interpolate" subexpression may be used in an expression.');
+            result = new ParsingError(
+                '',
+                'Only one zoom-based "step" or "interpolate" subexpression may be used in an expression.'
+            );
         }
     });
 
     return result;
 }
 
-import {ColorType, StringType, NumberType, BooleanType, ValueType, FormattedType, ResolvedImageType, array} from './types';
+import {
+    ColorType,
+    StringType,
+    NumberType,
+    BooleanType,
+    ValueType,
+    FormattedType,
+    ResolvedImageType,
+    array
+} from './types';
 
 function getExpectedType(spec: StylePropertySpecification): Type {
     const types = {

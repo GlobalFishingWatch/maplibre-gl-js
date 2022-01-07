@@ -3,23 +3,23 @@ import Color from './color';
 import {number as interpolateNumber} from './interpolate';
 
 type LABColor = {
-  l: number;
-  a: number;
-  b: number;
-  alpha: number;
+    l: number;
+    a: number;
+    b: number;
+    alpha: number;
 };
 
 type HCLColor = {
-  h: number;
-  c: number;
-  l: number;
-  alpha: number;
+    h: number;
+    c: number;
+    l: number;
+    alpha: number;
 };
 
 // Constants
-const Xn = 0.950470, // D65 standard referent
+const Xn = 0.95047, // D65 standard referent
     Yn = 1,
-    Zn = 1.088830,
+    Zn = 1.08883,
     t0 = 4 / 29,
     t1 = 6 / 29,
     t2 = 3 * t1 * t1,
@@ -51,8 +51,8 @@ function rgbToLab(rgbColor: Color): LABColor {
         a = rgb2xyz(rgbColor.g),
         l = rgb2xyz(rgbColor.b),
         x = xyz2lab((0.4124564 * b + 0.3575761 * a + 0.1804375 * l) / Xn),
-        y = xyz2lab((0.2126729 * b + 0.7151522 * a + 0.0721750 * l) / Yn),
-        z = xyz2lab((0.0193339 * b + 0.1191920 * a + 0.9503041 * l) / Zn);
+        y = xyz2lab((0.2126729 * b + 0.7151522 * a + 0.072175 * l) / Yn),
+        z = xyz2lab((0.0193339 * b + 0.119192 * a + 0.9503041 * l) / Zn);
 
     return {
         l: 116 * y - 16,
@@ -71,7 +71,7 @@ function labToRgb(labColor: LABColor): Color {
     z = Zn * lab2xyz(z);
     return new Color(
         xyz2rgb(3.2404542 * x - 1.5371385 * y - 0.4985314 * z), // D65 -> sRGB
-        xyz2rgb(-0.9692660 * x + 1.8760108 * y + 0.0415560 * z),
+        xyz2rgb(-0.969266 * x + 1.8760108 * y + 0.041556 * z),
         xyz2rgb(0.0556434 * x - 0.2040259 * y + 1.0572252 * z),
         labColor.alpha
     );

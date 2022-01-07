@@ -9,9 +9,9 @@ let cacheCheckThreshold = 50;
 const MIN_TIME_UNTIL_EXPIRY = 1000 * 60 * 7; // 7 minutes. Skip caching tiles with a short enough max age.
 
 export type ResponseOptions = {
-  status: number;
-  statusText: string;
-  headers: Headers;
+    status: number;
+    statusText: string;
+    headers: Headers;
 };
 
 // We're using a global shared cache object. Normally, requesting ad-hoc Cache objects is fine, but
@@ -88,7 +88,10 @@ function stripQueryParameters(url: string) {
     return start < 0 ? url : url.slice(0, start);
 }
 
-export function cacheGet(request: Request, callback: (error?: any | null, response?: Response | null, fresh?: boolean | null) => void) {
+export function cacheGet(
+    request: Request,
+    callback: (error?: any | null, response?: Response | null, fresh?: boolean | null) => void
+) {
     cacheOpen();
     if (!sharedCache) return callback(null);
 
@@ -98,7 +101,8 @@ export function cacheGet(request: Request, callback: (error?: any | null, respon
         .then(cache => {
             // manually strip URL instead of `ignoreSearch: true` because of a known
             // performance issue in Chrome https://github.com/mapbox/mapbox-gl-js/issues/8431
-            cache.match(strippedURL)
+            cache
+                .match(strippedURL)
                 .then(response => {
                     const fresh = isFresh(response);
 
@@ -114,7 +118,6 @@ export function cacheGet(request: Request, callback: (error?: any | null, respon
                 .catch(callback);
         })
         .catch(callback);
-
 }
 
 function isFresh(response) {
@@ -146,14 +149,13 @@ export function enforceCacheSizeLimit(limit: number) {
     cacheOpen();
     if (!sharedCache) return;
 
-    sharedCache
-        .then(cache => {
-            cache.keys().then(keys => {
-                for (let i = 0; i < keys.length - limit; i++) {
-                    cache.delete(keys[i]);
-                }
-            });
+    sharedCache.then(cache => {
+        cache.keys().then(keys => {
+            for (let i = 0; i < keys.length - limit; i++) {
+                cache.delete(keys[i]);
+            }
         });
+    });
 }
 
 export function clearTileCache(callback?: (err?: Error | null) => void) {

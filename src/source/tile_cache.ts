@@ -11,10 +11,10 @@ import type Tile from './tile';
 class TileCache {
     max: number;
     data: {
-      [key: string]: Array<{
-        value: Tile;
-        timeout: ReturnType<typeof setTimeout>;
-      }>;
+        [key: string]: Array<{
+            value: Tile;
+            timeout: ReturnType<typeof setTimeout>;
+        }>;
     };
     order: Array<string>;
     onRemove: (element: Tile) => void;
@@ -106,7 +106,9 @@ class TileCache {
      * @private
      */
     getAndRemove(tileID: OverscaledTileID): Tile {
-        if (!this.has(tileID)) { return null; }
+        if (!this.has(tileID)) {
+            return null;
+        }
         return this._getAndRemoveByKey(tileID.wrapped().key);
     }
 
@@ -142,7 +144,9 @@ class TileCache {
      * @private
      */
     get(tileID: OverscaledTileID): Tile {
-        if (!this.has(tileID)) { return null; }
+        if (!this.has(tileID)) {
+            return null;
+        }
 
         const data = this.data[tileID.wrapped().key][0];
         return data.value;
@@ -156,11 +160,16 @@ class TileCache {
      * @returns {TileCache} this cache
      * @private
      */
-    remove(tileID: OverscaledTileID, value?: {
-      value: Tile;
-      timeout: ReturnType<typeof setTimeout>;
-    }) {
-        if (!this.has(tileID)) { return this; }
+    remove(
+        tileID: OverscaledTileID,
+        value?: {
+            value: Tile;
+            timeout: ReturnType<typeof setTimeout>;
+        }
+    ) {
+        if (!this.has(tileID)) {
+            return this;
+        }
         const key = tileID.wrapped().key;
 
         const dataIndex = value === undefined ? 0 : this.data[key].indexOf(value);

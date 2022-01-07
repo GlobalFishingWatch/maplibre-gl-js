@@ -15,7 +15,7 @@ import type {LayerSpecification} from '../../style-spec/types';
 import type {VectorTileFeature} from '@mapbox/vector-tile';
 
 export class Point3D extends Point {
-    z: number
+    z: number;
 }
 
 class FillExtrusionStyleLayer extends StyleLayer {
@@ -40,20 +40,22 @@ class FillExtrusionStyleLayer extends StyleLayer {
     }
 
     queryIntersectsFeature(
-      queryGeometry: Array<Point>,
-      feature: VectorTileFeature,
-      featureState: FeatureState,
-      geometry: Array<Array<Point>>,
-      zoom: number,
-      transform: Transform,
-      pixelsToTileUnits: number,
-      pixelPosMatrix: mat4
+        queryGeometry: Array<Point>,
+        feature: VectorTileFeature,
+        featureState: FeatureState,
+        geometry: Array<Array<Point>>,
+        zoom: number,
+        transform: Transform,
+        pixelsToTileUnits: number,
+        pixelPosMatrix: mat4
     ): boolean | number {
-
-        const translatedPolygon = translate(queryGeometry,
+        const translatedPolygon = translate(
+            queryGeometry,
             this.paint.get('fill-extrusion-translate'),
             this.paint.get('fill-extrusion-translate-anchor'),
-            transform.angle, pixelsToTileUnits);
+            transform.angle,
+            pixelsToTileUnits
+        );
 
         const height = this.paint.get('fill-extrusion-height').evaluate(feature, featureState);
         const base = this.paint.get('fill-extrusion-base').evaluate(feature, featureState);
@@ -72,7 +74,6 @@ function dot(a, b) {
 }
 
 export function getIntersectionDistance(projectedQueryGeometry: Array<Point3D>, projectedFace: Array<Point3D>) {
-
     if (projectedQueryGeometry.length === 1) {
         // For point queries calculate the z at which the point intersects the face
         // using barycentric coordinates.
@@ -119,7 +120,6 @@ export function getIntersectionDistance(projectedQueryGeometry: Array<Point3D>, 
         }
 
         return Infinity;
-
     } else {
         // The counts as closest is less clear when the query is a box. This
         // returns the distance to the nearest point on the face, whether it is
@@ -134,7 +134,11 @@ export function getIntersectionDistance(projectedQueryGeometry: Array<Point3D>, 
     }
 }
 
-function checkIntersection(projectedBase: Array<Array<Point3D>>, projectedTop: Array<Array<Point3D>>, projectedQueryGeometry: Array<Point3D>) {
+function checkIntersection(
+    projectedBase: Array<Array<Point3D>>,
+    projectedTop: Array<Array<Point3D>>,
+    projectedQueryGeometry: Array<Point3D>
+) {
     let closestDistance = Infinity;
 
     if (polygonIntersectsMultiPolygon(projectedQueryGeometry, projectedTop)) {
@@ -166,7 +170,12 @@ function checkIntersection(projectedBase: Array<Array<Point3D>>, projectedTop: A
  * different points can only be done once. This produced a measurable
  * performance improvement.
  */
-function projectExtrusion(geometry: Array<Array<Point>>, zBase: number, zTop: number, m: mat4): [Array<Array<Point3D>>, Array<Array<Point3D>>] {
+function projectExtrusion(
+    geometry: Array<Array<Point>>,
+    zBase: number,
+    zTop: number,
+    m: mat4
+): [Array<Array<Point3D>>, Array<Array<Point3D>>] {
     const projectedBase = [] as Array<Array<Point3D>>;
     const projectedTop = [] as Array<Array<Point3D>>;
     const baseXZ = m[8] * zBase;

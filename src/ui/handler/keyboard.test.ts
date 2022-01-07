@@ -5,9 +5,14 @@ import {extend} from '../../util/util';
 import {setMatchMedia, setPerformance, setWebGlContext} from '../../util/test/util';
 
 function createMap(options?) {
-    return new Map(extend({
-        container: DOM.create('div', '', window.document.body),
-    }, options));
+    return new Map(
+        extend(
+            {
+                container: DOM.create('div', '', window.document.body)
+            },
+            options
+        )
+    );
 }
 
 beforeEach(() => {
@@ -57,7 +62,6 @@ describe('keyboard', () => {
         easeToArgs = spy.mock.calls[3][0];
         expect(easeToArgs.offset[0]).toBe(-0);
         expect(easeToArgs.offset[1]).toBe(100);
-
     });
 
     test('KeyboardHandler pans map in response to arrow keys when disableRotation has been called', () => {
@@ -91,7 +95,6 @@ describe('keyboard', () => {
         easeToArgs = spy.mock.calls[3][0];
         expect(easeToArgs.offset[0]).toBe(-0);
         expect(easeToArgs.offset[1]).toBe(100);
-
     });
 
     test('KeyboardHandler rotates map in response to Shift+left/right arrow keys', async () => {
@@ -113,7 +116,6 @@ describe('keyboard', () => {
         easeToArgs = spy.mock.calls[1][0];
         expect(easeToArgs.bearing).toBe(15);
         expect(easeToArgs.offset[0]).toBe(-0);
-
     });
 
     test('KeyboardHandler does not rotate map in response to Shift+left/right arrow keys when disableRotation has been called', async () => {
@@ -136,7 +138,6 @@ describe('keyboard', () => {
         easeToArgs = spy.mock.calls[1][0];
         expect(easeToArgs.bearing).toBe(0);
         expect(easeToArgs.offset[0]).toBe(-0);
-
     });
 
     test('KeyboardHandler pitches map in response to Shift+up/down arrow keys', async () => {
@@ -158,7 +159,6 @@ describe('keyboard', () => {
         easeToArgs = spy.mock.calls[1][0];
         expect(easeToArgs.pitch).toBe(40);
         expect(easeToArgs.offset[1]).toBe(-0);
-
     });
 
     test('KeyboardHandler does not pitch map in response to Shift+up/down arrow keys when disableRotation has been called', async () => {
@@ -181,7 +181,6 @@ describe('keyboard', () => {
         easeToArgs = spy.mock.calls[1][0];
         expect(easeToArgs.pitch).toBe(30);
         expect(easeToArgs.offset[1]).toBe(-0);
-
     });
 
     test('KeyboardHandler zooms map in response to -/+ keys', () => {
@@ -206,7 +205,6 @@ describe('keyboard', () => {
         simulate.keydown(map.getCanvas(), {keyCode: 189, key: 'Minus', shiftKey: true});
         expect(spy).toHaveBeenCalledTimes(4);
         expect(spy.mock.calls[3][0].zoom).toBe(8);
-
     });
 
     test('KeyboardHandler zooms map in response to -/+ keys when disableRotation has been called', () => {
@@ -232,6 +230,5 @@ describe('keyboard', () => {
         simulate.keydown(map.getCanvas(), {keyCode: 189, key: 'Minus', shiftKey: true});
         expect(spy).toHaveBeenCalledTimes(4);
         expect(spy.mock.calls[3][0].zoom).toBe(8);
-
     });
 });

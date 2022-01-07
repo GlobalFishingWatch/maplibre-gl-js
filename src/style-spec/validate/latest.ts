@@ -1,4 +1,3 @@
-
 import validateStyle from '../validate_style.min';
 
 /*

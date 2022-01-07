@@ -19,20 +19,25 @@ import type {CircleUniformsType} from './program/circle_program';
 export default drawCircles;
 
 type TileRenderState = {
-  programConfiguration: ProgramConfiguration;
-  program: Program<any>;
-  layoutVertexBuffer: VertexBuffer;
-  indexBuffer: IndexBuffer;
-  uniformValues: UniformValues<CircleUniformsType>;
+    programConfiguration: ProgramConfiguration;
+    program: Program<any>;
+    layoutVertexBuffer: VertexBuffer;
+    indexBuffer: IndexBuffer;
+    uniformValues: UniformValues<CircleUniformsType>;
 };
 
 type SegmentsTileRenderState = {
-  segments: SegmentVector;
-  sortKey: number;
-  state: TileRenderState;
+    segments: SegmentVector;
+    sortKey: number;
+    state: TileRenderState;
 };
 
-function drawCircles(painter: Painter, sourceCache: SourceCache, layer: CircleStyleLayer, coords: Array<OverscaledTileID>) {
+function drawCircles(
+    painter: Painter,
+    sourceCache: SourceCache,
+    layer: CircleStyleLayer,
+    coords: Array<OverscaledTileID>
+) {
     if (painter.renderPass !== 'translucent') return;
 
     const opacity = layer.paint.get('circle-opacity');
@@ -59,7 +64,7 @@ function drawCircles(painter: Painter, sourceCache: SourceCache, layer: CircleSt
         const coord = coords[i];
 
         const tile = sourceCache.getTile(coord);
-        const bucket: CircleBucket<any> = (tile.getBucket(layer) as any);
+        const bucket: CircleBucket<any> = tile.getBucket(layer) as any;
         if (!bucket) continue;
 
         const programConfiguration = bucket.programConfigurations.get(layer.id);
@@ -73,7 +78,7 @@ function drawCircles(painter: Painter, sourceCache: SourceCache, layer: CircleSt
             program,
             layoutVertexBuffer,
             indexBuffer,
-            uniformValues,
+            uniformValues
         };
 
         if (sortFeaturesByKey) {
@@ -81,7 +86,7 @@ function drawCircles(painter: Painter, sourceCache: SourceCache, layer: CircleSt
             for (const segment of oldSegments) {
                 segmentsRenderStates.push({
                     segments: new SegmentVector([segment]),
-                    sortKey: (segment.sortKey as any as number),
+                    sortKey: segment.sortKey as any as number,
                     state
                 });
             }
@@ -92,7 +97,6 @@ function drawCircles(painter: Painter, sourceCache: SourceCache, layer: CircleSt
                 state
             });
         }
-
     }
 
     if (sortFeaturesByKey) {
@@ -103,9 +107,21 @@ function drawCircles(painter: Painter, sourceCache: SourceCache, layer: CircleSt
         const {programConfiguration, program, layoutVertexBuffer, indexBuffer, uniformValues} = segmentsState.state;
         const segments = segmentsState.segments;
 
-        program.draw(context, gl.TRIANGLES, depthMode, stencilMode, colorMode, CullFaceMode.disabled,
-            uniformValues, layer.id,
-            layoutVertexBuffer, indexBuffer, segments,
-            layer.paint, painter.transform.zoom, programConfiguration);
+        program.draw(
+            context,
+            gl.TRIANGLES,
+            depthMode,
+            stencilMode,
+            colorMode,
+            CullFaceMode.disabled,
+            uniformValues,
+            layer.id,
+            layoutVertexBuffer,
+            indexBuffer,
+            segments,
+            layer.paint,
+            painter.transform.zoom,
+            programConfiguration
+        );
     }
 }

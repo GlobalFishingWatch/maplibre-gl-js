@@ -3,7 +3,10 @@ import StyleLayer from '../style_layer';
 import assert from 'assert';
 import SymbolBucket from '../../data/bucket/symbol_bucket';
 import resolveTokens from '../../util/resolve_tokens';
-import properties, {SymbolLayoutPropsPossiblyEvaluated, SymbolPaintPropsPossiblyEvaluated} from './symbol_style_layer_properties';
+import properties, {
+    SymbolLayoutPropsPossiblyEvaluated,
+    SymbolPaintPropsPossiblyEvaluated
+} from './symbol_style_layer_properties';
 
 import {
     Transitionable,
@@ -119,37 +122,50 @@ class SymbolStyleLayer extends StyleLayer {
             if (!SymbolStyleLayer.hasPaintOverride(this.layout, overridable)) {
                 continue;
             }
-            const overriden = this.paint.get(overridable as keyof SymbolPaintPropsPossiblyEvaluated) as PossiblyEvaluatedPropertyValue<number>;
+            const overriden = this.paint.get(
+                overridable as keyof SymbolPaintPropsPossiblyEvaluated
+            ) as PossiblyEvaluatedPropertyValue<number>;
             const override = new FormatSectionOverride(overriden);
             const styleExpression = new StyleExpression(override, overriden.property.specification);
             let expression = null;
             if (overriden.value.kind === 'constant' || overriden.value.kind === 'source') {
-                expression = (new ZoomConstantExpression('source', styleExpression) as SourceExpression);
+                expression = new ZoomConstantExpression('source', styleExpression) as SourceExpression;
             } else {
-                expression = (new ZoomDependentExpression('composite',
-                                                          styleExpression,
-                                                          overriden.value.zoomStops,
-                                                          (overriden.value as any)._interpolationType) as CompositeExpression);
+                expression = new ZoomDependentExpression(
+                    'composite',
+                    styleExpression,
+                    overriden.value.zoomStops,
+                    (overriden.value as any)._interpolationType
+                ) as CompositeExpression;
             }
-            this.paint._values[overridable] = new PossiblyEvaluatedPropertyValue(overriden.property,
-                                                                                 expression,
-                                                                                 overriden.parameters);
+            this.paint._values[overridable] = new PossiblyEvaluatedPropertyValue(
+                overriden.property,
+                expression,
+                overriden.parameters
+            );
         }
     }
 
-    _handleOverridablePaintPropertyUpdate<T, R>(name: string, oldValue: PropertyValue<T, R>, newValue: PropertyValue<T, R>): boolean {
+    _handleOverridablePaintPropertyUpdate<T, R>(
+        name: string,
+        oldValue: PropertyValue<T, R>,
+        newValue: PropertyValue<T, R>
+    ): boolean {
         if (!this.layout || oldValue.isDataDriven() || newValue.isDataDriven()) {
             return false;
         }
         return SymbolStyleLayer.hasPaintOverride(this.layout, name);
     }
 
-    static hasPaintOverride(layout: PossiblyEvaluated<SymbolLayoutProps, SymbolLayoutPropsPossiblyEvaluated>, propertyName: string): boolean {
+    static hasPaintOverride(
+        layout: PossiblyEvaluated<SymbolLayoutProps, SymbolLayoutPropsPossiblyEvaluated>,
+        propertyName: string
+    ): boolean {
         const textField = layout.get('text-field');
         const property = properties.paint.properties[propertyName];
         let hasOverrides = false;
 
-        const checkSections = (sections) => {
+        const checkSections = sections => {
             for (const section of sections) {
                 if (property.overrides && property.overrides.hasOverride(section)) {
                     hasOverrides = true;
@@ -161,12 +177,11 @@ class SymbolStyleLayer extends StyleLayer {
         if (textField.value.kind === 'constant' && textField.value.value instanceof Formatted) {
             checkSections(textField.value.value.sections);
         } else if (textField.value.kind === 'source') {
-
             const checkExpression = (expression: Expression) => {
                 if (hasOverrides) return;
 
                 if (expression instanceof Literal && typeOf(expression.value) === FormattedType) {
-                    const formatted: Formatted = (expression.value as any);
+                    const formatted: Formatted = expression.value as any;
                     checkSections(formatted.sections);
                 } else if (expression instanceof FormatExpression) {
                     checkSections(expression.sections);
@@ -175,7 +190,7 @@ class SymbolStyleLayer extends StyleLayer {
                 }
             };
 
-            const expr: ZoomConstantExpression<'source'> = (textField.value as any);
+            const expr: ZoomConstantExpression<'source'> = textField.value as any;
             if (expr._styleExpression) {
                 checkExpression(expr._styleExpression.expression);
             }

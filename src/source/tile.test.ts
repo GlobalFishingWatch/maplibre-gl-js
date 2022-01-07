@@ -11,11 +11,13 @@ import {extend} from '../util/util';
 import {serialize, deserialize} from '../util/web_worker_transfer';
 
 describe('querySourceFeatures', () => {
-    const features = [{
-        type: 1,
-        geometry: [0, 0],
-        tags: {oneway: true}
-    } as any as Feature];
+    const features = [
+        {
+            type: 1,
+            geometry: [0, 0],
+            tags: {oneway: true}
+        } as any as Feature
+    ];
 
     test('geojson tile', () => {
         const tile = new Tile(new OverscaledTileID(3, 0, 2, 1, 2), undefined);
@@ -28,7 +30,7 @@ describe('querySourceFeatures', () => {
         const geojsonWrapper = new GeoJSONWrapper(features);
         geojsonWrapper.name = '_geojsonTileLayer';
         tile.loadVectorData(
-            createVectorData({rawTileData: vtpbf({layers: {'_geojsonTileLayer': geojsonWrapper}})}),
+            createVectorData({rawTileData: vtpbf({layers: {_geojsonTileLayer: geojsonWrapper}})}),
             createPainter()
         );
 
@@ -47,7 +49,18 @@ describe('querySourceFeatures', () => {
         tile.querySourceFeatures(result, {sourceLayer: undefined, filter: ['!=', 'oneway', true]});
         expect(result).toHaveLength(0);
         result = [];
-        const polygon = {type: 'Polygon',  coordinates: [[[-91, -1], [-89, -1], [-89, 1], [-91, 1], [-91, -1]]]};
+        const polygon = {
+            type: 'Polygon',
+            coordinates: [
+                [
+                    [-91, -1],
+                    [-89, -1],
+                    [-89, 1],
+                    [-91, 1],
+                    [-91, -1]
+                ]
+            ]
+        };
         tile.querySourceFeatures(result, {sourceLayer: undefined, filter: ['within', polygon]});
         expect(result).toHaveLength(1);
     });
@@ -64,7 +77,9 @@ describe('querySourceFeatures', () => {
         geojsonWrapper.name = '_geojsonTileLayer';
 
         result = [];
-        expect(() => { tile.querySourceFeatures(result); }).not.toThrow();
+        expect(() => {
+            tile.querySourceFeatures(result);
+        }).not.toThrow();
         expect(result).toHaveLength(0);
     });
 
@@ -76,10 +91,7 @@ describe('querySourceFeatures', () => {
         tile.querySourceFeatures(result);
         expect(result).toHaveLength(0);
 
-        tile.loadVectorData(
-            createVectorData({rawTileData: createRawTileData()}),
-            createPainter()
-        );
+        tile.loadVectorData(createVectorData({rawTileData: createRawTileData()}), createPainter());
 
         result = [];
         tile.querySourceFeatures(result, {sourceLayer: 'does-not-exist', filter: undefined});
@@ -95,7 +107,6 @@ describe('querySourceFeatures', () => {
         result = [];
         tile.querySourceFeatures(result, {sourceLayer: 'road', filter: ['!=', 'class', 'main']});
         expect(result).toHaveLength(2);
-
     });
 
     test('loadVectorData unloads existing data before overwriting it', () => {
@@ -113,21 +124,13 @@ describe('querySourceFeatures', () => {
         const tile = new Tile(new OverscaledTileID(1, 0, 1, 1, 1), undefined);
         tile.state = 'loaded';
 
-        tile.loadVectorData(
-            createVectorData({rawTileData: createRawTileData()}),
-            createPainter()
-        );
-        tile.loadVectorData(
-            createVectorData(),
-            createPainter()
-        );
+        tile.loadVectorData(createVectorData({rawTileData: createRawTileData()}), createPainter());
+        tile.loadVectorData(createVectorData(), createPainter());
 
         const features = [];
         tile.querySourceFeatures(features, {sourceLayer: 'road', filter: undefined});
         expect(features).toHaveLength(3);
-
     });
-
 });
 
 describe('Tile#isLessThan', () => {
@@ -148,10 +151,12 @@ describe('Tile#isLessThan', () => {
             new OverscaledTileID(10, 1, 10, 293, 390),
             new OverscaledTileID(10, 0, 10, 294, 390),
             new OverscaledTileID(10, 0, 10, 295, 390),
-            new OverscaledTileID(10, 0, 10, 291, 391),
+            new OverscaledTileID(10, 0, 10, 291, 391)
         ];
 
-        const sortedTiles = tiles.sort((a, b) => { return a.isLessThan(b) ? -1 : b.isLessThan(a) ? 1 : 0; });
+        const sortedTiles = tiles.sort((a, b) => {
+            return a.isLessThan(b) ? -1 : b.isLessThan(a) ? 1 : 0;
+        });
 
         expect(sortedTiles).toEqual([
             new OverscaledTileID(9, 0, 9, 145, 194),
@@ -169,7 +174,7 @@ describe('Tile#isLessThan', () => {
             new OverscaledTileID(10, 0, 10, 295, 390),
             new OverscaledTileID(9, 1, 9, 144, 196),
             new OverscaledTileID(9, 1, 9, 147, 196),
-            new OverscaledTileID(10, 1, 10, 293, 390),
+            new OverscaledTileID(10, 1, 10, 293, 390)
         ]);
     });
 });
@@ -181,7 +186,6 @@ describe('expiring tiles', () => {
         tile.timeAdded = Date.now();
 
         expect(tile.getExpiryTimeout()).toBeFalsy();
-
     });
 
     test('set, get expiry', () => {
@@ -207,7 +211,6 @@ describe('expiring tiles', () => {
 
         expiryTimeout = tile.getExpiryTimeout();
         expect(expiryTimeout > 598000 && expiryTimeout < 600000).toBeTruthy();
-
     });
 
     test('exponential backoff handling', () => {
@@ -246,9 +249,7 @@ describe('expiring tiles', () => {
             expires: justNow
         });
         expect(tile.getExpiryTimeout()).toBe(8000);
-
     });
-
 });
 
 describe('rtl text detection', () => {
@@ -269,7 +270,6 @@ describe('rtl text detection', () => {
 
         expect(tile.hasRTLText).toBeTruthy();
     });
-
 });
 
 function createRawTileData() {
@@ -278,11 +278,14 @@ function createRawTileData() {
 
 function createVectorData(options?) {
     const collisionBoxArray = new CollisionBoxArray();
-    return extend({
-        collisionBoxArray: deserialize(serialize(collisionBoxArray)),
-        featureIndex: deserialize(serialize(new FeatureIndex(new OverscaledTileID(1, 0, 1, 1, 1)))),
-        buckets: []
-    }, options);
+    return extend(
+        {
+            collisionBoxArray: deserialize(serialize(collisionBoxArray)),
+            featureIndex: deserialize(serialize(new FeatureIndex(new OverscaledTileID(1, 0, 1, 1, 1)))),
+            buckets: []
+        },
+        options
+    );
 }
 
 function createPainter(styleStub = {}) {

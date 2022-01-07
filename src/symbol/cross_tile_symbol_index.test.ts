@@ -17,7 +17,9 @@ const makeSymbolInstance = (x, y, key): any => {
 const makeTile = (tileID, symbolInstances): any => {
     const bucket = {
         symbolInstances: {
-            get(i) { return symbolInstances[i]; },
+            get(i) {
+                return symbolInstances[i];
+            },
             length: symbolInstances.length
         },
         layerIds: ['test']
@@ -30,15 +32,11 @@ const makeTile = (tileID, symbolInstances): any => {
 };
 
 describe('CrossTileSymbolIndex.addLayer', () => {
-
     test('matches ids', () => {
         const index = new CrossTileSymbolIndex();
 
         const mainID = new OverscaledTileID(6, 0, 6, 8, 8);
-        const mainInstances = [
-            makeSymbolInstance(1000, 1000, 'Detroit'),
-            makeSymbolInstance(2000, 2000, 'Toronto')
-        ];
+        const mainInstances = [makeSymbolInstance(1000, 1000, 'Detroit'), makeSymbolInstance(2000, 2000, 'Toronto')];
         const mainTile = makeTile(mainID, mainInstances);
 
         index.addLayer(styleLayer, [mainTile], 0);
@@ -66,9 +64,7 @@ describe('CrossTileSymbolIndex.addLayer', () => {
         expect(childInstances[3].crossTileID).toBe(2);
 
         const parentID = new OverscaledTileID(5, 0, 5, 4, 4);
-        const parentInstances = [
-            makeSymbolInstance(500, 500, 'Detroit')
-        ];
+        const parentInstances = [makeSymbolInstance(500, 500, 'Detroit')];
         const parentTile = makeTile(parentID, parentInstances);
 
         index.addLayer(styleLayer, [mainTile, childTile, parentTile], 0);
@@ -88,7 +84,6 @@ describe('CrossTileSymbolIndex.addLayer', () => {
         expect(grandchildInstances[0].crossTileID).toBe(1);
         // Does not match the previous value for Windsor because that tile was removed
         expect(grandchildInstances[1].crossTileID).toBe(5);
-
     });
 
     test('overwrites ids when re-adding', () => {
@@ -117,7 +112,6 @@ describe('CrossTileSymbolIndex.addLayer', () => {
         index.addLayer(styleLayer, [mainTile, childTile], 0);
         expect(mainInstances[0].crossTileID).toBe(2);
         expect(childInstances[0].crossTileID).toBe(2);
-
     });
 
     test('does not duplicate ids within one zoom level', () => {
@@ -126,7 +120,7 @@ describe('CrossTileSymbolIndex.addLayer', () => {
         const mainID = new OverscaledTileID(6, 0, 6, 8, 8);
         const mainInstances = [
             makeSymbolInstance(1000, 1000, ''), // A
-            makeSymbolInstance(1000, 1000, '')  // B
+            makeSymbolInstance(1000, 1000, '') // B
         ];
         const mainTile = makeTile(mainID, mainInstances);
 
@@ -134,7 +128,7 @@ describe('CrossTileSymbolIndex.addLayer', () => {
         const childInstances = [
             makeSymbolInstance(2000, 2000, ''), // A'
             makeSymbolInstance(2000, 2000, ''), // B'
-            makeSymbolInstance(2000, 2000, '')  // C'
+            makeSymbolInstance(2000, 2000, '') // C'
         ];
         const childTile = makeTile(childID, childInstances);
 
@@ -155,7 +149,6 @@ describe('CrossTileSymbolIndex.addLayer', () => {
         // Updates per-zoom usedCrossTileIDs
         expect(Object.keys(layerIndex.usedCrossTileIDs[6])).toEqual([]);
         expect(Object.keys(layerIndex.usedCrossTileIDs[7])).toEqual(['1', '2', '3']);
-
     });
 
     test('does not regenerate ids for same zoom', () => {
@@ -164,14 +157,14 @@ describe('CrossTileSymbolIndex.addLayer', () => {
         const tileID = new OverscaledTileID(6, 0, 6, 8, 8);
         const firstInstances = [
             makeSymbolInstance(1000, 1000, ''), // A
-            makeSymbolInstance(1000, 1000, '')  // B
+            makeSymbolInstance(1000, 1000, '') // B
         ];
         const firstTile = makeTile(tileID, firstInstances);
 
         const secondInstances = [
             makeSymbolInstance(1000, 1000, ''), // A'
             makeSymbolInstance(1000, 1000, ''), // B'
-            makeSymbolInstance(1000, 1000, ''), // C'
+            makeSymbolInstance(1000, 1000, '') // C'
         ];
         const secondTile = makeTile(tileID, secondInstances);
 
@@ -190,7 +183,6 @@ describe('CrossTileSymbolIndex.addLayer', () => {
         expect(secondInstances[2].crossTileID).toBe(3); // C' gets new ID
 
         expect(Object.keys(layerIndex.usedCrossTileIDs[6])).toEqual(['1', '2', '3']);
-
     });
 
     test('reuses indexes when longitude is wrapped', () => {
@@ -199,7 +191,7 @@ describe('CrossTileSymbolIndex.addLayer', () => {
 
         const tileID = new OverscaledTileID(6, 1, 6, 8, 8);
         const firstInstances = [
-            makeSymbolInstance(1000, 1000, ''), // A
+            makeSymbolInstance(1000, 1000, '') // A
         ];
         const tile = makeTile(tileID, firstInstances);
 
@@ -210,9 +202,7 @@ describe('CrossTileSymbolIndex.addLayer', () => {
 
         index.addLayer(styleLayer, [tile], longitude % 360);
         expect(firstInstances[0].crossTileID).toBe(1);
-
     });
-
 });
 
 describe('CrossTileSymbolIndex.pruneUnusedLayers', () => {
@@ -221,7 +211,7 @@ describe('CrossTileSymbolIndex.pruneUnusedLayers', () => {
     const tileID = new OverscaledTileID(6, 0, 6, 8, 8);
     const instances = [
         makeSymbolInstance(1000, 1000, ''), // A
-        makeSymbolInstance(1000, 1000, '')  // B
+        makeSymbolInstance(1000, 1000, '') // B
     ];
     const tile = makeTile(tileID, instances);
 
@@ -234,5 +224,4 @@ describe('CrossTileSymbolIndex.pruneUnusedLayers', () => {
     // remove styleLayer
     index.pruneUnusedLayers([]);
     expect(index.layerIndexes[styleLayer.id]).toBeFalsy();
-
 });

@@ -12,16 +12,16 @@ import type {LngLatLike} from '../geo/lng_lat';
 import type {MapMouseEvent, MapTouchEvent} from './events';
 
 type MarkerOptions = {
-  element?: HTMLElement;
-  offset?: PointLike;
-  anchor?: PositionAnchor;
-  color?: string;
-  scale?: number;
-  draggable?: boolean;
-  clickTolerance?: number;
-  rotation?: number;
-  rotationAlignment?: string;
-  pitchAlignment?: string;
+    element?: HTMLElement;
+    offset?: PointLike;
+    anchor?: PositionAnchor;
+    color?: string;
+    scale?: number;
+    draggable?: boolean;
+    clickTolerance?: number;
+    rotation?: number;
+    rotationAlignment?: string;
+    pitchAlignment?: string;
 };
 
 /**
@@ -82,25 +82,21 @@ export default class Marker extends Evented {
             options = extend({element: options}, legacyOptions);
         }
 
-        bindAll([
-            '_update',
-            '_onMove',
-            '_onUp',
-            '_addDragHandler',
-            '_onMapClick',
-            '_onKeyPress'
-        ], this);
+        bindAll(['_update', '_onMove', '_onUp', '_addDragHandler', '_onMapClick', '_onKeyPress'], this);
 
-        this._anchor = options && options.anchor || 'center';
-        this._color = options && options.color || '#3FB1CE';
-        this._scale = options && options.scale || 1;
-        this._draggable = options && options.draggable || false;
-        this._clickTolerance = options && options.clickTolerance || 0;
+        this._anchor = (options && options.anchor) || 'center';
+        this._color = (options && options.color) || '#3FB1CE';
+        this._scale = (options && options.scale) || 1;
+        this._draggable = (options && options.draggable) || false;
+        this._clickTolerance = (options && options.clickTolerance) || 0;
         this._isDragging = false;
         this._state = 'inactive';
-        this._rotation = options && options.rotation || 0;
-        this._rotationAlignment = options && options.rotationAlignment || 'auto';
-        this._pitchAlignment = options && options.pitchAlignment && options.pitchAlignment !== 'auto' ?  options.pitchAlignment : this._rotationAlignment;
+        this._rotation = (options && options.rotation) || 0;
+        this._rotationAlignment = (options && options.rotationAlignment) || 'auto';
+        this._pitchAlignment =
+            options && options.pitchAlignment && options.pitchAlignment !== 'auto'
+                ? options.pitchAlignment
+                : this._rotationAlignment;
 
         if (!options || !options.element) {
             this._defaultMarker = true;
@@ -130,14 +126,14 @@ export default class Marker extends Evented {
             shadow.setAttributeNS(null, 'fill', '#000000');
 
             const ellipses = [
-                {'rx': '10.5', 'ry': '5.25002273'},
-                {'rx': '10.5', 'ry': '5.25002273'},
-                {'rx': '9.5', 'ry': '4.77275007'},
-                {'rx': '8.5', 'ry': '4.29549936'},
-                {'rx': '7.5', 'ry': '3.81822308'},
-                {'rx': '6.5', 'ry': '3.34094679'},
-                {'rx': '5.5', 'ry': '2.86367051'},
-                {'rx': '4.5', 'ry': '2.38636864'}
+                {rx: '10.5', ry: '5.25002273'},
+                {rx: '10.5', ry: '5.25002273'},
+                {rx: '9.5', ry: '4.77275007'},
+                {rx: '8.5', ry: '4.29549936'},
+                {rx: '7.5', ry: '3.81822308'},
+                {rx: '6.5', ry: '3.34094679'},
+                {rx: '5.5', ry: '2.86367051'},
+                {rx: '4.5', ry: '2.38636864'}
             ];
 
             for (const data of ellipses) {
@@ -154,7 +150,11 @@ export default class Marker extends Evented {
             background.setAttributeNS(null, 'fill', this._color);
 
             const bgPath = DOM.createNS('http://www.w3.org/2000/svg', 'path');
-            bgPath.setAttributeNS(null, 'd', 'M27,13.5 C27,19.074644 20.250001,27.000002 14.75,34.500002 C14.016665,35.500004 12.983335,35.500004 12.25,34.500002 C6.7499993,27.000002 0,19.222562 0,13.5 C0,6.0441559 6.0441559,0 13.5,0 C20.955844,0 27,6.0441559 27,13.5 Z');
+            bgPath.setAttributeNS(
+                null,
+                'd',
+                'M27,13.5 C27,19.074644 20.250001,27.000002 14.75,34.500002 C14.016665,35.500004 12.983335,35.500004 12.25,34.500002 C6.7499993,27.000002 0,19.222562 0,13.5 C0,6.0441559 6.0441559,0 13.5,0 C20.955844,0 27,6.0441559 27,13.5 Z'
+            );
 
             background.appendChild(bgPath);
 
@@ -163,7 +163,11 @@ export default class Marker extends Evented {
             border.setAttributeNS(null, 'fill', '#000000');
 
             const borderPath = DOM.createNS('http://www.w3.org/2000/svg', 'path');
-            borderPath.setAttributeNS(null, 'd', 'M13.5,0 C6.0441559,0 0,6.0441559 0,13.5 C0,19.222562 6.7499993,27 12.25,34.5 C13,35.522727 14.016664,35.500004 14.75,34.5 C20.250001,27 27,19.074644 27,13.5 C27,6.0441559 20.955844,0 13.5,0 Z M13.5,1 C20.415404,1 26,6.584596 26,13.5 C26,15.898657 24.495584,19.181431 22.220703,22.738281 C19.945823,26.295132 16.705119,30.142167 13.943359,33.908203 C13.743445,34.180814 13.612715,34.322738 13.5,34.441406 C13.387285,34.322738 13.256555,34.180814 13.056641,33.908203 C10.284481,30.127985 7.4148684,26.314159 5.015625,22.773438 C2.6163816,19.232715 1,15.953538 1,13.5 C1,6.584596 6.584596,1 13.5,1 Z');
+            borderPath.setAttributeNS(
+                null,
+                'd',
+                'M13.5,0 C6.0441559,0 0,6.0441559 0,13.5 C0,19.222562 6.7499993,27 12.25,34.5 C13,35.522727 14.016664,35.500004 14.75,34.5 C20.250001,27 27,19.074644 27,13.5 C27,6.0441559 20.955844,0 13.5,0 Z M13.5,1 C20.415404,1 26,6.584596 26,13.5 C26,15.898657 24.495584,19.181431 22.220703,22.738281 C19.945823,26.295132 16.705119,30.142167 13.943359,33.908203 C13.743445,34.180814 13.612715,34.322738 13.5,34.441406 C13.387285,34.322738 13.256555,34.180814 13.056641,33.908203 C10.284481,30.127985 7.4148684,26.314159 5.015625,22.773438 C2.6163816,19.232715 1,15.953538 1,13.5 C1,6.584596 6.584596,1 13.5,1 Z'
+            );
 
             border.appendChild(borderPath);
 
@@ -210,10 +214,10 @@ export default class Marker extends Evented {
             // the y value of the center of the shadow ellipse relative to the svg top left is "shadow transform translate-y (29.0) + ellipse cy (5.80029008)"
             // offset to the svg center "height (41 / 2)" gives (29.0 + 5.80029008) - (41 / 2) and rounded for an integer pixel offset gives 14
             // negative is used to move the marker up from the center so the tip is at the Marker lngLat
-            this._offset = Point.convert(options && options.offset || [0, -14]);
+            this._offset = Point.convert((options && options.offset) || [0, -14]);
         } else {
             this._element = options.element;
-            this._offset = Point.convert(options && options.offset || [0, 0]);
+            this._offset = Point.convert((options && options.offset) || [0, 0]);
         }
 
         this._element.classList.add('maplibregl-marker', 'mapboxgl-marker');
@@ -288,29 +292,29 @@ export default class Marker extends Evented {
      * the marker on screen.
      *
      * @returns {LngLat} A {@link LngLat} describing the marker's location.
-    * @example
-    * // Store the marker's longitude and latitude coordinates in a variable
-    * var lngLat = marker.getLngLat();
-    * // Print the marker's longitude and latitude values in the console
-    * console.log('Longitude: ' + lngLat.lng + ', Latitude: ' + lngLat.lat )
-    * @see [Create a draggable Marker](https://maplibre.org/maplibre-gl-js-docs/example/drag-a-marker/)
-    */
+     * @example
+     * // Store the marker's longitude and latitude coordinates in a variable
+     * var lngLat = marker.getLngLat();
+     * // Print the marker's longitude and latitude values in the console
+     * console.log('Longitude: ' + lngLat.lng + ', Latitude: ' + lngLat.lat )
+     * @see [Create a draggable Marker](https://maplibre.org/maplibre-gl-js-docs/example/drag-a-marker/)
+     */
     getLngLat() {
         return this._lngLat;
     }
 
     /**
-    * Set the marker's geographical position and move it.
-    * @param {LngLat} lnglat A {@link LngLat} describing where the marker should be located.
-    * @returns {Marker} `this`
-    * @example
-    * // Create a new marker, set the longitude and latitude, and add it to the map
-    * new maplibregl.Marker()
-    *   .setLngLat([-65.017, -16.457])
-    *   .addTo(map);
-    * @see [Add custom icons with Markers](https://maplibre.org/maplibre-gl-js-docs/example/custom-marker-icons/)
-    * @see [Create a draggable Marker](https://maplibre.org/maplibre-gl-js-docs/example/drag-a-marker/)
-    */
+     * Set the marker's geographical position and move it.
+     * @param {LngLat} lnglat A {@link LngLat} describing where the marker should be located.
+     * @returns {Marker} `this`
+     * @example
+     * // Create a new marker, set the longitude and latitude, and add it to the map
+     * new maplibregl.Marker()
+     *   .setLngLat([-65.017, -16.457])
+     *   .addTo(map);
+     * @see [Add custom icons with Markers](https://maplibre.org/maplibre-gl-js-docs/example/custom-marker-icons/)
+     * @see [Create a draggable Marker](https://maplibre.org/maplibre-gl-js-docs/example/drag-a-marker/)
+     */
     setLngLat(lnglat: LngLatLike) {
         this._lngLat = LngLat.convert(lnglat);
         this._pos = null;
@@ -352,19 +356,21 @@ export default class Marker extends Evented {
 
         if (popup) {
             if (!('offset' in popup.options)) {
-                const markerHeight = 41 - (5.8 / 2);
+                const markerHeight = 41 - 5.8 / 2;
                 const markerRadius = 13.5;
                 const linearOffset = Math.sqrt(Math.pow(markerRadius, 2) / 2);
-                popup.options.offset = this._defaultMarker ? {
-                    'top': [0, 0],
-                    'top-left': [0, 0],
-                    'top-right': [0, 0],
-                    'bottom': [0, -markerHeight],
-                    'bottom-left': [linearOffset, (markerHeight - markerRadius + linearOffset) * -1],
-                    'bottom-right': [-linearOffset, (markerHeight - markerRadius + linearOffset) * -1],
-                    'left': [markerRadius, (markerHeight - markerRadius) * -1],
-                    'right': [-markerRadius, (markerHeight - markerRadius) * -1]
-                } as Offset : this._offset;
+                popup.options.offset = this._defaultMarker
+                    ? ({
+                          top: [0, 0],
+                          'top-left': [0, 0],
+                          'top-right': [0, 0],
+                          bottom: [0, -markerHeight],
+                          'bottom-left': [linearOffset, (markerHeight - markerRadius + linearOffset) * -1],
+                          'bottom-right': [-linearOffset, (markerHeight - markerRadius + linearOffset) * -1],
+                          left: [markerRadius, (markerHeight - markerRadius) * -1],
+                          right: [-markerRadius, (markerHeight - markerRadius) * -1]
+                      } as Offset)
+                    : this._offset;
             }
             this._popup = popup;
             if (this._lngLat) this._popup.setLngLat(this._lngLat);
@@ -384,8 +390,10 @@ export default class Marker extends Evented {
         const legacyCode = e.charCode || e.keyCode;
 
         if (
-            (code === 'Space') || (code === 'Enter') ||
-            (legacyCode === 32) || (legacyCode === 13) // space or enter
+            code === 'Space' ||
+            code === 'Enter' ||
+            legacyCode === 32 ||
+            legacyCode === 13 // space or enter
         ) {
             this.togglePopup();
         }
@@ -435,9 +443,7 @@ export default class Marker extends Evented {
         return this;
     }
 
-    _update(e?: {
-      type: 'move' | 'moveend';
-    }) {
+    _update(e?: {type: 'move' | 'moveend'}) {
         if (!this._map) return;
 
         if (this._map.transform.renderWorldCopies) {
@@ -467,7 +473,10 @@ export default class Marker extends Evented {
             this._pos = this._pos.round();
         }
 
-        DOM.setTransform(this._element, `${anchorTranslate[this._anchor]} translate(${this._pos.x}px, ${this._pos.y}px) ${pitch} ${rotation}`);
+        DOM.setTransform(
+            this._element,
+            `${anchorTranslate[this._anchor]} translate(${this._pos.x}px, ${this._pos.y}px) ${pitch} ${rotation}`
+        );
     }
 
     /**
@@ -544,14 +553,14 @@ export default class Marker extends Evented {
         // only fire dragend if it was preceded by at least one drag event
         if (this._state === 'active') {
             /**
-            * Fired when the marker is finished being dragged
-            *
-            * @event dragend
-            * @memberof Marker
-            * @instance
-            * @type {Object}
-            * @property {Marker} marker object that was dragged
-            */
+             * Fired when the marker is finished being dragged
+             *
+             * @event dragend
+             * @memberof Marker
+             * @instance
+             * @type {Object}
+             * @property {Marker} marker object that was dragged
+             */
             this.fire(new Event('dragend'));
         }
 

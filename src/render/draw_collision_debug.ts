@@ -18,15 +18,23 @@ import IndexBuffer from '../gl/index_buffer';
 export default drawCollisionDebug;
 
 type TileBatch = {
-  circleArray: Array<number>;
-  circleOffset: number;
-  transform: mat4;
-  invTransform: mat4;
+    circleArray: Array<number>;
+    circleOffset: number;
+    transform: mat4;
+    invTransform: mat4;
 };
 
 let quadTriangles: QuadTriangleArray;
 
-function drawCollisionDebug(painter: Painter, sourceCache: SourceCache, layer: StyleLayer, coords: Array<OverscaledTileID>, translate: [number, number], translateAnchor: 'map' | 'viewport', isText: boolean) {
+function drawCollisionDebug(
+    painter: Painter,
+    sourceCache: SourceCache,
+    layer: StyleLayer,
+    coords: Array<OverscaledTileID>,
+    translate: [number, number],
+    translateAnchor: 'map' | 'viewport',
+    isText: boolean
+) {
     const context = painter.context;
     const gl = context.gl;
     const program = painter.useProgram('collisionBox');
@@ -37,7 +45,7 @@ function drawCollisionDebug(painter: Painter, sourceCache: SourceCache, layer: S
     for (let i = 0; i < coords.length; i++) {
         const coord = coords[i];
         const tile = sourceCache.getTile(coord);
-        const bucket: SymbolBucket = (tile.getBucket(layer) as any);
+        const bucket: SymbolBucket = tile.getBucket(layer) as any;
         if (!bucket) continue;
         let posMatrix = coord.posMatrix;
         if (translate[0] !== 0 || translate[1] !== 0) {
@@ -63,21 +71,28 @@ function drawCollisionDebug(painter: Painter, sourceCache: SourceCache, layer: S
                 invTransform
             });
 
-            circleCount += circleArray.length / 4;  // 4 values per circle
+            circleCount += circleArray.length / 4; // 4 values per circle
             circleOffset = circleCount;
         }
         if (!buffers) continue;
-        program.draw(context, gl.LINES,
-            DepthMode.disabled, StencilMode.disabled,
+        program.draw(
+            context,
+            gl.LINES,
+            DepthMode.disabled,
+            StencilMode.disabled,
             painter.colorModeForRenderPass(),
             CullFaceMode.disabled,
-            collisionUniformValues(
-                posMatrix,
-                painter.transform,
-                tile),
-            layer.id, buffers.layoutVertexBuffer, buffers.indexBuffer,
-            buffers.segments, null, painter.transform.zoom, null, null,
-            buffers.collisionVertexBuffer);
+            collisionUniformValues(posMatrix, painter.transform, tile),
+            layer.id,
+            buffers.layoutVertexBuffer,
+            buffers.indexBuffer,
+            buffers.segments,
+            null,
+            painter.transform.zoom,
+            null,
+            null,
+            buffers.collisionVertexBuffer
+        );
     }
 
     if (!isText || !tileBatches.length) {
@@ -118,11 +133,7 @@ function drawCollisionDebug(painter: Painter, sourceCache: SourceCache, layer: S
 
     // Render batches
     for (const batch of tileBatches) {
-        const uniforms = collisionCircleUniformValues(
-            batch.transform,
-            batch.invTransform,
-            painter.transform
-        );
+        const uniforms = collisionCircleUniformValues(batch.transform, batch.invTransform, painter.transform);
 
         circleProgram.draw(
             context,
@@ -135,12 +146,18 @@ function drawCollisionDebug(painter: Painter, sourceCache: SourceCache, layer: S
             layer.id,
             vertexBuffer,
             indexBuffer,
-            SegmentVector.simpleSegment(0, batch.circleOffset * 2, batch.circleArray.length, batch.circleArray.length / 2),
+            SegmentVector.simpleSegment(
+                0,
+                batch.circleOffset * 2,
+                batch.circleArray.length,
+                batch.circleArray.length / 2
+            ),
             null,
             painter.transform.zoom,
             null,
             null,
-            null);
+            null
+        );
     }
 
     vertexBuffer.destroy();

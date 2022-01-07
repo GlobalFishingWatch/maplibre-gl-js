@@ -13,12 +13,13 @@ class LayerPlacement {
     _currentTileIndex: number;
     _currentPartIndex: number;
     _seenCrossTileIDs: {
-      [k in string | number]: boolean;
+        [k in string | number]: boolean;
     };
     _bucketParts: Array<BucketPart>;
 
     constructor(styleLayer: SymbolStyleLayer) {
-        this._sortAcrossTiles = styleLayer.layout.get('symbol-z-order') !== 'viewport-y' &&
+        this._sortAcrossTiles =
+            styleLayer.layout.get('symbol-z-order') !== 'viewport-y' &&
             !styleLayer.layout.get('symbol-sort-key').isConstant();
 
         this._currentTileIndex = 0;
@@ -27,8 +28,13 @@ class LayerPlacement {
         this._bucketParts = [];
     }
 
-    continuePlacement(tiles: Array<Tile>, placement: Placement, showCollisionBoxes: boolean, styleLayer: StyleLayer, shouldPausePlacement: () => boolean) {
-
+    continuePlacement(
+        tiles: Array<Tile>,
+        placement: Placement,
+        showCollisionBoxes: boolean,
+        styleLayer: StyleLayer,
+        shouldPausePlacement: () => boolean
+    ) {
         const bucketParts = this._bucketParts;
 
         while (this._currentTileIndex < tiles.length) {
@@ -87,11 +93,7 @@ class PauseablePlacement {
         return this._done;
     }
 
-    continuePlacement(
-        order: Array<string>,
-        layers: {[_: string]: StyleLayer},
-        layerTiles: {[_: string]: Array<Tile>}
-    ) {
+    continuePlacement(order: Array<string>, layers: {[_: string]: StyleLayer}, layerTiles: {[_: string]: Array<Tile>}) {
         const startTime = browser.now();
 
         const shouldPausePlacement = () => {
@@ -103,15 +105,22 @@ class PauseablePlacement {
             const layerId = order[this._currentPlacementIndex];
             const layer = layers[layerId];
             const placementZoom = this.placement.collisionIndex.transform.zoom;
-            if (layer.type === 'symbol' &&
+            if (
+                layer.type === 'symbol' &&
                 (!layer.minzoom || layer.minzoom <= placementZoom) &&
-                (!layer.maxzoom || layer.maxzoom > placementZoom)) {
-
+                (!layer.maxzoom || layer.maxzoom > placementZoom)
+            ) {
                 if (!this._inProgressLayer) {
                     this._inProgressLayer = new LayerPlacement(layer as any as SymbolStyleLayer);
                 }
 
-                const pausePlacement = this._inProgressLayer.continuePlacement(layerTiles[layer.source], this.placement, this._showCollisionBoxes, layer, shouldPausePlacement);
+                const pausePlacement = this._inProgressLayer.continuePlacement(
+                    layerTiles[layer.source],
+                    this.placement,
+                    this._showCollisionBoxes,
+                    layer,
+                    shouldPausePlacement
+                );
 
                 if (pausePlacement) {
                     // We didn't finish placing all layers within 2ms,

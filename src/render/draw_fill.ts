@@ -27,21 +27,25 @@ function drawFill(painter: Painter, sourceCache: SourceCache, layer: FillStyleLa
     const colorMode = painter.colorModeForRenderPass();
 
     const pattern = layer.paint.get('fill-pattern');
-    const pass = painter.opaquePassEnabledForLayer() &&
-        (!pattern.constantOr(1 as any) &&
+    const pass =
+        painter.opaquePassEnabledForLayer() &&
+        !pattern.constantOr(1 as any) &&
         color.constantOr(Color.transparent).a === 1 &&
-        opacity.constantOr(0) === 1) ? 'opaque' : 'translucent';
+        opacity.constantOr(0) === 1
+            ? 'opaque'
+            : 'translucent';
 
     // Draw fill
     if (painter.renderPass === pass) {
         const depthMode = painter.depthModeForSublayer(
-            1, painter.renderPass === 'opaque' ? DepthMode.ReadWrite : DepthMode.ReadOnly);
+            1,
+            painter.renderPass === 'opaque' ? DepthMode.ReadWrite : DepthMode.ReadOnly
+        );
         drawFillTiles(painter, sourceCache, layer, coords, depthMode, colorMode, false);
     }
 
     // Draw stroke
     if (painter.renderPass === 'translucent' && layer.paint.get('fill-antialias')) {
-
         // If we defined a different color for the fill outline, we are
         // going to ignore the bits in 0x07 and just care about the global
         // clipping mask.
@@ -51,7 +55,9 @@ function drawFill(painter: Painter, sourceCache: SourceCache, layer: FillStyleLa
         // the current shape, some pixels from the outline stroke overlapped
         // the (non-antialiased) fill.
         const depthMode = painter.depthModeForSublayer(
-            layer.getPaintProperty('fill-outline-color') ? 2 : 0, DepthMode.ReadOnly);
+            layer.getPaintProperty('fill-outline-color') ? 2 : 0,
+            DepthMode.ReadOnly
+        );
         drawFillTiles(painter, sourceCache, layer, coords, depthMode, colorMode, true);
     }
 }
@@ -76,7 +82,7 @@ function drawFillTiles(painter, sourceCache, layer, coords, depthMode, colorMode
         const tile = sourceCache.getTile(coord);
         if (image && !tile.patternsLoaded()) continue;
 
-        const bucket: FillBucket = (tile.getBucket(layer) as any);
+        const bucket: FillBucket = tile.getBucket(layer) as any;
         if (!bucket) continue;
 
         const programConfiguration = bucket.programConfigurations.get(layer.id);
@@ -96,27 +102,44 @@ function drawFillTiles(painter, sourceCache, layer, coords, depthMode, colorMode
             if (posTo && posFrom) programConfiguration.setConstantPatternPositions(posTo, posFrom);
         }
 
-        const tileMatrix = painter.translatePosMatrix(coord.posMatrix, tile,
-            layer.paint.get('fill-translate'), layer.paint.get('fill-translate-anchor'));
+        const tileMatrix = painter.translatePosMatrix(
+            coord.posMatrix,
+            tile,
+            layer.paint.get('fill-translate'),
+            layer.paint.get('fill-translate-anchor')
+        );
 
         if (!isOutline) {
             indexBuffer = bucket.indexBuffer;
             segments = bucket.segments;
-            uniformValues = image ?
-                fillPatternUniformValues(tileMatrix, painter, crossfade, tile) :
-                fillUniformValues(tileMatrix);
+            uniformValues = image
+                ? fillPatternUniformValues(tileMatrix, painter, crossfade, tile)
+                : fillUniformValues(tileMatrix);
         } else {
             indexBuffer = bucket.indexBuffer2;
             segments = bucket.segments2;
             const drawingBufferSize = [gl.drawingBufferWidth, gl.drawingBufferHeight] as [number, number];
-            uniformValues = (programName === 'fillOutlinePattern' && image) ?
-                fillOutlinePatternUniformValues(tileMatrix, painter, crossfade, tile, drawingBufferSize) :
-                fillOutlineUniformValues(tileMatrix, drawingBufferSize);
+            uniformValues =
+                programName === 'fillOutlinePattern' && image
+                    ? fillOutlinePatternUniformValues(tileMatrix, painter, crossfade, tile, drawingBufferSize)
+                    : fillOutlineUniformValues(tileMatrix, drawingBufferSize);
         }
 
-        program.draw(painter.context, drawMode, depthMode,
-            painter.stencilModeForClipping(coord), colorMode, CullFaceMode.disabled, uniformValues,
-            layer.id, bucket.layoutVertexBuffer, indexBuffer, segments,
-            layer.paint, painter.transform.zoom, programConfiguration);
+        program.draw(
+            painter.context,
+            drawMode,
+            depthMode,
+            painter.stencilModeForClipping(coord),
+            colorMode,
+            CullFaceMode.disabled,
+            uniformValues,
+            layer.id,
+            bucket.layoutVertexBuffer,
+            indexBuffer,
+            segments,
+            layer.paint,
+            painter.transform.zoom,
+            programConfiguration
+        );
     }
 }

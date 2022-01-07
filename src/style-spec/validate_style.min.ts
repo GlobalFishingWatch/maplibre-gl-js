@@ -1,4 +1,3 @@
-
 import validateConstants from './validate/validate_constants';
 import validate from './validate/validate';
 import latestStyleSpec from './reference/latest';
@@ -27,30 +26,33 @@ import validateLayoutProperty from './validate/validate_layout_property';
  *   var errors = validate(style);
  */
 function validateStyleMin(style, styleSpec = latestStyleSpec) {
-
     let errors = [];
 
-    errors = errors.concat(validate({
-        key: '',
-        value: style,
-        valueSpec: styleSpec.$root,
-        styleSpec,
-        style,
-        objectElementValidators: {
-            glyphs: validateGlyphsURL,
-            '*'() {
-                return [];
+    errors = errors.concat(
+        validate({
+            key: '',
+            value: style,
+            valueSpec: styleSpec.$root,
+            styleSpec,
+            style,
+            objectElementValidators: {
+                glyphs: validateGlyphsURL,
+                '*'() {
+                    return [];
+                }
             }
-        }
-    }));
+        })
+    );
 
     if (style.constants) {
-        errors = errors.concat(validateConstants({
-            key: 'constants',
-            value: style.constants,
-            style,
-            styleSpec
-        }));
+        errors = errors.concat(
+            validateConstants({
+                key: 'constants',
+                value: style.constants,
+                style,
+                styleSpec
+            })
+        );
     }
 
     return sortErrors(errors);
@@ -70,7 +72,7 @@ function sortErrors(errors) {
 }
 
 function wrapCleanErrors(inner) {
-    return function(...args) {
+    return function (...args) {
         return sortErrors(inner.apply(this, args));
     };
 }

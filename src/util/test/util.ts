@@ -11,9 +11,9 @@ export function createMap(options?, callback?) {
         attributionControl: false,
         trackResize: true,
         style: {
-            'version': 8,
-            'sources': {},
-            'layers': []
+            version: 8,
+            sources: {},
+            layers: []
         }
     };
 
@@ -23,9 +23,10 @@ export function createMap(options?, callback?) {
     if (options && options.deleteStyle) delete defaultOptions.style;
 
     const map = new Map(extend(defaultOptions, options));
-    if (callback) map.on('load', () => {
-        callback(null, map);
-    });
+    if (callback)
+        map.on('load', () => {
+            callback(null, map);
+        });
 
     return map;
 }
@@ -39,7 +40,7 @@ export function equalWithPrecision(test, expected, actual, multiplier, message, 
 }
 
 // Add webgl context with the supplied GL
-export function setWebGlContext () {
+export function setWebGlContext() {
     const originalGetContext = global.HTMLCanvasElement.prototype.getContext;
 
     function imitateWebGlGetContext(type, attributes) {
@@ -55,13 +56,13 @@ export function setWebGlContext () {
     global.HTMLCanvasElement.prototype.getContext = imitateWebGlGetContext;
 }
 
-export function setPerformance () {
+export function setPerformance() {
     window.performance.mark = jest.fn();
     window.performance.clearMeasures = jest.fn();
     window.performance.clearMarks = jest.fn();
 }
 
-export function setMatchMedia () {
+export function setMatchMedia() {
     // https://jestjs.io/docs/manual-mocks#mocking-methods-which-are-not-implemented-in-jsdom
     Object.defineProperty(window, 'matchMedia', {
         writable: true,
@@ -73,13 +74,13 @@ export function setMatchMedia () {
             removeListener: jest.fn(), // deprecated
             addEventListener: jest.fn(),
             removeEventListener: jest.fn(),
-            dispatchEvent: jest.fn(),
-        })),
+            dispatchEvent: jest.fn()
+        }))
     });
 }
 
-export function getWrapDispatcher () {
-    const wrapDispatcher = (dispatcher) => {
+export function getWrapDispatcher() {
+    const wrapDispatcher = dispatcher => {
         return {
             getActor() {
                 return dispatcher;
@@ -90,11 +91,11 @@ export function getWrapDispatcher () {
     return wrapDispatcher;
 }
 
-export function getMockDispatcher () {
+export function getMockDispatcher() {
     const wrapDispatcher = getWrapDispatcher();
 
     const mockDispatcher = wrapDispatcher({
-        send () {}
+        send() {}
     });
 
     return mockDispatcher;

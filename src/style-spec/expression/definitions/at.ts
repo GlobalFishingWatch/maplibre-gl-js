@@ -28,13 +28,13 @@ class At implements Expression {
 
         if (!index || !input) return null;
 
-        const t: ArrayType = (input.type as any);
+        const t: ArrayType = input.type as any;
         return new At(t.itemType, index, input);
     }
 
     evaluate(ctx: EvaluationContext) {
-        const index = (this.index.evaluate(ctx) as any as number);
-        const array = (this.input.evaluate(ctx) as any as Array<Value>);
+        const index = this.index.evaluate(ctx) as any as number;
+        const array = this.input.evaluate(ctx) as any as Array<Value>;
 
         if (index < 0) {
             throw new RuntimeError(`Array index out of bounds: ${index} < 0.`);

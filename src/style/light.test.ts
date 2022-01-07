@@ -13,7 +13,9 @@ test('Light with defaults', () => {
     light.recalculate({zoom: 0, zoomHistory: {}} as EvaluationParameters);
 
     expect(light.properties.get('anchor')).toEqual(spec.anchor.default);
-    expect(light.properties.get('position')).toEqual(sphericalToCartesian(spec.position.default as any as [number, number, number]));
+    expect(light.properties.get('position')).toEqual(
+        sphericalToCartesian(spec.position.default as any as [number, number, number])
+    );
     expect(light.properties.get('intensity')).toEqual(spec.intensity.default);
     expect(light.properties.get('color')).toEqual(Color.parse(spec.color.default));
 });
@@ -35,7 +37,10 @@ test('Light with options', () => {
 test('Light with stops function', () => {
     const light = new Light({
         intensity: {
-            stops: [[16, 0.2], [17, 0.8]]
+            stops: [
+                [16, 0.2],
+                [17, 0.8]
+            ]
         }
     } as LightSpecification);
     light.recalculate({zoom: 16.5, zoomHistory: {}} as EvaluationParameters);
@@ -64,7 +69,7 @@ describe('Light#setLight', () => {
     test('validates by default', () => {
         const light = new Light({});
         const lightSpy = jest.spyOn(light, '_validate');
-        jest.spyOn(console, 'error').mockImplementation(() => { });
+        jest.spyOn(console, 'error').mockImplementation(() => {});
         light.setLight({color: 'notacolor'});
         light.updateTransitions({transition: false} as any as TransitionParameters);
         light.recalculate({zoom: 16, zoomHistory: {}, now: 10} as EvaluationParameters);

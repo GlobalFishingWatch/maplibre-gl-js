@@ -37,10 +37,9 @@ class Coercion implements Expression {
     }
 
     static parse(args: ReadonlyArray<unknown>, context: ParsingContext): Expression {
-        if (args.length < 2)
-            return context.error('Expected at least one argument.') as null;
+        if (args.length < 2) return context.error('Expected at least one argument.') as null;
 
-        const name: string = (args[0] as any);
+        const name: string = args[0] as any;
         assert(types[name], name);
 
         if ((name === 'to-boolean' || name === 'to-string') && args.length !== 2)
@@ -74,16 +73,28 @@ class Coercion implements Expression {
                     if (c) return c;
                 } else if (Array.isArray(input)) {
                     if (input.length < 3 || input.length > 4) {
-                        error = `Invalid rbga value ${JSON.stringify(input)}: expected an array containing either three or four numeric values.`;
+                        error = `Invalid rbga value ${JSON.stringify(
+                            input
+                        )}: expected an array containing either three or four numeric values.`;
                     } else {
                         error = validateRGBA(input[0], input[1], input[2], input[3]);
                     }
                     if (!error) {
-                        return new Color((input[0] as any) / 255, (input[1] as any) / 255, (input[2] as any) / 255, (input[3] as any));
+                        return new Color(
+                            (input[0] as any) / 255,
+                            (input[1] as any) / 255,
+                            (input[2] as any) / 255,
+                            input[3] as any
+                        );
                     }
                 }
             }
-            throw new RuntimeError(error || `Could not parse color from value '${typeof input === 'string' ? input : String(JSON.stringify(input))}'`);
+            throw new RuntimeError(
+                error ||
+                    `Could not parse color from value '${
+                        typeof input === 'string' ? input : String(JSON.stringify(input))
+                    }'`
+            );
         } else if (this.type.kind === 'number') {
             let value = null;
             for (const arg of this.args) {
@@ -115,7 +126,9 @@ class Coercion implements Expression {
 
     serialize() {
         if (this.type.kind === 'formatted') {
-            return new FormatExpression([{content: this.args[0], scale: null, font: null, textColor: null}]).serialize();
+            return new FormatExpression([
+                {content: this.args[0], scale: null, font: null, textColor: null}
+            ]).serialize();
         }
 
         if (this.type.kind === 'resolvedImage') {
@@ -123,7 +136,9 @@ class Coercion implements Expression {
         }
 
         const serialized = [`to-${this.type.kind}` as unknown];
-        this.eachChild(child => { serialized.push(child.serialize()); });
+        this.eachChild(child => {
+            serialized.push(child.serialize());
+        });
         return serialized;
     }
 }

@@ -16,14 +16,10 @@ class Hash {
 
     constructor(hashName?: string | null) {
         this._hashName = hashName && encodeURIComponent(hashName);
-        bindAll([
-            '_getCurrentHash',
-            '_onHashChange',
-            '_updateHash'
-        ], this);
+        bindAll(['_getCurrentHash', '_onHashChange', '_updateHash'], this);
 
         // Mobile Safari doesn't allow updating the hash more than 100 times per 30 seconds.
-        this._updateHash = throttle(this._updateHashUnthrottled.bind(this), 30 * 1000 / 100);
+        this._updateHash = throttle(this._updateHashUnthrottled.bind(this), (30 * 1000) / 100);
     }
 
     /*
@@ -72,20 +68,24 @@ class Hash {
             hash += `${zoom}/${lat}/${lng}`;
         }
 
-        if (bearing || pitch) hash += (`/${Math.round(bearing * 10) / 10}`);
-        if (pitch) hash += (`/${Math.round(pitch)}`);
+        if (bearing || pitch) hash += `/${Math.round(bearing * 10) / 10}`;
+        if (pitch) hash += `/${Math.round(pitch)}`;
 
         if (this._hashName) {
             const hashName = this._hashName;
             let found = false;
-            const parts = window.location.hash.slice(1).split('&').map(part => {
-                const key = part.split('=')[0];
-                if (key === hashName) {
-                    found = true;
-                    return `${key}=${hash}`;
-                }
-                return part;
-            }).filter(a => a);
+            const parts = window.location.hash
+                .slice(1)
+                .split('&')
+                .map(part => {
+                    const key = part.split('=')[0];
+                    if (key === hashName) {
+                        found = true;
+                        return `${key}=${hash}`;
+                    }
+                    return part;
+                })
+                .filter(a => a);
             if (!found) {
                 parts.push(`${hashName}=${hash}`);
             }
@@ -101,13 +101,13 @@ class Hash {
         if (this._hashName) {
             // Split the parameter-styled hash into parts and find the value we need
             let keyval;
-            hash.split('&').map(
-                part => part.split('=')
-            ).forEach(part => {
-                if (part[0] === this._hashName) {
-                    keyval = part;
-                }
-            });
+            hash.split('&')
+                .map(part => part.split('='))
+                .forEach(part => {
+                    if (part[0] === this._hashName) {
+                        keyval = part;
+                    }
+                });
             return (keyval ? keyval[1] || '' : '').split('/');
         }
         return hash.split('/');
@@ -116,7 +116,10 @@ class Hash {
     _onHashChange() {
         const loc = this._getCurrentHash();
         if (loc.length >= 3 && !loc.some(v => isNaN(v))) {
-            const bearing = this._map.dragRotate.isEnabled() && this._map.touchZoomRotate.isEnabled() ? +(loc[3] || 0) : this._map.getBearing();
+            const bearing =
+                this._map.dragRotate.isEnabled() && this._map.touchZoomRotate.isEnabled()
+                    ? +(loc[3] || 0)
+                    : this._map.getBearing();
             this._map.jumpTo({
                 center: [+loc[2], +loc[1]],
                 zoom: +loc[0],
@@ -139,7 +142,6 @@ class Hash {
             // https://github.com/mapbox/mapbox-gl-js/issues/7410
         }
     }
-
 }
 
 export default Hash;

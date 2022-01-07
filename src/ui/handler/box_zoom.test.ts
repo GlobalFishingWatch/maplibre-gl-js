@@ -18,10 +18,10 @@ describe('BoxZoomHandler', () => {
         const map = createMap(undefined);
 
         const boxzoomstart = jest.fn();
-        const boxzoomend   = jest.fn();
+        const boxzoomend = jest.fn();
 
         map.on('boxzoomstart', boxzoomstart);
-        map.on('boxzoomend',   boxzoomend);
+        map.on('boxzoomend', boxzoomend);
 
         simulate.mousedown(map.getCanvas(), {shiftKey: true, clientX: 0, clientY: 0});
         map._renderTaskQueue.run();
@@ -48,18 +48,18 @@ describe('BoxZoomHandler', () => {
         map.boxZoom.enable();
 
         const boxzoomstart = jest.fn();
-        const boxzoomend   = jest.fn();
+        const boxzoomend = jest.fn();
 
         map.on('boxzoomstart', boxzoomstart);
-        map.on('boxzoomend',   boxzoomend);
+        map.on('boxzoomend', boxzoomend);
 
         const dragstart = jest.fn();
-        const drag      = jest.fn();
-        const dragend   = jest.fn();
+        const drag = jest.fn();
+        const dragend = jest.fn();
 
         map.on('dragstart', dragstart);
-        map.on('drag',      drag);
-        map.on('dragend',   dragend);
+        map.on('drag', drag);
+        map.on('dragend', dragend);
 
         simulate.mousedown(map.getCanvas(), {shiftKey: true, clientX: 0, clientY: 0});
         map._renderTaskQueue.run();
@@ -89,10 +89,10 @@ describe('BoxZoomHandler', () => {
         map.on('mousedown', e => e.preventDefault());
 
         const boxzoomstart = jest.fn();
-        const boxzoomend   = jest.fn();
+        const boxzoomend = jest.fn();
 
         map.on('boxzoomstart', boxzoomstart);
-        map.on('boxzoomend',   boxzoomend);
+        map.on('boxzoomend', boxzoomend);
 
         simulate.mousedown(map.getCanvas(), {shiftKey: true, clientX: 0, clientY: 0});
         map._renderTaskQueue.run();
@@ -113,10 +113,10 @@ describe('BoxZoomHandler', () => {
         const map = createMap(undefined);
 
         const boxzoomstart = jest.fn();
-        const boxzoomend   = jest.fn();
+        const boxzoomend = jest.fn();
 
         map.on('boxzoomstart', boxzoomstart);
-        map.on('boxzoomend',   boxzoomend);
+        map.on('boxzoomend', boxzoomend);
 
         simulate.mousedown(map.getCanvas(), {shiftKey: true, clientX: 0, clientY: 0});
         map._renderTaskQueue.run();
@@ -140,10 +140,10 @@ describe('BoxZoomHandler', () => {
         const map = createMap(4);
 
         const boxzoomstart = jest.fn();
-        const boxzoomend   = jest.fn();
+        const boxzoomend = jest.fn();
 
         map.on('boxzoomstart', boxzoomstart);
-        map.on('boxzoomend',   boxzoomend);
+        map.on('boxzoomend', boxzoomend);
 
         simulate.mousedown(map.getCanvas(), {shiftKey: true, clientX: 0, clientY: 0});
         map._renderTaskQueue.run();

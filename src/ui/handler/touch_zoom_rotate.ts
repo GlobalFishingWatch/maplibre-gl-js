@@ -2,7 +2,6 @@ import Point from '../../util/point';
 import DOM from '../../util/dom';
 
 class TwoTouchHandler {
-
     _enabled: boolean;
     _active: boolean;
     _firstTwoTouches: [number, number];
@@ -20,17 +19,16 @@ class TwoTouchHandler {
     }
 
     _start(points: [Point, Point]) {} //eslint-disable-line
-    _move(points: [Point, Point], pinchAround: Point, e: TouchEvent) { return {}; } //eslint-disable-line
+    _move(points: [Point, Point], pinchAround: Point, e: TouchEvent) {
+        return {};
+    } //eslint-disable-line
 
     touchstart(e: TouchEvent, points: Array<Point>, mapTouches: Array<Touch>) {
         //console.log(e.target, e.targetTouches.length ? e.targetTouches[0].target : null);
         //log('touchstart', points, e.target.innerHTML, e.targetTouches.length ? e.targetTouches[0].target.innerHTML: undefined);
         if (this._firstTwoTouches || mapTouches.length < 2) return;
 
-        this._firstTwoTouches = [
-            mapTouches[0].identifier,
-            mapTouches[1].identifier
-        ];
+        this._firstTwoTouches = [mapTouches[0].identifier, mapTouches[1].identifier];
 
         // implemented by child classes
         this._start([points[0], points[1]]);
@@ -49,7 +47,6 @@ class TwoTouchHandler {
 
         // implemented by child classes
         return this._move([a, b], pinchAround, e);
-
     }
 
     touchend(e: TouchEvent, points: Array<Point>, mapTouches: Array<Touch>) {
@@ -69,9 +66,11 @@ class TwoTouchHandler {
         this.reset();
     }
 
-    enable(options?: {
-      around?: 'center';
-    } | null) {
+    enable(
+        options?: {
+            around?: 'center';
+        } | null
+    ) {
         this._enabled = true;
         this._aroundCenter = !!options && options.around === 'center';
     }
@@ -105,7 +104,6 @@ function getZoomDelta(distance, lastDistance) {
 }
 
 export class TouchZoomHandler extends TwoTouchHandler {
-
     _distance: number;
     _startDistance: number;
 
@@ -136,7 +134,7 @@ export class TouchZoomHandler extends TwoTouchHandler {
 const ROTATION_THRESHOLD = 25; // pixels along circumference of touch circle
 
 function getBearingDelta(a, b) {
-    return a.angleWith(b) * 180 / Math.PI;
+    return (a.angleWith(b) * 180) / Math.PI;
 }
 
 export class TouchRotateHandler extends TwoTouchHandler {
@@ -180,7 +178,7 @@ export class TouchRotateHandler extends TwoTouchHandler {
 
         this._minDiameter = Math.min(this._minDiameter, vector.mag());
         const circumference = Math.PI * this._minDiameter;
-        const threshold = ROTATION_THRESHOLD / circumference * 360;
+        const threshold = (ROTATION_THRESHOLD / circumference) * 360;
 
         const bearingDeltaSinceStart = getBearingDelta(vector, this._startVector);
         return Math.abs(bearingDeltaSinceStart) < threshold;
@@ -199,7 +197,6 @@ const ALLOWED_SINGLE_TOUCH_TIME = 100;
  * The `TouchPitchHandler` allows the user to pitch the map by dragging up and down with two fingers.
  */
 export class TouchPitchHandler extends TwoTouchHandler {
-
     _valid: boolean | void;
     _firstMove: number;
     _lastPoints: [Point, Point];
@@ -216,7 +213,6 @@ export class TouchPitchHandler extends TwoTouchHandler {
         if (isVertical(points[0].sub(points[1]))) {
             // fingers are more horizontal than vertical
             this._valid = false;
-
         }
     }
 

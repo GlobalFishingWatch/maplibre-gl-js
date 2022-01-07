@@ -9,7 +9,6 @@ beforeEach(() => {
 });
 
 describe('map events', () => {
-
     test('Map#on adds a non-delegated event listener', () => {
         const map = createMap();
         const spy = jest.fn(function (e) {
@@ -32,7 +31,6 @@ describe('map events', () => {
         simulate.click(map.getCanvas());
 
         expect(spy).not.toHaveBeenCalled();
-
     });
 
     test('Map#on adds a listener for an event on a given layer', () => {
@@ -73,7 +71,6 @@ describe('map events', () => {
         simulate.click(map.getCanvas());
 
         expect(spy).not.toHaveBeenCalled();
-
     });
 
     test('Map#on adds a listener not triggered when the specified layer does not exiist', () => {
@@ -87,7 +84,6 @@ describe('map events', () => {
         simulate.click(map.getCanvas());
 
         expect(spy).not.toHaveBeenCalled();
-
     });
 
     test('Map#on distinguishes distinct event types', () => {
@@ -96,11 +92,11 @@ describe('map events', () => {
         jest.spyOn(map, 'getLayer').mockReturnValue({} as StyleLayer);
         jest.spyOn(map, 'queryRenderedFeatures').mockReturnValue([{}]);
 
-        const spyDown = jest.fn((e) => {
+        const spyDown = jest.fn(e => {
             expect(e.type).toBe('mousedown');
         });
 
-        const spyUp = jest.fn((e) => {
+        const spyUp = jest.fn(e => {
             expect(e.type).toBe('mouseup');
         });
 
@@ -122,11 +118,11 @@ describe('map events', () => {
             return (options as any).layers[0] === 'A' ? featuresA : featuresB;
         });
 
-        const spyA = jest.fn((e) => {
+        const spyA = jest.fn(e => {
             expect(e.features).toBe(featuresA);
         });
 
-        const spyB = jest.fn((e) => {
+        const spyB = jest.fn(e => {
             expect(e.features).toBe(featuresB);
         });
 
@@ -168,7 +164,6 @@ describe('map events', () => {
         simulate.click(map.getCanvas());
 
         expect(spy).not.toHaveBeenCalled();
-
     });
 
     test('Map#off distinguishes distinct event types', () => {
@@ -177,7 +172,7 @@ describe('map events', () => {
         jest.spyOn(map, 'getLayer').mockReturnValue({} as StyleLayer);
         jest.spyOn(map, 'queryRenderedFeatures').mockReturnValue([{}]);
 
-        const spy = jest.fn((e) => {
+        const spy = jest.fn(e => {
             expect(e.type).toBe('mousedown');
         });
 
@@ -199,7 +194,7 @@ describe('map events', () => {
             return featuresA;
         });
 
-        const spy = jest.fn((e) => {
+        const spy = jest.fn(e => {
             expect(e.features).toBe(featuresA);
         });
 
@@ -229,7 +224,7 @@ describe('map events', () => {
         expect(spyB).not.toHaveBeenCalled();
     });
 
-    (['mouseenter', 'mouseover'] as (keyof MapLayerEventType)[]).forEach((event) => {
+    (['mouseenter', 'mouseover'] as (keyof MapLayerEventType)[]).forEach(event => {
         test(`Map#on ${event} does not fire if the specified layer does not exist`, () => {
             const map = createMap();
 
@@ -242,7 +237,6 @@ describe('map events', () => {
             simulate.mousemove(map.getCanvas());
 
             expect(spy).not.toHaveBeenCalled();
-
         });
 
         test(`Map#on ${event} fires when entering the specified layer`, () => {
@@ -328,11 +322,11 @@ describe('map events', () => {
                 return (options as any).layers[0] === 'A' ? featuresA : featuresB;
             });
 
-            const spyA = jest.fn((e) => {
+            const spyA = jest.fn(e => {
                 expect(e.features).toBe(featuresA);
             });
 
-            const spyB = jest.fn((e) => {
+            const spyB = jest.fn(e => {
                 expect(e.features).toBe(featuresB);
             });
 
@@ -376,7 +370,6 @@ describe('map events', () => {
             simulate.mousemove(map.getCanvas());
 
             expect(spy).not.toHaveBeenCalled();
-
         });
 
         test(`Map#off ${event} distinguishes distinct layers`, () => {
@@ -389,7 +382,7 @@ describe('map events', () => {
                 return featuresA;
             });
 
-            const spy = jest.fn((e) => {
+            const spy = jest.fn(e => {
                 expect(e.features).toBe(featuresA);
             });
 
@@ -420,7 +413,7 @@ describe('map events', () => {
         });
     });
 
-    (['mouseleave', 'mouseout'] as (keyof MapLayerEventType)[]).forEach((event) => {
+    (['mouseleave', 'mouseout'] as (keyof MapLayerEventType)[]).forEach(event => {
         test(`Map#on ${event} does not fire if the specified layer does not exiist`, () => {
             const map = createMap();
 
@@ -433,7 +426,6 @@ describe('map events', () => {
             simulate.mousemove(map.getCanvas());
 
             expect(spy).not.toHaveBeenCalled();
-
         });
 
         test(`Map#on ${event} does not fire on mousemove when entering or within the specified layer`, () => {
@@ -449,16 +441,13 @@ describe('map events', () => {
             simulate.mousemove(map.getCanvas());
 
             expect(spy).not.toHaveBeenCalled();
-
         });
 
         test(`Map#on ${event} fires when exiting the specified layer`, () => {
             const map = createMap();
 
             jest.spyOn(map, 'getLayer').mockReturnValue({} as StyleLayer);
-            jest.spyOn(map, 'queryRenderedFeatures')
-                .mockReturnValueOnce([{}])
-                .mockReturnValueOnce([]);
+            jest.spyOn(map, 'queryRenderedFeatures').mockReturnValueOnce([{}]).mockReturnValueOnce([]);
 
             const spy = jest.fn(function (e) {
                 expect(this).toBe(map);
@@ -496,9 +485,7 @@ describe('map events', () => {
             const map = createMap();
 
             jest.spyOn(map, 'getLayer').mockReturnValue({} as StyleLayer);
-            jest.spyOn(map, 'queryRenderedFeatures')
-                .mockReturnValueOnce([{}])
-                .mockReturnValueOnce([]);
+            jest.spyOn(map, 'queryRenderedFeatures').mockReturnValueOnce([{}]).mockReturnValueOnce([]);
 
             const spy = jest.fn();
 
@@ -509,7 +496,6 @@ describe('map events', () => {
             simulate.mouseout(map.getCanvas());
 
             expect(spy).not.toHaveBeenCalled();
-
         });
     });
 
@@ -527,7 +513,7 @@ describe('map events', () => {
         map.remove();
     });
 
-    test('Map#on mousedown doesn\'t fire subsequent click event if mousepos changes', () => {
+    test("Map#on mousedown doesn't fire subsequent click event if mousepos changes", () => {
         const map = createMap();
 
         map.on('mousedown', e => e.preventDefault());
@@ -590,9 +576,15 @@ describe('map events', () => {
     test('Map#isMoving() returns false in mousedown/mouseup/click with no movement', () => {
         const map = createMap({interactive: true, clickTolerance: 4});
         let mousedown, mouseup, click;
-        map.on('mousedown', () => { mousedown = map.isMoving(); });
-        map.on('mouseup', () => { mouseup = map.isMoving(); });
-        map.on('click', () => { click = map.isMoving(); });
+        map.on('mousedown', () => {
+            mousedown = map.isMoving();
+        });
+        map.on('mouseup', () => {
+            mouseup = map.isMoving();
+        });
+        map.on('click', () => {
+            click = map.isMoving();
+        });
 
         const canvas = map.getCanvas();
         const MouseEvent = window(canvas).MouseEvent;

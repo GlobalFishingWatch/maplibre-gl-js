@@ -1,4 +1,3 @@
-
 // Disable Flow annotations here because Flow doesn't support importing GLSL files
 
 import preludeFrag from './_prelude.fragment.glsl';
@@ -105,7 +104,7 @@ varying ${precision} ${type} ${name};
 uniform ${precision} ${type} u_${name};
 #endif
 `;
-        } else /* if (operation === 'initialize') */ {
+        } /* if (operation === 'initialize') */ else {
             return `
 #ifdef HAS_UNIFORM_u_${name}
     ${precision} ${type} ${name} = u_${name};
@@ -129,7 +128,7 @@ varying ${precision} ${type} ${name};
 uniform ${precision} ${type} u_${name};
 #endif
 `;
-            } else /* if (operation === 'initialize') */ {
+            } /* if (operation === 'initialize') */ else {
                 if (unpackType === 'vec4') {
                     // vec4 attributes are only used for cross-faded properties, and are not packed
                     return `
@@ -159,7 +158,7 @@ attribute ${precision} ${attrType} a_${name};
 uniform ${precision} ${type} u_${name};
 #endif
 `;
-            } else /* if (operation === 'initialize') */ {
+            } /* if (operation === 'initialize') */ else {
                 if (unpackType === 'vec4') {
                     // vec4 attributes are only used for cross-faded properties, and are not packed
                     return `
@@ -169,7 +168,7 @@ uniform ${precision} ${type} u_${name};
     ${precision} ${type} ${name} = u_${name};
 #endif
 `;
-                } else /* */ {
+                } /* */ else {
                     return `
 #ifndef HAS_UNIFORM_u_${name}
     ${precision} ${type} ${name} = unpack_mix_${unpackType}(a_${name}, u_${name}_t);

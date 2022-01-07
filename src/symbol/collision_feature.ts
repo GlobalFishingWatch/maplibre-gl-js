@@ -26,17 +26,18 @@ class CollisionFeature {
      * @param alignLine Whether the label is aligned with the line or the viewport.
      * @private
      */
-    constructor(collisionBoxArray: CollisionBoxArray,
-                anchor: Anchor,
-                featureIndex: number,
-                sourceLayerIndex: number,
-                bucketIndex: number,
-                shaped: any,
-                boxScale: number,
-                padding: number,
-                alignLine: boolean,
-                rotate: number) {
-
+    constructor(
+        collisionBoxArray: CollisionBoxArray,
+        anchor: Anchor,
+        featureIndex: number,
+        sourceLayerIndex: number,
+        bucketIndex: number,
+        shaped: any,
+        boxScale: number,
+        padding: number,
+        alignLine: boolean,
+        rotate: number
+    ) {
         this.boxStartIndex = collisionBoxArray.length;
 
         if (alignLine) {
@@ -82,7 +83,7 @@ class CollisionFeature {
                 const bl = new Point(x1, y2);
                 const br = new Point(x2, y2);
 
-                const rotateRadians = rotate * Math.PI / 180;
+                const rotateRadians = (rotate * Math.PI) / 180;
 
                 tl._rotate(rotateRadians);
                 tr._rotate(rotateRadians);
@@ -97,7 +98,17 @@ class CollisionFeature {
                 y1 = Math.min(tl.y, tr.y, bl.y, br.y);
                 y2 = Math.max(tl.y, tr.y, bl.y, br.y);
             }
-            collisionBoxArray.emplaceBack(anchor.x, anchor.y, x1, y1, x2, y2, featureIndex, sourceLayerIndex, bucketIndex);
+            collisionBoxArray.emplaceBack(
+                anchor.x,
+                anchor.y,
+                x1,
+                y1,
+                x2,
+                y2,
+                featureIndex,
+                sourceLayerIndex,
+                bucketIndex
+            );
         }
 
         this.boxEndIndex = collisionBoxArray.length;

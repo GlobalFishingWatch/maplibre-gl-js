@@ -1,8 +1,6 @@
-
 import isEqual from './util/deep_equal';
 
 const operations = {
-
     /*
      * { command: 'setStyle', args: [stylesheet] }
      */
@@ -97,7 +95,6 @@ const operations = {
      * { command: 'setLighting', args: [lightProperties] }
      */
     setLight: 'setLight'
-
 };
 
 function addSource(sourceId, after, commands) {
@@ -151,7 +148,11 @@ function diffSources(before, after, commands, sourcesRemoved) {
         if (!Object.prototype.hasOwnProperty.call(before, sourceId)) {
             addSource(sourceId, after, commands);
         } else if (!isEqual(before[sourceId], after[sourceId])) {
-            if (before[sourceId].type === 'geojson' && after[sourceId].type === 'geojson' && canUpdateGeoJSON(before, after, sourceId)) {
+            if (
+                before[sourceId].type === 'geojson' &&
+                after[sourceId].type === 'geojson' &&
+                canUpdateGeoJSON(before, after, sourceId)
+            ) {
                 commands.push({command: operations.setGeoJSONSourceData, args: [sourceId, after[sourceId].data]});
             } else {
                 // no update command, must remove then add
@@ -174,7 +175,8 @@ function diffLayerPropertyChanges(before, after, commands, layerId, klass, comma
         }
     }
     for (prop in after) {
-        if (!Object.prototype.hasOwnProperty.call(after, prop) || Object.prototype.hasOwnProperty.call(before, prop)) continue;
+        if (!Object.prototype.hasOwnProperty.call(after, prop) || Object.prototype.hasOwnProperty.call(before, prop))
+            continue;
         if (!isEqual(before[prop], after[prop])) {
             commands.push({command, args: [layerId, prop, after[prop], klass]});
         }
@@ -255,7 +257,11 @@ function diffLayers(before, after, commands) {
 
         // If source, source-layer, or type have changes, then remove the layer
         // and add it back 'from scratch'.
-        if (!isEqual(beforeLayer.source, afterLayer.source) || !isEqual(beforeLayer['source-layer'], afterLayer['source-layer']) || !isEqual(beforeLayer.type, afterLayer.type)) {
+        if (
+            !isEqual(beforeLayer.source, afterLayer.source) ||
+            !isEqual(beforeLayer['source-layer'], afterLayer['source-layer']) ||
+            !isEqual(beforeLayer.type, afterLayer.type)
+        ) {
             commands.push({command: operations.removeLayer, args: [layerId]});
             // we add the layer back at the same position it was already in, so
             // there's no need to update the `tracker`
@@ -265,32 +271,81 @@ function diffLayers(before, after, commands) {
         }
 
         // layout, paint, filter, minzoom, maxzoom
-        diffLayerPropertyChanges(beforeLayer.layout, afterLayer.layout, commands, layerId, null, operations.setLayoutProperty);
-        diffLayerPropertyChanges(beforeLayer.paint, afterLayer.paint, commands, layerId, null, operations.setPaintProperty);
+        diffLayerPropertyChanges(
+            beforeLayer.layout,
+            afterLayer.layout,
+            commands,
+            layerId,
+            null,
+            operations.setLayoutProperty
+        );
+        diffLayerPropertyChanges(
+            beforeLayer.paint,
+            afterLayer.paint,
+            commands,
+            layerId,
+            null,
+            operations.setPaintProperty
+        );
         if (!isEqual(beforeLayer.filter, afterLayer.filter)) {
             commands.push({command: operations.setFilter, args: [layerId, afterLayer.filter]});
         }
         if (!isEqual(beforeLayer.minzoom, afterLayer.minzoom) || !isEqual(beforeLayer.maxzoom, afterLayer.maxzoom)) {
-            commands.push({command: operations.setLayerZoomRange, args: [layerId, afterLayer.minzoom, afterLayer.maxzoom]});
+            commands.push({
+                command: operations.setLayerZoomRange,
+                args: [layerId, afterLayer.minzoom, afterLayer.maxzoom]
+            });
         }
 
         // handle all other layer props, including paint.*
         for (prop in beforeLayer) {
             if (!Object.prototype.hasOwnProperty.call(beforeLayer, prop)) continue;
-            if (prop === 'layout' || prop === 'paint' || prop === 'filter' ||
-                prop === 'metadata' || prop === 'minzoom' || prop === 'maxzoom') continue;
+            if (
+                prop === 'layout' ||
+                prop === 'paint' ||
+                prop === 'filter' ||
+                prop === 'metadata' ||
+                prop === 'minzoom' ||
+                prop === 'maxzoom'
+            )
+                continue;
             if (prop.indexOf('paint.') === 0) {
-                diffLayerPropertyChanges(beforeLayer[prop], afterLayer[prop], commands, layerId, prop.slice(6), operations.setPaintProperty);
+                diffLayerPropertyChanges(
+                    beforeLayer[prop],
+                    afterLayer[prop],
+                    commands,
+                    layerId,
+                    prop.slice(6),
+                    operations.setPaintProperty
+                );
             } else if (!isEqual(beforeLayer[prop], afterLayer[prop])) {
                 commands.push({command: operations.setLayerProperty, args: [layerId, prop, afterLayer[prop]]});
             }
         }
         for (prop in afterLayer) {
-            if (!Object.prototype.hasOwnProperty.call(afterLayer, prop) || Object.prototype.hasOwnProperty.call(beforeLayer, prop)) continue;
-            if (prop === 'layout' || prop === 'paint' || prop === 'filter' ||
-                prop === 'metadata' || prop === 'minzoom' || prop === 'maxzoom') continue;
+            if (
+                !Object.prototype.hasOwnProperty.call(afterLayer, prop) ||
+                Object.prototype.hasOwnProperty.call(beforeLayer, prop)
+            )
+                continue;
+            if (
+                prop === 'layout' ||
+                prop === 'paint' ||
+                prop === 'filter' ||
+                prop === 'metadata' ||
+                prop === 'minzoom' ||
+                prop === 'maxzoom'
+            )
+                continue;
             if (prop.indexOf('paint.') === 0) {
-                diffLayerPropertyChanges(beforeLayer[prop], afterLayer[prop], commands, layerId, prop.slice(6), operations.setPaintProperty);
+                diffLayerPropertyChanges(
+                    beforeLayer[prop],
+                    afterLayer[prop],
+                    commands,
+                    layerId,
+                    prop.slice(6),
+                    operations.setPaintProperty
+                );
             } else if (!isEqual(beforeLayer[prop], afterLayer[prop])) {
                 commands.push({command: operations.setLayerProperty, args: [layerId, prop, afterLayer[prop]]});
             }
@@ -367,7 +422,7 @@ function diffStyles(before, after) {
         // command
         const beforeLayers = [];
         if (before.layers) {
-            before.layers.forEach((layer) => {
+            before.layers.forEach(layer => {
                 if (sourcesRemoved[layer.source]) {
                     commands.push({command: operations.removeLayer, args: [layer.id]});
                 } else {
@@ -379,7 +434,6 @@ function diffStyles(before, after) {
 
         // Handle changes to `layers`
         diffLayers(beforeLayers, after.layers, commands);
-
     } catch (e) {
         // fall back to setStyle
         console.warn('Unable to compute style diff:', e);

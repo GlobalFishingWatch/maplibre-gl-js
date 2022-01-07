@@ -3,7 +3,10 @@ import StyleLayer from '../style_layer';
 import FillBucket from '../../data/bucket/fill_bucket';
 import {polygonIntersectsMultiPolygon} from '../../util/intersection_tests';
 import {translateDistance, translate} from '../query_utils';
-import properties, {FillLayoutPropsPossiblyEvaluated, FillPaintPropsPossiblyEvaluated} from './fill_style_layer_properties';
+import properties, {
+    FillLayoutPropsPossiblyEvaluated,
+    FillPaintPropsPossiblyEvaluated
+} from './fill_style_layer_properties';
 import {Transitionable, Transitioning, Layout, PossiblyEvaluated} from '../properties';
 
 import type {FeatureState} from '../../style-spec/expression';
@@ -45,18 +48,21 @@ class FillStyleLayer extends StyleLayer {
     }
 
     queryIntersectsFeature(
-      queryGeometry: Array<Point>,
-      feature: VectorTileFeature,
-      featureState: FeatureState,
-      geometry: Array<Array<Point>>,
-      zoom: number,
-      transform: Transform,
-      pixelsToTileUnits: number
+        queryGeometry: Array<Point>,
+        feature: VectorTileFeature,
+        featureState: FeatureState,
+        geometry: Array<Array<Point>>,
+        zoom: number,
+        transform: Transform,
+        pixelsToTileUnits: number
     ): boolean {
-        const translatedPolygon = translate(queryGeometry,
+        const translatedPolygon = translate(
+            queryGeometry,
             this.paint.get('fill-translate'),
             this.paint.get('fill-translate-anchor'),
-            transform.angle, pixelsToTileUnits);
+            transform.angle,
+            pixelsToTileUnits
+        );
         return polygonIntersectsMultiPolygon(translatedPolygon, geometry);
     }
 

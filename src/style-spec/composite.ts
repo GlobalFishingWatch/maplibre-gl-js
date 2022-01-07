@@ -1,4 +1,3 @@
-
 export default function (style) {
     const styleIDs = [];
     const sourceIDs = [];
@@ -7,32 +6,29 @@ export default function (style) {
     for (const id in style.sources) {
         const source = style.sources[id];
 
-        if (source.type !== 'vector')
-            continue;
+        if (source.type !== 'vector') continue;
 
         const match = /^mapbox:\/\/(.*)/.exec(source.url);
-        if (!match)
-            continue;
+        if (!match) continue;
 
         styleIDs.push(id);
         sourceIDs.push(match[1]);
     }
 
-    if (styleIDs.length < 2)
-        return style;
+    if (styleIDs.length < 2) return style;
 
-    styleIDs.forEach((id) => {
+    styleIDs.forEach(id => {
         delete style.sources[id];
     });
 
     const compositeID = sourceIDs.join(',');
 
     style.sources[compositeID] = {
-        'type': 'vector',
-        'url': `mapbox://${compositeID}`
+        type: 'vector',
+        url: `mapbox://${compositeID}`
     };
 
-    style.layers.forEach((layer) => {
+    style.layers.forEach(layer => {
         if (styleIDs.indexOf(layer.source) >= 0) {
             layer.source = compositeID;
 

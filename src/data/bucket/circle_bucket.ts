@@ -11,13 +11,7 @@ import {register} from '../../util/web_worker_transfer';
 import EvaluationParameters from '../../style/evaluation_parameters';
 
 import type {CanonicalTileID} from '../../source/tile_id';
-import type {
-    Bucket,
-    BucketParameters,
-    BucketFeature,
-    IndexedFeature,
-    PopulateParameters
-} from '../bucket';
+import type {Bucket, BucketParameters, BucketFeature, IndexedFeature, PopulateParameters} from '../bucket';
 import type CircleStyleLayer from '../../style/style_layer/circle_style_layer';
 import type HeatmapStyleLayer from '../../style/style_layer/heatmap_style_layer';
 import type Context from '../../gl/context';
@@ -29,9 +23,7 @@ import type {ImagePosition} from '../../render/image_atlas';
 import type {VectorTileLayer} from '@mapbox/vector-tile';
 
 function addCircleVertex(layoutVertexArray, x, y, extrudeX, extrudeY) {
-    layoutVertexArray.emplaceBack(
-        (x * 2) + ((extrudeX + 1) / 2),
-        (y * 2) + ((extrudeY + 1) / 2));
+    layoutVertexArray.emplaceBack(x * 2 + (extrudeX + 1) / 2, y * 2 + (extrudeY + 1) / 2);
 }
 
 /**
@@ -73,7 +65,7 @@ class CircleBucket<Layer extends CircleStyleLayer | HeatmapStyleLayer> implement
         this.indexArray = new TriangleIndexArray();
         this.segments = new SegmentVector();
         this.programConfigurations = new ProgramConfigurationSet(options.layers, options.zoom);
-        this.stateDependentLayerIds = this.layers.filter((l) => l.isStateDependent()).map((l) => l.id);
+        this.stateDependentLayerIds = this.layers.filter(l => l.isStateDependent()).map(l => l.id);
     }
 
     populate(features: Array<IndexedFeature>, options: PopulateParameters, canonical: CanonicalTileID) {
@@ -92,11 +84,12 @@ class CircleBucket<Layer extends CircleStyleLayer | HeatmapStyleLayer> implement
             const needGeometry = this.layers[0]._featureFilter.needGeometry;
             const evaluationFeature = toEvaluationFeature(feature, needGeometry);
 
-            if (!this.layers[0]._featureFilter.filter(new EvaluationParameters(this.zoom), evaluationFeature, canonical)) continue;
+            if (
+                !this.layers[0]._featureFilter.filter(new EvaluationParameters(this.zoom), evaluationFeature, canonical)
+            )
+                continue;
 
-            const sortKey = sortFeaturesByKey ?
-                circleSortKey.evaluate(evaluationFeature, {}, canonical) :
-                undefined;
+            const sortKey = sortFeaturesByKey ? circleSortKey.evaluate(evaluationFeature, {}, canonical) : undefined;
 
             const bucketFeature: BucketFeature = {
                 id,
@@ -110,7 +103,6 @@ class CircleBucket<Layer extends CircleStyleLayer | HeatmapStyleLayer> implement
             };
 
             bucketFeatures.push(bucketFeature);
-
         }
 
         if (sortFeaturesByKey) {
@@ -174,7 +166,12 @@ class CircleBucket<Layer extends CircleStyleLayer | HeatmapStyleLayer> implement
                 // │ 0     1 │
                 // └─────────┘
 
-                const segment = this.segments.prepareSegment(4, this.layoutVertexArray, this.indexArray, feature.sortKey);
+                const segment = this.segments.prepareSegment(
+                    4,
+                    this.layoutVertexArray,
+                    this.indexArray,
+                    feature.sortKey
+                );
                 const index = segment.vertexLength;
 
                 addCircleVertex(this.layoutVertexArray, x, y, -1, -1);

@@ -21,15 +21,15 @@ class Actor {
     parent: any;
     mapId: number;
     callbacks: {
-      number: any;
+        number: any;
     };
     name: string;
     tasks: {
-      number: any;
+        number: any;
     };
     taskQueue: Array<number>;
     cancelCallbacks: {
-      number: Cancelable;
+        number: Cancelable;
     };
     invoker: ThrottledInvoker;
     globalScope: any;
@@ -38,10 +38,10 @@ class Actor {
         this.target = target;
         this.parent = parent;
         this.mapId = mapId;
-        this.callbacks = {} as { number: any };
-        this.tasks = {} as { number: any };
+        this.callbacks = {} as {number: any};
+        this.tasks = {} as {number: any};
         this.taskQueue = [];
-        this.cancelCallbacks = {} as { number: Cancelable };
+        this.cancelCallbacks = {} as {number: Cancelable};
         bindAll(['receive', 'process'], this);
         this.invoker = new ThrottledInvoker(this.process);
         this.target.addEventListener('message', this.receive, false);
@@ -57,30 +57,35 @@ class Actor {
      * @private
      */
     send(
-      type: string,
-      data: unknown,
-      callback?: Function | null,
-      targetMapId?: string | null,
-      mustQueue: boolean = false
+        type: string,
+        data: unknown,
+        callback?: Function | null,
+        targetMapId?: string | null,
+        mustQueue: boolean = false
     ): Cancelable {
         // We're using a string ID instead of numbers because they are being used as object keys
         // anyway, and thus stringified implicitly. We use random IDs because an actor may receive
         // message from multiple other actors which could run in different execution context. A
         // linearly increasing ID could produce collisions.
-        const id = Math.round((Math.random() * 1e18)).toString(36).substring(0, 10);
+        const id = Math.round(Math.random() * 1e18)
+            .toString(36)
+            .substring(0, 10);
         if (callback) {
             this.callbacks[id] = callback;
         }
         const buffers: Array<Transferable> = isSafari(this.globalScope) ? undefined : [];
-        this.target.postMessage({
-            id,
-            type,
-            hasCallback: !!callback,
-            targetMapId,
-            mustQueue,
-            sourceMapId: this.mapId,
-            data: serialize(data, buffers)
-        }, buffers);
+        this.target.postMessage(
+            {
+                id,
+                type,
+                hasCallback: !!callback,
+                targetMapId,
+                mustQueue,
+                sourceMapId: this.mapId,
+                data: serialize(data, buffers)
+            },
+            buffers
+        );
         return {
             cancel: () => {
                 if (callback) {
@@ -176,22 +181,27 @@ class Actor {
         } else {
             let completed = false;
             const buffers: Array<Transferable> = isSafari(this.globalScope) ? undefined : [];
-            const done = task.hasCallback ? (err: Error, data?: any) => {
-                completed = true;
-                delete this.cancelCallbacks[id];
-                this.target.postMessage({
-                    id,
-                    type: '<response>',
-                    sourceMapId: this.mapId,
-                    error: err ? serialize(err) : null,
-                    data: serialize(data, buffers)
-                }, buffers);
-            } : (_) => {
-                completed = true;
-            };
+            const done = task.hasCallback
+                ? (err: Error, data?: any) => {
+                      completed = true;
+                      delete this.cancelCallbacks[id];
+                      this.target.postMessage(
+                          {
+                              id,
+                              type: '<response>',
+                              sourceMapId: this.mapId,
+                              error: err ? serialize(err) : null,
+                              data: serialize(data, buffers)
+                          },
+                          buffers
+                      );
+                  }
+                : _ => {
+                      completed = true;
+                  };
 
             let callback = null;
-            const params = (deserialize(task.data) as any);
+            const params = deserialize(task.data) as any;
             if (this.parent[task.type]) {
                 // task.type == 'loadTile', 'removeTile', etc.
                 callback = this.parent[task.type](task.sourceMapId, params, done);

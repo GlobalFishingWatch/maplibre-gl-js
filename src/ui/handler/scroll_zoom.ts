@@ -45,11 +45,11 @@ class ScrollZoomHandler {
     _startZoom: number;
     _targetZoom: number;
     _delta: number;
-    _easing: ((a: number) => number);
+    _easing: (a: number) => number;
     _prevEase: {
-      start: number;
-      duration: number;
-      easing: (_: number) => number;
+        start: number;
+        duration: number;
+        easing: (_: number) => number;
     };
 
     _frameId: boolean;
@@ -86,12 +86,12 @@ class ScrollZoomHandler {
     }
 
     /**
-    * Set the zoom rate of a mouse wheel
-    * @param {number} [wheelZoomRate=1/450] The rate used to scale mouse wheel movement to a zoom value.
-    * @example
-    * // Slow down zoom of mouse wheel
-    * map.scrollZoom.setWheelZoomRate(1/600);
-    */
+     * Set the zoom rate of a mouse wheel
+     * @param {number} [wheelZoomRate=1/450] The rate used to scale mouse wheel movement to a zoom value.
+     * @example
+     * // Slow down zoom of mouse wheel
+     * map.scrollZoom.setWheelZoomRate(1/600);
+     */
     setWheelZoomRate(wheelZoomRate: number) {
         this._wheelZoomRate = wheelZoomRate;
     }
@@ -106,10 +106,10 @@ class ScrollZoomHandler {
     }
 
     /*
-    * Active state is turned on and off with every scroll wheel event and is set back to false before the map
-    * render is called, so _active is not a good candidate for determining if a scroll zoom animation is in
-    * progress.
-    */
+     * Active state is turned on and off with every scroll wheel event and is set back to false before the map
+     * render is called, so _active is not a good candidate for determining if a scroll zoom animation is in
+     * progress.
+     */
     isActive() {
         return !!this._active || this._finishTimeout !== undefined;
     }
@@ -154,14 +154,12 @@ class ScrollZoomHandler {
 
         this._lastWheelEventTime = now;
 
-        if (value !== 0 && (value % wheelZoomDelta) === 0) {
+        if (value !== 0 && value % wheelZoomDelta === 0) {
             // This one is definitely a mouse wheel event.
             this._type = 'wheel';
-
         } else if (value !== 0 && Math.abs(value) < 4) {
             // This one is definitely a trackpad event because it is so small.
             this._type = 'trackpad';
-
         } else if (timeDelta > 400) {
             // This is likely a new scroll action.
             this._type = null;
@@ -169,11 +167,10 @@ class ScrollZoomHandler {
 
             // Start a timeout in case this was a singular event, and dely it by up to 40ms.
             this._timeout = setTimeout(this._onTimeout, 40, e);
-
         } else if (!this._type) {
             // This is a repeating event, but we don't know the type of event just yet.
             // If the delta per time is small, we assume it's a fast trackpad; otherwise we switch into wheel mode.
-            this._type = (Math.abs(timeDelta * value) < 200) ? 'trackpad' : 'wheel';
+            this._type = Math.abs(timeDelta * value) < 200 ? 'trackpad' : 'wheel';
 
             // Make sure our delayed event isn't fired again, because we accumulate
             // the previous event (which was less than 40ms ago) into this event.
@@ -245,7 +242,10 @@ class ScrollZoomHandler {
         // accumulated delta, and update the target zoom level accordingly
         if (this._delta !== 0) {
             // For trackpad events and single mouse wheel ticks, use the default zoom rate
-            const zoomRate = (this._type === 'wheel' && Math.abs(this._delta) > wheelZoomDelta) ? this._wheelZoomRate : this._defaultZoomRate;
+            const zoomRate =
+                this._type === 'wheel' && Math.abs(this._delta) > wheelZoomDelta
+                    ? this._wheelZoomRate
+                    : this._defaultZoomRate;
             // Scale by sigmoid of scroll wheel delta.
             let scale = maxScalePerFrame / (1 + Math.exp(-Math.abs(this._delta * zoomRate)));
 
@@ -267,8 +267,7 @@ class ScrollZoomHandler {
             this._delta = 0;
         }
 
-        const targetZoom = typeof this._targetZoom === 'number' ?
-            this._targetZoom : tr.zoom;
+        const targetZoom = typeof this._targetZoom === 'number' ? this._targetZoom : tr.zoom;
         const startZoom = this._startZoom;
         const easing = this._easing;
 
@@ -320,9 +319,8 @@ class ScrollZoomHandler {
             const ease = this._prevEase,
                 t = (browser.now() - ease.start) / ease.duration,
                 speed = ease.easing(t + 0.01) - ease.easing(t),
-
                 // Quick hack to make new bezier that is continuous with last
-                x = 0.27 / Math.sqrt(speed * speed + 0.0001) * 0.01,
+                x = (0.27 / Math.sqrt(speed * speed + 0.0001)) * 0.01,
                 y = Math.sqrt(0.27 * 0.27 - x * x);
 
             easing = bezier(x, y, 0.25, 1);

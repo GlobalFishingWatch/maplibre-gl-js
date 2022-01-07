@@ -8,16 +8,18 @@ for (const glyph of parseGlyphPBF(fs.readFileSync('./test/fixtures/0-255.pbf')))
     glyphs[glyph.id] = glyph;
 }
 
-const identityTransform = ((url) => ({url})) as any as RequestManager;
+const identityTransform = (url => ({url})) as any as RequestManager;
 
 const createLoadGlyphRangeStub = () => {
-    return jest.spyOn(GlyphManager, 'loadGlyphRange').mockImplementation((stack, range, urlTemplate, transform, callback) => {
-        expect(stack).toBe('Arial Unicode MS');
-        expect(range).toBe(0);
-        expect(urlTemplate).toBe('https://localhost/fonts/v1/{fontstack}/{range}.pbf');
-        expect(transform).toBe(identityTransform);
-        setTimeout(() => callback(null, glyphs), 0);
-    });
+    return jest
+        .spyOn(GlyphManager, 'loadGlyphRange')
+        .mockImplementation((stack, range, urlTemplate, transform, callback) => {
+            expect(stack).toBe('Arial Unicode MS');
+            expect(range).toBe(0);
+            expect(urlTemplate).toBe('https://localhost/fonts/v1/{fontstack}/{range}.pbf');
+            expect(transform).toBe(identityTransform);
+            setTimeout(() => callback(null, glyphs), 0);
+        });
 };
 
 const createGlyphManager = (font?) => {
@@ -37,7 +39,6 @@ afterEach(() => {
 });
 
 describe('GlyphManager', () => {
-
     test('GlyphManager requests 0-255 PBF', done => {
         createLoadGlyphRangeStub();
         const manager = createGlyphManager();
@@ -49,11 +50,11 @@ describe('GlyphManager', () => {
         });
     });
 
-    test('GlyphManager doesn\'t request twice 0-255 PBF if a glyph is missing', done => {
+    test("GlyphManager doesn't request twice 0-255 PBF if a glyph is missing", done => {
         const stub = createLoadGlyphRangeStub();
         const manager = createGlyphManager();
 
-        manager.getGlyphs({'Arial Unicode MS': [0.5]}, (err) => {
+        manager.getGlyphs({'Arial Unicode MS': [0.5]}, err => {
             expect(err).toBeFalsy();
             expect(manager.entries['Arial Unicode MS'].ranges[0]).toBe(true);
             expect(stub).toHaveBeenCalledTimes(1);
@@ -61,7 +62,7 @@ describe('GlyphManager', () => {
             // We remove all requests as in getGlyphs code.
             delete manager.entries['Arial Unicode MS'].requests[0];
 
-            manager.getGlyphs({'Arial Unicode MS': [0.5]}, (err) => {
+            manager.getGlyphs({'Arial Unicode MS': [0.5]}, err => {
                 expect(err).toBeFalsy();
                 expect(manager.entries['Arial Unicode MS'].ranges[0]).toBe(true);
                 expect(stub).toHaveBeenCalledTimes(1);
@@ -71,9 +72,11 @@ describe('GlyphManager', () => {
     });
 
     test('GlyphManager requests remote CJK PBF', done => {
-        jest.spyOn(GlyphManager, 'loadGlyphRange').mockImplementation((stack, range, urlTemplate, transform, callback) => {
-            setTimeout(() => callback(null, glyphs), 0);
-        });
+        jest.spyOn(GlyphManager, 'loadGlyphRange').mockImplementation(
+            (stack, range, urlTemplate, transform, callback) => {
+                setTimeout(() => callback(null, glyphs), 0);
+            }
+        );
 
         const manager = createGlyphManager();
 
@@ -85,15 +88,17 @@ describe('GlyphManager', () => {
     });
 
     test('GlyphManager does not cache CJK chars that should be rendered locally', done => {
-        jest.spyOn(GlyphManager, 'loadGlyphRange').mockImplementation((stack, range, urlTemplate, transform, callback) => {
-            const overlappingGlyphs = {};
-            const start = range * 256;
-            const end = start + 256;
-            for (let i = start, j = 0; i < end; i++, j++) {
-                overlappingGlyphs[i] = glyphs[j];
+        jest.spyOn(GlyphManager, 'loadGlyphRange').mockImplementation(
+            (stack, range, urlTemplate, transform, callback) => {
+                const overlappingGlyphs = {};
+                const start = range * 256;
+                const end = start + 256;
+                for (let i = start, j = 0; i < end; i++, j++) {
+                    overlappingGlyphs[i] = glyphs[j];
+                }
+                setTimeout(() => callback(null, overlappingGlyphs), 0);
             }
-            setTimeout(() => callback(null, overlappingGlyphs), 0);
-        });
+        );
 
         const manager = createGlyphManager('sans-serif');
 
@@ -102,7 +107,7 @@ describe('GlyphManager', () => {
             expect(err).toBeFalsy();
             expect(glyphs['Arial Unicode MS'][0x3005]).not.toBeNull();
             //Request char from Katakana range (te)
-            manager.getGlyphs({'Arial Unicode MS': [0x30C6]}, (err, glyphs) => {
+            manager.getGlyphs({'Arial Unicode MS': [0x30c6]}, (err, glyphs) => {
                 expect(err).toBeFalsy();
                 const glyph = glyphs['Arial Unicode MS'][0x30c6];
                 //Ensure that te is locally generated.
@@ -146,7 +151,6 @@ describe('GlyphManager', () => {
     });
 
     test('GlyphManager caches locally generated glyphs', done => {
-
         const manager = createGlyphManager('sans-serif');
         let drawCallCount = 0;
         GlyphManager.TinySDF = class {

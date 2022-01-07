@@ -59,54 +59,54 @@ import type {ControlPosition, IControl} from './control/control';
 /* eslint-enable no-use-before-define */
 
 export type MapOptions = {
-  hash?: boolean | string;
-  interactive?: boolean;
-  container: HTMLElement | string;
-  bearingSnap?: number;
-  attributionControl?: boolean;
-  customAttribution?: string | Array<string>;
-  logoPosition?: ControlPosition;
-  failIfMajorPerformanceCaveat?: boolean;
-  preserveDrawingBuffer?: boolean;
-  antialias?: boolean;
-  refreshExpiredTiles?: boolean;
-  maxBounds?: LngLatBoundsLike;
-  scrollZoom?: boolean;
-  minZoom?: number | null;
-  maxZoom?: number | null;
-  minPitch?: number | null;
-  maxPitch?: number | null;
-  boxZoom?: boolean;
-  dragRotate?: boolean;
-  dragPan?: DragPanOptions | boolean;
-  keyboard?: boolean;
-  doubleClickZoom?: boolean;
-  touchZoomRotate?: boolean;
-  touchPitch?: boolean;
-  trackResize?: boolean;
-  center?: LngLatLike;
-  zoom?: number;
-  bearing?: number;
-  pitch?: number;
-  renderWorldCopies?: boolean;
-  maxTileCacheSize?: number;
-  transformRequest?: RequestTransformFunction;
-  locale?: any;
-  fadeDuration?: number;
-  crossSourceCollisions?: boolean;
-  collectResourceTiming?: boolean;
-  clickTolerance?: number;
-  bounds?: LngLatBoundsLike;
-  fitBoundsOptions?: Object;
-  localIdeographFontFamily?: string;
-  style: StyleSpecification | string;
-  pitchWithRotate?: boolean;
+    hash?: boolean | string;
+    interactive?: boolean;
+    container: HTMLElement | string;
+    bearingSnap?: number;
+    attributionControl?: boolean;
+    customAttribution?: string | Array<string>;
+    logoPosition?: ControlPosition;
+    failIfMajorPerformanceCaveat?: boolean;
+    preserveDrawingBuffer?: boolean;
+    antialias?: boolean;
+    refreshExpiredTiles?: boolean;
+    maxBounds?: LngLatBoundsLike;
+    scrollZoom?: boolean;
+    minZoom?: number | null;
+    maxZoom?: number | null;
+    minPitch?: number | null;
+    maxPitch?: number | null;
+    boxZoom?: boolean;
+    dragRotate?: boolean;
+    dragPan?: DragPanOptions | boolean;
+    keyboard?: boolean;
+    doubleClickZoom?: boolean;
+    touchZoomRotate?: boolean;
+    touchPitch?: boolean;
+    trackResize?: boolean;
+    center?: LngLatLike;
+    zoom?: number;
+    bearing?: number;
+    pitch?: number;
+    renderWorldCopies?: boolean;
+    maxTileCacheSize?: number;
+    transformRequest?: RequestTransformFunction;
+    locale?: any;
+    fadeDuration?: number;
+    crossSourceCollisions?: boolean;
+    collectResourceTiming?: boolean;
+    clickTolerance?: number;
+    bounds?: LngLatBoundsLike;
+    fitBoundsOptions?: Object;
+    localIdeographFontFamily?: string;
+    style: StyleSpecification | string;
+    pitchWithRotate?: boolean;
 };
 
 // See article here: https://medium.com/terria/typescript-transforming-optional-properties-to-required-properties-that-may-be-undefined-7482cb4e1585
 type Complete<T> = {
-    [P in keyof Required<T>]: Pick<T, P> extends Required<Pick<T, P>> ? T[P] : (T[P] | undefined);
-}
+    [P in keyof Required<T>]: Pick<T, P> extends Required<Pick<T, P>> ? T[P] : T[P] | undefined;
+};
 
 // This type is used inside map since all properties are assigned a default value.
 export type CompleteMapOptions = Complete<MapOptions>;
@@ -386,7 +386,13 @@ class Map extends Camera {
             throw new Error(`maxPitch must be less than or equal to ${maxPitchThreshold}`);
         }
 
-        const transform = new Transform(options.minZoom, options.maxZoom, options.minPitch, options.maxPitch, options.renderWorldCopies);
+        const transform = new Transform(
+            options.minZoom,
+            options.maxZoom,
+            options.minPitch,
+            options.maxPitch,
+            options.renderWorldCopies
+        );
         super(transform, {bearingSnap: options.bearingSnap});
 
         this._interactive = options.interactive;
@@ -417,20 +423,14 @@ class Map extends Camera {
         } else if (options.container instanceof HTMLElement) {
             this._container = options.container;
         } else {
-            throw new Error('Invalid type: \'container\' must be a String or HTMLElement.');
+            throw new Error("Invalid type: 'container' must be a String or HTMLElement.");
         }
 
         if (options.maxBounds) {
             this.setMaxBounds(options.maxBounds);
         }
 
-        bindAll([
-            '_onWindowOnline',
-            '_onWindowResize',
-            '_onMapScroll',
-            '_contextLost',
-            '_contextRestored'
-        ], this);
+        bindAll(['_onWindowOnline', '_onWindowResize', '_onMapScroll', '_contextLost', '_contextRestored'], this);
 
         this._setupContainer();
         this._setupPainter();
@@ -451,7 +451,7 @@ class Map extends Camera {
         this.handlers = new HandlerManager(this, options as CompleteMapOptions);
 
         const hashName = (typeof options.hash === 'string' && options.hash) || undefined;
-        this._hash = options.hash && (new Hash(hashName)).addTo(this);
+        this._hash = options.hash && new Hash(hashName).addTo(this);
         // don't set position from options if set through hash
         if (!this._hash || !this._hash._onHashChange()) {
             this.jumpTo({
@@ -492,11 +492,11 @@ class Map extends Camera {
     }
 
     /*
-    * Returns a unique number for this map instance which is used for the MapLoadEvent
-    * to make sure we only fire one event per instantiated map object.
-    * @private
-    * @returns {number}
-    */
+     * Returns a unique number for this map instance which is used for the MapLoadEvent
+     * to make sure we only fire one event per instantiated map object.
+     * @private
+     * @returns {number}
+     */
     _getMapId() {
         return this._mapId;
     }
@@ -522,8 +522,13 @@ class Map extends Camera {
             }
         }
         if (!control || !control.onAdd) {
-            return this.fire(new ErrorEvent(new Error(
-                'Invalid argument to map.addControl(). Argument must be a control with onAdd and onRemove methods.')));
+            return this.fire(
+                new ErrorEvent(
+                    new Error(
+                        'Invalid argument to map.addControl(). Argument must be a control with onAdd and onRemove methods.'
+                    )
+                )
+            );
         }
         const controlElement = control.onAdd(this);
         this._controls.push(control);
@@ -552,8 +557,13 @@ class Map extends Camera {
      */
     removeControl(control: IControl) {
         if (!control || !control.onRemove) {
-            return this.fire(new ErrorEvent(new Error(
-                'Invalid argument to map.removeControl(). Argument must be a control with onAdd and onRemove methods.')));
+            return this.fire(
+                new ErrorEvent(
+                    new Error(
+                        'Invalid argument to map.removeControl(). Argument must be a control with onAdd and onRemove methods.'
+                    )
+                )
+            );
         }
         const ci = this._controls.indexOf(control);
         if (ci > -1) this._controls.splice(ci, 1);
@@ -608,8 +618,7 @@ class Map extends Camera {
         const fireMoving = !this._moving;
         if (fireMoving) {
             this.stop();
-            this.fire(new Event('movestart', eventData))
-                .fire(new Event('move', eventData));
+            this.fire(new Event('movestart', eventData)).fire(new Event('move', eventData));
         }
 
         this.fire(new Event('resize', eventData));
@@ -683,7 +692,6 @@ class Map extends Camera {
      * map.setMinZoom(12.25);
      */
     setMinZoom(minZoom?: number | null) {
-
         minZoom = minZoom === null || minZoom === undefined ? defaultMinZoom : minZoom;
 
         if (minZoom >= defaultMinZoom && minZoom <= this.transform.maxZoom) {
@@ -693,7 +701,6 @@ class Map extends Camera {
             if (this.getZoom() < minZoom) this.setZoom(minZoom);
 
             return this;
-
         } else throw new Error(`minZoom must be between ${defaultMinZoom} and the current maxZoom, inclusive`);
     }
 
@@ -704,7 +711,9 @@ class Map extends Camera {
      * @example
      * var minZoom = map.getMinZoom();
      */
-    getMinZoom() { return this.transform.minZoom; }
+    getMinZoom() {
+        return this.transform.minZoom;
+    }
 
     /**
      * Sets or clears the map's maximum zoom level.
@@ -718,7 +727,6 @@ class Map extends Camera {
      * map.setMaxZoom(18.75);
      */
     setMaxZoom(maxZoom?: number | null) {
-
         maxZoom = maxZoom === null || maxZoom === undefined ? defaultMaxZoom : maxZoom;
 
         if (maxZoom >= this.transform.minZoom) {
@@ -728,7 +736,6 @@ class Map extends Camera {
             if (this.getZoom() > maxZoom) this.setZoom(maxZoom);
 
             return this;
-
         } else throw new Error('maxZoom must be greater than the current minZoom');
     }
 
@@ -739,7 +746,9 @@ class Map extends Camera {
      * @example
      * var maxZoom = map.getMaxZoom();
      */
-    getMaxZoom() { return this.transform.maxZoom; }
+    getMaxZoom() {
+        return this.transform.maxZoom;
+    }
 
     /**
      * Sets or clears the map's minimum pitch.
@@ -751,7 +760,6 @@ class Map extends Camera {
      * @returns {Map} `this`
      */
     setMinPitch(minPitch?: number | null) {
-
         minPitch = minPitch === null || minPitch === undefined ? defaultMinPitch : minPitch;
 
         if (minPitch < defaultMinPitch) {
@@ -765,7 +773,6 @@ class Map extends Camera {
             if (this.getPitch() < minPitch) this.setPitch(minPitch);
 
             return this;
-
         } else throw new Error(`minPitch must be between ${defaultMinPitch} and the current maxPitch, inclusive`);
     }
 
@@ -774,7 +781,9 @@ class Map extends Camera {
      *
      * @returns {number} minPitch
      */
-    getMinPitch() { return this.transform.minPitch; }
+    getMinPitch() {
+        return this.transform.minPitch;
+    }
 
     /**
      * Sets or clears the map's maximum pitch.
@@ -786,7 +795,6 @@ class Map extends Camera {
      * @returns {Map} `this`
      */
     setMaxPitch(maxPitch?: number | null) {
-
         maxPitch = maxPitch === null || maxPitch === undefined ? defaultMaxPitch : maxPitch;
 
         if (maxPitch > maxPitchThreshold) {
@@ -800,7 +808,6 @@ class Map extends Camera {
             if (this.getPitch() > maxPitch) this.setPitch(maxPitch);
 
             return this;
-
         } else throw new Error('maxPitch must be greater than the current minPitch');
     }
 
@@ -809,7 +816,9 @@ class Map extends Camera {
      *
      * @returns {number} maxPitch
      */
-    getMaxPitch() { return this.transform.maxPitch; }
+    getMaxPitch() {
+        return this.transform.maxPitch;
+    }
 
     /**
      * Returns the state of `renderWorldCopies`. If `true`, multiple copies of the world will be rendered side by side beyond -180 and 180 degrees longitude. If set to `false`:
@@ -822,7 +831,9 @@ class Map extends Camera {
      * var worldCopiesRendered = map.getRenderWorldCopies();
      * @see [Render world copies](https://maplibre.org/maplibre-gl-js-docs/example/render-world-copies/)
      */
-    getRenderWorldCopies() { return this.transform.renderWorldCopies; }
+    getRenderWorldCopies() {
+        return this.transform.renderWorldCopies;
+    }
 
     /**
      * Sets the state of `renderWorldCopies`.
@@ -907,7 +918,7 @@ class Map extends Camera {
     _createDelegatedListener(type: MapEvent, layerId: any, listener: any) {
         if (type === 'mouseenter' || type === 'mouseover') {
             let mousein = false;
-            const mousemove = (e) => {
+            const mousemove = e => {
                 const features = this.getLayer(layerId) ? this.queryRenderedFeatures(e.point, {layers: [layerId]}) : [];
                 if (!features.length) {
                     mousein = false;
@@ -922,7 +933,7 @@ class Map extends Camera {
             return {layer: layerId, listener, delegates: {mousemove, mouseout}};
         } else if (type === 'mouseleave' || type === 'mouseout') {
             let mousein = false;
-            const mousemove = (e) => {
+            const mousemove = e => {
                 const features = this.getLayer(layerId) ? this.queryRenderedFeatures(e.point, {layers: [layerId]}) : [];
                 if (features.length) {
                     mousein = true;
@@ -931,7 +942,7 @@ class Map extends Camera {
                     listener.call(this, new MapMouseEvent(type, this, e.originalEvent));
                 }
             };
-            const mouseout = (e) => {
+            const mouseout = e => {
                 if (mousein) {
                     mousein = false;
                     listener.call(this, new MapMouseEvent(type, this, e.originalEvent));
@@ -939,7 +950,7 @@ class Map extends Camera {
             };
             return {layer: layerId, listener, delegates: {mousemove, mouseout}};
         } else {
-            const delegate = (e) => {
+            const delegate = e => {
                 const features = this.getLayer(layerId) ? this.queryRenderedFeatures(e.point, {layers: [layerId]}) : [];
                 if (features.length) {
                     // Here we need to mutate the original event, so that preventDefault works as expected.
@@ -1054,7 +1065,7 @@ class Map extends Camera {
     on<T extends keyof MapLayerEventType>(
         type: T,
         layer: string,
-        listener: (ev: MapLayerEventType[T] & Object) => void,
+        listener: (ev: MapLayerEventType[T] & Object) => void
     ): this;
     on<T extends keyof MapEventType>(type: T, listener: (ev: MapEventType[T] & Object) => void): this;
     on(type: MapEvent, listener: Listener): this;
@@ -1108,12 +1119,11 @@ class Map extends Camera {
     once<T extends keyof MapLayerEventType>(
         type: T,
         layer: string,
-        listener: (ev: MapLayerEventType[T] & Object) => void,
+        listener: (ev: MapLayerEventType[T] & Object) => void
     ): this;
     once<T extends keyof MapEventType>(type: T, listener: (ev: MapEventType[T] & Object) => void): this;
     once(type: MapEvent, listener: Listener): this;
     once(type: MapEvent, layerIdOrListener: string | Listener, listener?: Listener): this {
-
         if (listener === undefined) {
             return super.once(type, layerIdOrListener as Listener);
         }
@@ -1150,7 +1160,7 @@ class Map extends Camera {
     off<T extends keyof MapLayerEventType>(
         type: T,
         layer: string,
-        listener: (ev: MapLayerEventType[T] & Object) => void,
+        listener: (ev: MapLayerEventType[T] & Object) => void
     ): this;
     off<T extends keyof MapEventType>(type: T, listener: (ev: MapEventType[T] & Object) => void): this;
     off(type: MapEvent, listener: Listener): this;
@@ -1159,13 +1169,13 @@ class Map extends Camera {
             return super.off(type, layerIdOrListener as Listener);
         }
 
-        const removeDelegatedListener = (delegatedListeners) => {
+        const removeDelegatedListener = delegatedListeners => {
             const listeners = delegatedListeners[type];
             for (let i = 0; i < listeners.length; i++) {
                 const delegatedListener = listeners[i];
                 if (delegatedListener.layer === layerIdOrListener && delegatedListener.listener === listener) {
                     for (const event in delegatedListener.delegates) {
-                        this.off(((event as any)), delegatedListener.delegates[event]);
+                        this.off(event as any, delegatedListener.delegates[event]);
                     }
                     listeners.splice(i, 1);
                     return this;
@@ -1271,13 +1281,21 @@ class Map extends Camera {
             return [];
         }
 
-        if (options === undefined && geometry !== undefined && !(geometry instanceof Point) && !Array.isArray(geometry)) {
+        if (
+            options === undefined &&
+            geometry !== undefined &&
+            !(geometry instanceof Point) &&
+            !Array.isArray(geometry)
+        ) {
             options = geometry;
             geometry = undefined;
         }
 
         options = options || {};
-        geometry = geometry || [[0, 0], [this.transform.width, this.transform.height]];
+        geometry = geometry || [
+            [0, 0],
+            [this.transform.width, this.transform.height]
+        ];
 
         let queryGeometry;
         if (geometry instanceof Point || typeof geometry[0] === 'number') {
@@ -1327,11 +1345,14 @@ class Map extends Camera {
      * });
      *
      */
-    querySourceFeatures(sourceId: string, parameters?: {
-      sourceLayer: string;
-      filter: Array<any>;
-      validate?: boolean;
-    } | null) {
+    querySourceFeatures(
+        sourceId: string,
+        parameters?: {
+            sourceLayer: string;
+            filter: Array<any>;
+            validate?: boolean;
+        } | null
+    ) {
         return this.style.querySourceFeatures(sourceId, parameters);
     }
 
@@ -1361,12 +1382,20 @@ class Map extends Camera {
      * map.setStyle("mapbox://styles/mapbox/streets-v11");
      *
      */
-    setStyle(style: StyleSpecification | string | null, options?: {
-      diff?: boolean;
-    } & StyleOptions) {
+    setStyle(
+        style: StyleSpecification | string | null,
+        options?: {
+            diff?: boolean;
+        } & StyleOptions
+    ) {
         options = extend({}, {localIdeographFontFamily: this._localIdeographFontFamily}, options);
 
-        if ((options.diff !== false && options.localIdeographFontFamily === this._localIdeographFontFamily) && this.style && style) {
+        if (
+            options.diff !== false &&
+            options.localIdeographFontFamily === this._localIdeographFontFamily &&
+            this.style &&
+            style
+        ) {
             this._diffStyle(style, options);
             return this;
         } else {
@@ -1400,9 +1429,12 @@ class Map extends Camera {
         return str;
     }
 
-    _updateStyle(style: StyleSpecification | string | null,  options?: {
-      diff?: boolean;
-    } & StyleOptions) {
+    _updateStyle(
+        style: StyleSpecification | string | null,
+        options?: {
+            diff?: boolean;
+        } & StyleOptions
+    ) {
         if (this.style) {
             this.style.setEventedParent(null);
             this.style._remove();
@@ -1434,9 +1466,12 @@ class Map extends Camera {
         }
     }
 
-    _diffStyle(style: StyleSpecification | string,  options?: {
-      diff?: boolean;
-    } & StyleOptions) {
+    _diffStyle(
+        style: StyleSpecification | string,
+        options?: {
+            diff?: boolean;
+        } & StyleOptions
+    ) {
         if (typeof style === 'string') {
             const url = style;
             const request = this._requestManager.transformRequest(url, ResourceType.Style);
@@ -1452,17 +1487,18 @@ class Map extends Camera {
         }
     }
 
-    _updateDiff(style: StyleSpecification,  options?: {
-      diff?: boolean;
-    } & StyleOptions) {
+    _updateDiff(
+        style: StyleSpecification,
+        options?: {
+            diff?: boolean;
+        } & StyleOptions
+    ) {
         try {
             if (this.style.setState(style)) {
                 this._update(true);
             }
         } catch (e) {
-            warnOnce(
-                `Unable to perform style diff: ${e.message || e.error || e}.  Rebuilding the style from scratch.`
-            );
+            warnOnce(`Unable to perform style diff: ${e.message || e.error || e}.  Rebuilding the style from scratch.`);
             this._updateStyle(style, options);
         }
     }
@@ -1668,32 +1704,46 @@ class Map extends Camera {
      * @see Use `HTMLImageElement`: [Add an icon to the map](https://maplibre.org/maplibre-gl-js-docs/example/add-image/)
      * @see Use `ImageData`: [Add a generated icon to the map](https://maplibre.org/maplibre-gl-js-docs/example/add-image-generated/)
      */
-    addImage(id: string,
-             image: HTMLImageElement | ImageBitmap | ImageData | {
-               width: number;
-               height: number;
-               data: Uint8Array | Uint8ClampedArray;
-             } | StyleImageInterface,
-             {
-                 pixelRatio = 1,
-                 sdf = false,
-                 stretchX,
-                 stretchY,
-                 content
-             }: Partial<StyleImageMetadata> = {}) {
+    addImage(
+        id: string,
+        image:
+            | HTMLImageElement
+            | ImageBitmap
+            | ImageData
+            | {
+                  width: number;
+                  height: number;
+                  data: Uint8Array | Uint8ClampedArray;
+              }
+            | StyleImageInterface,
+        {pixelRatio = 1, sdf = false, stretchX, stretchY, content}: Partial<StyleImageMetadata> = {}
+    ) {
         this._lazyInitEmptyStyle();
         const version = 0;
 
         if (image instanceof HTMLImageElement || isImageBitmap(image)) {
             const {width, height, data} = browser.getImageData(image);
-            this.style.addImage(id, {data: new RGBAImage({width, height}, data), pixelRatio, stretchX, stretchY, content, sdf, version});
+            this.style.addImage(id, {
+                data: new RGBAImage({width, height}, data),
+                pixelRatio,
+                stretchX,
+                stretchY,
+                content,
+                sdf,
+                version
+            });
         } else if (image.width === undefined || image.height === undefined) {
-            return this.fire(new ErrorEvent(new Error(
-                'Invalid arguments to map.addImage(). The second argument must be an `HTMLImageElement`, `ImageData`, `ImageBitmap`, ' +
-                'or object with `width`, `height`, and `data` properties with the same format as `ImageData`')));
+            return this.fire(
+                new ErrorEvent(
+                    new Error(
+                        'Invalid arguments to map.addImage(). The second argument must be an `HTMLImageElement`, `ImageData`, `ImageBitmap`, ' +
+                            'or object with `width`, `height`, and `data` properties with the same format as `ImageData`'
+                    )
+                )
+            );
         } else {
             const {width, height, data} = image as ImageData;
-            const userImage = (image as any as StyleImageInterface);
+            const userImage = image as any as StyleImageInterface;
 
             this.style.addImage(id, {
                 data: new RGBAImage({width, height}, new Uint8Array(data)),
@@ -1730,32 +1780,52 @@ class Map extends Camera {
      * // replace that image with a new image, 'other-cat-icon.png'.
      * if (map.hasImage('cat')) map.updateImage('cat', './other-cat-icon.png');
      */
-    updateImage(id: string,
-        image: HTMLImageElement | ImageBitmap | ImageData | {
-          width: number;
-          height: number;
-          data: Uint8Array | Uint8ClampedArray;
-        } | StyleImageInterface) {
-
+    updateImage(
+        id: string,
+        image:
+            | HTMLImageElement
+            | ImageBitmap
+            | ImageData
+            | {
+                  width: number;
+                  height: number;
+                  data: Uint8Array | Uint8ClampedArray;
+              }
+            | StyleImageInterface
+    ) {
         const existingImage = this.style.getImage(id);
         if (!existingImage) {
-            return this.fire(new ErrorEvent(new Error(
-                'The map has no image with that id. If you are adding a new image use `map.addImage(...)` instead.')));
+            return this.fire(
+                new ErrorEvent(
+                    new Error(
+                        'The map has no image with that id. If you are adding a new image use `map.addImage(...)` instead.'
+                    )
+                )
+            );
         }
-        const imageData = (image instanceof HTMLImageElement || isImageBitmap(image)) ?
-            browser.getImageData(image) :
-            image;
+        const imageData =
+            image instanceof HTMLImageElement || isImageBitmap(image) ? browser.getImageData(image) : image;
         const {width, height, data} = imageData;
 
         if (width === undefined || height === undefined) {
-            return this.fire(new ErrorEvent(new Error(
-                'Invalid arguments to map.updateImage(). The second argument must be an `HTMLImageElement`, `ImageData`, `ImageBitmap`, ' +
-                'or object with `width`, `height`, and `data` properties with the same format as `ImageData`')));
+            return this.fire(
+                new ErrorEvent(
+                    new Error(
+                        'Invalid arguments to map.updateImage(). The second argument must be an `HTMLImageElement`, `ImageData`, `ImageBitmap`, ' +
+                            'or object with `width`, `height`, and `data` properties with the same format as `ImageData`'
+                    )
+                )
+            );
         }
 
         if (width !== existingImage.data.width || height !== existingImage.data.height) {
-            return this.fire(new ErrorEvent(new Error(
-                'The width and height of the updated image must be that same as the previous version of the image')));
+            return this.fire(
+                new ErrorEvent(
+                    new Error(
+                        'The width and height of the updated image must be that same as the previous version of the image'
+                    )
+                )
+            );
         }
 
         const copy = !(image instanceof HTMLImageElement || isImageBitmap(image));
@@ -1824,16 +1894,16 @@ class Map extends Camera {
     }
 
     /**
-    * Returns an Array of strings containing the IDs of all images currently available in the map.
-    * This includes both images from the style's original [sprite](https://docs.mapbox.com/help/glossary/sprite/)
-    * and any images that have been added at runtime using {@link Map#addImage}.
-    *
-    * @returns {Array<string>} An Array of strings containing the names of all sprites/images currently available in the map.
-    *
-    * @example
-    * var allImages = map.listImages();
-    *
-    */
+     * Returns an Array of strings containing the IDs of all images currently available in the map.
+     * This includes both images from the style's original [sprite](https://docs.mapbox.com/help/glossary/sprite/)
+     * and any images that have been added at runtime using {@link Map#addImage}.
+     *
+     * @returns {Array<string>} An Array of strings containing the names of all sprites/images currently available in the map.
+     *
+     * @example
+     * var allImages = map.listImages();
+     *
+     */
     listImages() {
         return this.style.listImages();
     }
@@ -2060,7 +2130,7 @@ class Map extends Camera {
      * @see [Create a timeline animation](https://maplibre.org/maplibre-gl-js-docs/example/timeline-animation/)
      * @see Tutorial: [Show changes over time](https://docs.mapbox.com/help/tutorials/show-changes-over-time/)
      */
-    setFilter(layerId: string, filter?: FilterSpecification | null,  options: StyleSetterOptions = {}) {
+    setFilter(layerId: string, filter?: FilterSpecification | null, options: StyleSetterOptions = {}) {
         this.style.setFilter(layerId, filter, options);
         return this._update(true);
     }
@@ -2198,11 +2268,14 @@ class Map extends Camera {
      * @see [Create a hover effect](https://maplibre.org/maplibre-gl-js-docs/example/hover-styles/)
      * @see Tutorial: [Create interactive hover effects with Mapbox GL JS](https://docs.mapbox.com/help/tutorials/create-interactive-hover-effects-with-mapbox-gl-js/)
      */
-    setFeatureState(feature: {
-      source: string;
-      sourceLayer?: string;
-      id: string | number;
-    }, state: any) {
+    setFeatureState(
+        feature: {
+            source: string;
+            sourceLayer?: string;
+            id: string | number;
+        },
+        state: any
+    ) {
         this.style.setFeatureState(feature, state);
         return this._update();
     }
@@ -2253,12 +2326,15 @@ class Map extends Camera {
      *   }, 'hover');
      * });
      *
-    */
-    removeFeatureState(target: {
-      source: string;
-      sourceLayer?: string;
-      id?: string | number;
-    }, key?: string) {
+     */
+    removeFeatureState(
+        target: {
+            source: string;
+            sourceLayer?: string;
+            id?: string | number;
+        },
+        key?: string
+    ) {
         this.style.removeFeatureState(target, key);
         return this._update();
     }
@@ -2292,13 +2368,7 @@ class Map extends Camera {
      * });
      *
      */
-    getFeatureState(
-      feature: {
-        source: string;
-        sourceLayer?: string;
-        id: string | number;
-      }
-    ): any {
+    getFeatureState(feature: {source: string; sourceLayer?: string; id: string | number}): any {
         return this.style.getFeatureState(feature);
     }
 
@@ -2355,7 +2425,11 @@ class Map extends Camera {
         const container = this._container;
         container.classList.add('maplibregl-map', 'mapboxgl-map');
 
-        const canvasContainer = this._canvasContainer = DOM.create('div', 'maplibregl-canvas-container mapboxgl-canvas-container', container);
+        const canvasContainer = (this._canvasContainer = DOM.create(
+            'div',
+            'maplibregl-canvas-container mapboxgl-canvas-container',
+            container
+        ));
         if (this._interactive) {
             canvasContainer.classList.add('maplibregl-interactive', 'mapboxgl-interactive');
         }
@@ -2370,10 +2444,18 @@ class Map extends Camera {
         const dimensions = this._containerDimensions();
         this._resizeCanvas(dimensions[0], dimensions[1]);
 
-        const controlContainer = this._controlContainer = DOM.create('div', 'maplibregl-control-container mapboxgl-control-container', container);
-        const positions = this._controlPositions = {};
-        ['top-left', 'top-right', 'bottom-left', 'bottom-right'].forEach((positionName) => {
-            positions[positionName] = DOM.create('div', `maplibregl-ctrl-${positionName} mapboxgl-ctrl-${positionName}`, controlContainer);
+        const controlContainer = (this._controlContainer = DOM.create(
+            'div',
+            'maplibregl-control-container mapboxgl-control-container',
+            container
+        ));
+        const positions = (this._controlPositions = {});
+        ['top-left', 'top-right', 'bottom-left', 'bottom-right'].forEach(positionName => {
+            positions[positionName] = DOM.create(
+                'div',
+                `maplibregl-ctrl-${positionName} mapboxgl-ctrl-${positionName}`,
+                controlContainer
+            );
         });
 
         this._container.addEventListener('scroll', this._onMapScroll, false);
@@ -2398,8 +2480,8 @@ class Map extends Camera {
             antialias: this._antialias || false
         });
 
-        const gl = this._canvas.getContext('webgl', attributes) ||
-            this._canvas.getContext('experimental-webgl', attributes);
+        const gl =
+            this._canvas.getContext('webgl', attributes) || this._canvas.getContext('experimental-webgl', attributes);
 
         if (!gl) {
             this.fire(new ErrorEvent(new Error('Failed to initialize WebGL')));
@@ -2495,7 +2577,8 @@ class Map extends Camera {
      * @private
      */
     _render(paintStartTimeStamp: number) {
-        let gpuTimer, frameStartTime = 0;
+        let gpuTimer,
+            frameStartTime = 0;
         const extTimerQuery = this.painter.context.extTimerQuery;
         if (this.listens('gpu-timing-frame')) {
             gpuTimer = extTimerQuery.createQueryEXT();
@@ -2547,7 +2630,14 @@ class Map extends Camera {
             this.style._updateSources(this.transform);
         }
 
-        this._placementDirty = this.style && this.style._updatePlacement(this.painter.transform, this.showCollisionBoxes, this._fadeDuration, this._crossSourceCollisions);
+        this._placementDirty =
+            this.style &&
+            this.style._updatePlacement(
+                this.painter.transform,
+                this.showCollisionBoxes,
+                this._fadeDuration,
+                this._crossSourceCollisions
+            );
 
         // Actually draw
         this.painter.render(this.style, {
@@ -2558,7 +2648,7 @@ class Map extends Camera {
             moving: this.isMoving(),
             fadeDuration: this._fadeDuration,
             showPadding: this.showPadding,
-            gpuTiming: !!this.listens('gpu-timing-layer'),
+            gpuTiming: !!this.listens('gpu-timing-layer')
         });
 
         this.fire(new Event('render'));
@@ -2584,12 +2674,15 @@ class Map extends Camera {
             const renderCPUTime = browser.now() - frameStartTime;
             extTimerQuery.endQueryEXT(extTimerQuery.TIME_ELAPSED_EXT, gpuTimer);
             setTimeout(() => {
-                const renderGPUTime = extTimerQuery.getQueryObjectEXT(gpuTimer, extTimerQuery.QUERY_RESULT_EXT) / (1000 * 1000);
+                const renderGPUTime =
+                    extTimerQuery.getQueryObjectEXT(gpuTimer, extTimerQuery.QUERY_RESULT_EXT) / (1000 * 1000);
                 extTimerQuery.deleteQueryEXT(gpuTimer);
-                this.fire(new Event('gpu-timing-frame', {
-                    cpuTime: renderCPUTime,
-                    gpuTime: renderGPUTime
-                }));
+                this.fire(
+                    new Event('gpu-timing-frame', {
+                        cpuTime: renderCPUTime,
+                        gpuTime: renderGPUTime
+                    })
+                );
             }, 50); // Wait 50ms to give time for all GPU calls to finish before querying
         }
 
@@ -2601,9 +2694,11 @@ class Map extends Camera {
             setTimeout(() => {
                 const renderedLayerTimes = this.painter.queryGpuTimers(frameLayerQueries);
 
-                this.fire(new Event('gpu-timing-layer', {
-                    layerTimes: renderedLayerTimes
-                }));
+                this.fire(
+                    new Event('gpu-timing-layer', {
+                        layerTimes: renderedLayerTimes
+                    })
+                );
             }, 50); // Wait 50ms to give time for all GPU calls to finish before querying
         }
 
@@ -2628,11 +2723,11 @@ class Map extends Camera {
     }
 
     /**
-    * Force a synchronous redraw of the map.
-    * @example
-    * map.redraw();
-    * @returns {Map} `this`
-    */
+     * Force a synchronous redraw of the map.
+     * @example
+     * map.redraw();
+     * @returns {Map} `this`
+     */
     redraw(): Map {
         if (this.style) {
             // cancel the scheduled update
@@ -2733,7 +2828,9 @@ class Map extends Camera {
      * @example
      * map.showTileBoundaries = true;
      */
-    get showTileBoundaries(): boolean { return !!this._showTileBoundaries; }
+    get showTileBoundaries(): boolean {
+        return !!this._showTileBoundaries;
+    }
     set showTileBoundaries(value: boolean) {
         if (this._showTileBoundaries === value) return;
         this._showTileBoundaries = value;
@@ -2749,7 +2846,9 @@ class Map extends Camera {
      * @instance
      * @memberof Map
      */
-    get showPadding(): boolean { return !!this._showPadding; }
+    get showPadding(): boolean {
+        return !!this._showPadding;
+    }
     set showPadding(value: boolean) {
         if (this._showPadding === value) return;
         this._showPadding = value;
@@ -2767,7 +2866,9 @@ class Map extends Camera {
      * @instance
      * @memberof Map
      */
-    get showCollisionBoxes(): boolean { return !!this._showCollisionBoxes; }
+    get showCollisionBoxes(): boolean {
+        return !!this._showCollisionBoxes;
+    }
     set showCollisionBoxes(value: boolean) {
         if (this._showCollisionBoxes === value) return;
         this._showCollisionBoxes = value;
@@ -2793,7 +2894,9 @@ class Map extends Camera {
      * @instance
      * @memberof Map
      */
-    get showOverdrawInspector(): boolean { return !!this._showOverdrawInspector; }
+    get showOverdrawInspector(): boolean {
+        return !!this._showOverdrawInspector;
+    }
     set showOverdrawInspector(value: boolean) {
         if (this._showOverdrawInspector === value) return;
         this._showOverdrawInspector = value;
@@ -2809,7 +2912,9 @@ class Map extends Camera {
      * @instance
      * @memberof Map
      */
-    get repaint(): boolean { return !!this._repaint; }
+    get repaint(): boolean {
+        return !!this._repaint;
+    }
     set repaint(value: boolean) {
         if (this._repaint !== value) {
             this._repaint = value;
@@ -2817,8 +2922,13 @@ class Map extends Camera {
         }
     }
     // show vertices
-    get vertices(): boolean { return !!this._vertices; }
-    set vertices(value: boolean) { this._vertices = value; this._update(); }
+    get vertices(): boolean {
+        return !!this._vertices;
+    }
+    set vertices(value: boolean) {
+        this._vertices = value;
+        this._update();
+    }
 
     // for cache browser tests
     _setCacheLimits(limit: number, checkThreshold: number) {

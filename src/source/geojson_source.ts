@@ -17,7 +17,7 @@ import type {MapSourceDataType} from '../ui/events';
 export type GeoJSONSourceOptions = GeoJSONSourceSpecification & {
     workerOptions?: any;
     collectResourceTiming: boolean;
-}
+};
 
 /**
  * A source containing GeoJSON.
@@ -108,7 +108,7 @@ class GeoJSONSource extends Evented implements Source {
         this.actor = dispatcher.getActor();
         this.setEventedParent(eventedParent);
 
-        this._data = (options.data as any);
+        this._data = options.data as any;
         this._options = extend({}, options);
 
         this._collectResourceTiming = options.collectResourceTiming;
@@ -124,30 +124,34 @@ class GeoJSONSource extends Evented implements Source {
         // so that it can load/parse/index the geojson data
         // extending with `options.workerOptions` helps to make it easy for
         // third-party sources to hack/reuse GeoJSONSource.
-        this.workerOptions = extend({
-            source: this.id,
-            cluster: options.cluster || false,
-            geojsonVtOptions: {
-                buffer: (options.buffer !== undefined ? options.buffer : 128) * scale,
-                tolerance: (options.tolerance !== undefined ? options.tolerance : 0.375) * scale,
-                extent: EXTENT,
-                maxZoom: this.maxzoom,
-                lineMetrics: options.lineMetrics || false,
-                generateId: options.generateId || false
+        this.workerOptions = extend(
+            {
+                source: this.id,
+                cluster: options.cluster || false,
+                geojsonVtOptions: {
+                    buffer: (options.buffer !== undefined ? options.buffer : 128) * scale,
+                    tolerance: (options.tolerance !== undefined ? options.tolerance : 0.375) * scale,
+                    extent: EXTENT,
+                    maxZoom: this.maxzoom,
+                    lineMetrics: options.lineMetrics || false,
+                    generateId: options.generateId || false
+                },
+                superclusterOptions: {
+                    maxZoom:
+                        options.clusterMaxZoom !== undefined
+                            ? Math.min(options.clusterMaxZoom, this.maxzoom - 1)
+                            : this.maxzoom - 1,
+                    minPoints: Math.max(2, options.clusterMinPoints || 2),
+                    extent: EXTENT,
+                    radius: (options.clusterRadius || 50) * scale,
+                    log: false,
+                    generateId: options.generateId || false
+                },
+                clusterProperties: options.clusterProperties,
+                filter: options.filter
             },
-            superclusterOptions: {
-                maxZoom: options.clusterMaxZoom !== undefined ?
-                    Math.min(options.clusterMaxZoom, this.maxzoom - 1) :
-                    (this.maxzoom - 1),
-                minPoints: Math.max(2, options.clusterMinPoints || 2),
-                extent: EXTENT,
-                radius: (options.clusterRadius || 50) * scale,
-                log: false,
-                generateId: options.generateId || false
-            },
-            clusterProperties: options.clusterProperties,
-            filter: options.filter
-        }, options.workerOptions);
+            options.workerOptions
+        );
     }
 
     load() {
@@ -224,12 +228,16 @@ class GeoJSONSource extends Evented implements Source {
      * });
      */
     getClusterLeaves(clusterId: number, limit: number, offset: number, callback: Callback<Array<GeoJSON.Feature>>) {
-        this.actor.send('geojson.getClusterLeaves', {
-            source: this.id,
-            clusterId,
-            limit,
-            offset
-        }, callback);
+        this.actor.send(
+            'geojson.getClusterLeaves',
+            {
+                source: this.id,
+                clusterId,
+                limit,
+                offset
+            },
+            callback
+        );
         return this;
     }
 

@@ -2,18 +2,17 @@ import {mat4, vec3, vec4} from 'gl-matrix';
 import assert from 'assert';
 
 class Frustum {
-
-    constructor(public points: vec4[], public planes: vec4[]) { } // eslint-disable-line
+    constructor(public points: vec4[], public planes: vec4[]) {} // eslint-disable-line
 
     public static fromInvProjectionMatrix(invProj: mat4, worldSize: number, zoom: number): Frustum {
         const clipSpaceCorners = [
             [-1, 1, -1, 1],
-            [ 1, 1, -1, 1],
-            [ 1, -1, -1, 1],
+            [1, 1, -1, 1],
+            [1, -1, -1, 1],
             [-1, -1, -1, 1],
             [-1, 1, 1, 1],
-            [ 1, 1, 1, 1],
-            [ 1, -1, 1, 1],
+            [1, 1, 1, 1],
+            [1, -1, 1, 1],
             [-1, -1, 1, 1]
         ];
 
@@ -22,15 +21,15 @@ class Frustum {
         // Transform frustum corner points from clip space to tile space
         const frustumCoords = clipSpaceCorners
             .map(v => vec4.transformMat4([] as any, v as any, invProj))
-            .map(v => vec4.scale([] as any, v, 1.0 / v[3] / worldSize * scale));
+            .map(v => vec4.scale([] as any, v, (1.0 / v[3] / worldSize) * scale));
 
         const frustumPlanePointIndices = [
-            [0, 1, 2],  // near
-            [6, 5, 4],  // far
-            [0, 3, 7],  // left
-            [2, 1, 5],  // right
-            [3, 2, 6],  // bottom
-            [0, 4, 5]   // top
+            [0, 1, 2], // near
+            [6, 5, 4], // far
+            [0, 3, 7], // left
+            [2, 1, 5], // right
+            [3, 2, 6], // bottom
+            [0, 4, 5] // top
         ];
 
         const frustumPlanes = frustumPlanePointIndices.map((p: number[]) => {
@@ -57,7 +56,7 @@ class Aabb {
     }
 
     quadrant(index: number): Aabb {
-        const split = [(index % 2) === 0, index < 2];
+        const split = [index % 2 === 0, index < 2];
         const qMin = vec3.clone(this.min);
         const qMax = vec3.clone(this.max);
         for (let axis = 0; axis < split.length; axis++) {
@@ -106,15 +105,12 @@ class Aabb {
                 }
             }
 
-            if (pointsInside === 0)
-                return 0;
+            if (pointsInside === 0) return 0;
 
-            if (pointsInside !== aabbPoints.length)
-                fullyInside = false;
+            if (pointsInside !== aabbPoints.length) fullyInside = false;
         }
 
-        if (fullyInside)
-            return 2;
+        if (fullyInside) return 2;
 
         for (let axis = 0; axis < 3; axis++) {
             let projMin = Number.MAX_VALUE;
@@ -127,14 +123,10 @@ class Aabb {
                 projMax = Math.max(projMax, projectedPoint);
             }
 
-            if (projMax < 0 || projMin > this.max[axis] - this.min[axis])
-                return 0;
+            if (projMax < 0 || projMin > this.max[axis] - this.min[axis]) return 0;
         }
 
         return 1;
     }
 }
-export {
-    Aabb,
-    Frustum
-};
+export {Aabb, Frustum};

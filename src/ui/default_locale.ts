@@ -14,7 +14,6 @@ const defaultLocale = {
     'ScaleControl.Kilometers': 'km',
     'ScaleControl.Miles': 'mi',
     'ScaleControl.NauticalMiles': 'nm'
-
 };
 
 export default defaultLocale;

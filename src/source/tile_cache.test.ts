@@ -13,11 +13,11 @@ const tileC = {tileID: idC} as Tile;
 const tileD = {tileID: idD} as Tile;
 
 function keysExpected(cache, ids) {
-    expect(cache.order).toEqual(ids.map((id) => id.key));
+    expect(cache.order).toEqual(ids.map(id => id.key));
 }
 describe('TileCache', () => {
     test('complex flow', () => {
-        const cache = new TileCache(10, (removed) => {
+        const cache = new TileCache(10, removed => {
             expect(removed).toBe('dc');
         });
         expect(cache.getAndRemove(idC)).toBeNull();
@@ -56,7 +56,7 @@ describe('TileCache', () => {
     });
 
     test('expiry', () => {
-        const cache = new TileCache(10, (removed) => {
+        const cache = new TileCache(10, removed => {
             expect(cache.has(idB)).toBeTruthy();
             expect(removed).toBe(tileA2);
         });
@@ -86,11 +86,10 @@ describe('TileCache', () => {
         expect(cache.has(idB)).toBeFalsy();
 
         expect(cache.remove(idB)).toBeTruthy();
-
     });
 
     test('overflow', () => {
-        const cache = new TileCache(1, (removed) => {
+        const cache = new TileCache(1, removed => {
             expect(removed).toBe(tileA);
         });
         cache.add(idA, tileA);
@@ -102,7 +101,7 @@ describe('TileCache', () => {
 
     test('.reset', () => {
         let called;
-        const cache = new TileCache(10, (removed) => {
+        const cache = new TileCache(10, removed => {
             expect(removed).toBe(tileA);
             called = true;
         });

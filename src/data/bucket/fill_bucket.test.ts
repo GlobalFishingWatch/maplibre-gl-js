@@ -1,4 +1,3 @@
-
 import fs from 'fs';
 import path from 'path';
 import Protobuf from 'pbf';
@@ -13,13 +12,20 @@ import ZoomHistory from '../../style/zoom_history';
 import {BucketFeature, BucketParameters} from '../bucket';
 
 // Load a fill feature from fixture tile.
-const vt = new VectorTile(new Protobuf(fs.readFileSync(path.resolve(__dirname, '../../../test/fixtures/mbsv5-6-18-23.vector.pbf'))));
+const vt = new VectorTile(
+    new Protobuf(fs.readFileSync(path.resolve(__dirname, '../../../test/fixtures/mbsv5-6-18-23.vector.pbf')))
+);
 const feature = vt.layers.water.feature(0);
 
 function createPolygon(numPoints) {
     const points = [];
     for (let i = 0; i < numPoints; i++) {
-        points.push(new Point(2048 + 256 * Math.cos(i / numPoints * 2 * Math.PI), 2048 + 256 * Math.sin(i / numPoints * 2 * Math.PI)));
+        points.push(
+            new Point(
+                2048 + 256 * Math.cos((i / numPoints) * 2 * Math.PI),
+                2048 + 256 * Math.sin((i / numPoints) * 2 * Math.PI)
+            )
+        );
     }
     return points;
 }
@@ -31,16 +37,15 @@ test('FillBucket', () => {
 
         const bucket = new FillBucket({layers: [layer]} as BucketParameters<FillStyleLayer>);
 
-        bucket.addFeature({} as BucketFeature, [[
-            new Point(0, 0),
-            new Point(10, 10)
-        ]], undefined, undefined, undefined);
+        bucket.addFeature({} as BucketFeature, [[new Point(0, 0), new Point(10, 10)]], undefined, undefined, undefined);
 
-        bucket.addFeature({} as BucketFeature, [[
-            new Point(0, 0),
-            new Point(10, 10),
-            new Point(10, 20)
-        ]], undefined, undefined, undefined);
+        bucket.addFeature(
+            {} as BucketFeature,
+            [[new Point(0, 0), new Point(10, 10), new Point(10, 20)]],
+            undefined,
+            undefined,
+            undefined
+        );
 
         bucket.addFeature(feature, feature.loadGeometry(), undefined, undefined, undefined);
     }).not.toThrow();
@@ -68,10 +73,7 @@ test('FillBucket segmentation', () => {
     bucket.addFeature({} as BucketFeature, [createPolygon(10)], undefined, undefined, undefined);
 
     // add a feature that will break across the group boundary
-    bucket.addFeature({} as BucketFeature, [
-        createPolygon(128),
-        createPolygon(128)
-    ], undefined, undefined, undefined);
+    bucket.addFeature({} as BucketFeature, [createPolygon(128), createPolygon(128)], undefined, undefined, undefined);
 
     // Each polygon must fit entirely within a segment, so we expect the
     // first segment to include the first feature and the first polygon
@@ -90,5 +92,4 @@ test('FillBucket segmentation', () => {
         primitiveOffset: 134,
         primitiveLength: 126
     });
-
 });

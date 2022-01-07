@@ -1,46 +1,57 @@
 export type NullTypeT = {
-  kind: 'null';
+    kind: 'null';
 };
 export type NumberTypeT = {
-  kind: 'number';
+    kind: 'number';
 };
 export type StringTypeT = {
-  kind: 'string';
+    kind: 'string';
 };
 export type BooleanTypeT = {
-  kind: 'boolean';
+    kind: 'boolean';
 };
 export type ColorTypeT = {
-  kind: 'color';
+    kind: 'color';
 };
 export type ObjectTypeT = {
-  kind: 'object';
+    kind: 'object';
 };
 export type ValueTypeT = {
-  kind: 'value';
+    kind: 'value';
 };
 export type ErrorTypeT = {
-  kind: 'error';
+    kind: 'error';
 };
 export type CollatorTypeT = {
-  kind: 'collator';
+    kind: 'collator';
 };
 export type FormattedTypeT = {
-  kind: 'formatted';
+    kind: 'formatted';
 };
 export type ResolvedImageTypeT = {
-  kind: 'resolvedImage';
+    kind: 'resolvedImage';
 };
 
 export type EvaluationKind = 'constant' | 'source' | 'camera' | 'composite';
 
-export type Type = NullTypeT | NumberTypeT | StringTypeT | BooleanTypeT | ColorTypeT | ObjectTypeT | ValueTypeT | // eslint-disable-line no-use-before-define
-ArrayType | ErrorTypeT | CollatorTypeT | FormattedTypeT | ResolvedImageTypeT;
+export type Type =
+    | NullTypeT
+    | NumberTypeT
+    | StringTypeT
+    | BooleanTypeT
+    | ColorTypeT
+    | ObjectTypeT
+    | ValueTypeT // eslint-disable-line no-use-before-define
+    | ArrayType
+    | ErrorTypeT
+    | CollatorTypeT
+    | FormattedTypeT
+    | ResolvedImageTypeT;
 
 export type ArrayType = {
-  kind: 'array';
-  itemType: Type;
-  N: number;
+    kind: 'array';
+    itemType: Type;
+    N: number;
 };
 
 export type NativeType = 'number' | 'string' | 'boolean' | 'null' | 'array' | 'object';
@@ -68,9 +79,11 @@ export function array(itemType: Type, N?: number | null): ArrayType {
 export function toString(type: Type): string {
     if (type.kind === 'array') {
         const itemType = toString(type.itemType);
-        return typeof type.N === 'number' ?
-            `array<${itemType}, ${type.N}>` :
-            type.itemType.kind === 'value' ? 'array' : `array<${itemType}>`;
+        return typeof type.N === 'number'
+            ? `array<${itemType}, ${type.N}>`
+            : type.itemType.kind === 'value'
+            ? 'array'
+            : `array<${itemType}>`;
     } else {
         return type.kind;
     }
@@ -98,9 +111,11 @@ export function checkSubtype(expected: Type, t: Type): string {
         // Error is a subtype of every type
         return null;
     } else if (expected.kind === 'array') {
-        if (t.kind === 'array' &&
+        if (
+            t.kind === 'array' &&
             ((t.N === 0 && t.itemType.kind === 'value') || !checkSubtype(expected.itemType, t.itemType)) &&
-            (typeof expected.N !== 'number' || expected.N === t.N)) {
+            (typeof expected.N !== 'number' || expected.N === t.N)
+        ) {
             return null;
         }
     } else if (expected.kind === t.kind) {

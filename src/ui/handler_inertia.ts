@@ -6,34 +6,46 @@ import type {DragPanOptions} from './handler/shim/drag_pan';
 
 const defaultInertiaOptions = {
     linearity: 0.3,
-    easing: bezier(0, 0, 0.3, 1),
+    easing: bezier(0, 0, 0.3, 1)
 };
 
-const defaultPanInertiaOptions = extend({
-    deceleration: 2500,
-    maxSpeed: 1400
-}, defaultInertiaOptions);
+const defaultPanInertiaOptions = extend(
+    {
+        deceleration: 2500,
+        maxSpeed: 1400
+    },
+    defaultInertiaOptions
+);
 
-const defaultZoomInertiaOptions = extend({
-    deceleration: 20,
-    maxSpeed: 1400
-}, defaultInertiaOptions);
+const defaultZoomInertiaOptions = extend(
+    {
+        deceleration: 20,
+        maxSpeed: 1400
+    },
+    defaultInertiaOptions
+);
 
-const defaultBearingInertiaOptions = extend({
-    deceleration: 1000,
-    maxSpeed: 360
-}, defaultInertiaOptions);
+const defaultBearingInertiaOptions = extend(
+    {
+        deceleration: 1000,
+        maxSpeed: 360
+    },
+    defaultInertiaOptions
+);
 
-const defaultPitchInertiaOptions = extend({
-    deceleration: 1000,
-    maxSpeed: 90
-}, defaultInertiaOptions);
+const defaultPitchInertiaOptions = extend(
+    {
+        deceleration: 1000,
+        maxSpeed: 90
+    },
+    defaultInertiaOptions
+);
 
 export type InertiaOptions = {
-  linearity: number;
-  easing: (t: number) => number;
-  deceleration: number;
-  maxSpeed: number;
+    linearity: number;
+    easing: (t: number) => number;
+    deceleration: number;
+    maxSpeed: number;
 };
 
 export type InputEvent = MouseEvent | TouchEvent | KeyboardEvent | WheelEvent;
@@ -41,8 +53,8 @@ export type InputEvent = MouseEvent | TouchEvent | KeyboardEvent | WheelEvent;
 export default class HandlerInertia {
     _map: Map;
     _inertiaBuffer: Array<{
-      time: number;
-      settings: any;
+        time: number;
+        settings: any;
     }>;
 
     constructor(map: Map) {
@@ -62,10 +74,9 @@ export default class HandlerInertia {
     _drainInertiaBuffer() {
         const inertia = this._inertiaBuffer,
             now = browser.now(),
-            cutoff = 160;   //msec
+            cutoff = 160; //msec
 
-        while (inertia.length > 0 && now - inertia[0].time > cutoff)
-            inertia.shift();
+        while (inertia.length > 0 && now - inertia[0].time > cutoff) inertia.shift();
     }
 
     _onMoveEnd(panInertiaOptions?: DragPanOptions) {
@@ -93,12 +104,16 @@ export default class HandlerInertia {
         }
 
         const lastEntry = this._inertiaBuffer[this._inertiaBuffer.length - 1];
-        const duration = (lastEntry.time - this._inertiaBuffer[0].time);
+        const duration = lastEntry.time - this._inertiaBuffer[0].time;
 
         const easeOptions = {} as any;
 
         if (deltas.pan.mag()) {
-            const result = calculateEasing(deltas.pan.mag(), duration, extend({}, defaultPanInertiaOptions, panInertiaOptions || {}));
+            const result = calculateEasing(
+                deltas.pan.mag(),
+                duration,
+                extend({}, defaultPanInertiaOptions, panInertiaOptions || {})
+            );
             easeOptions.offset = deltas.pan.mult(result.amount / deltas.pan.mag());
             easeOptions.center = this._map.transform.center;
             extendDuration(easeOptions, result);
@@ -131,7 +146,6 @@ export default class HandlerInertia {
         return extend(easeOptions, {
             noMoveStart: true
         });
-
     }
 }
 
@@ -146,10 +160,7 @@ function extendDuration(easeOptions, result) {
 
 function calculateEasing(amount, inertiaDuration: number, inertiaOptions) {
     const {maxSpeed, linearity, deceleration} = inertiaOptions;
-    const speed = clamp(
-        amount * linearity / (inertiaDuration / 1000),
-        -maxSpeed,
-        maxSpeed);
+    const speed = clamp((amount * linearity) / (inertiaDuration / 1000), -maxSpeed, maxSpeed);
     const duration = Math.abs(speed) / (deceleration * linearity);
     return {
         easing: inertiaOptions.easing,

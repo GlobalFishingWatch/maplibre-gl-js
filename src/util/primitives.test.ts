@@ -21,7 +21,6 @@ describe('primitives', () => {
         expect(aabb.quadrant(1)).toEqual(new Aabb(vec3.fromValues(1, 0, 0), vec3.fromValues(2, 2, 1)));
         expect(aabb.quadrant(2)).toEqual(new Aabb(vec3.fromValues(0, 2, 0), vec3.fromValues(1, 4, 1)));
         expect(aabb.quadrant(3)).toEqual(new Aabb(vec3.fromValues(1, 2, 0), vec3.fromValues(2, 4, 1)));
-
     });
 
     test('Distance to a point', () => {
@@ -67,9 +66,7 @@ describe('primitives', () => {
             new Aabb(vec3.fromValues(-5, -5, 0), vec3.fromValues(-4, -2, 0))
         ];
 
-        for (const aabb of aabbList)
-            expect(aabb.intersects(frustum)).toBe(2);
-
+        for (const aabb of aabbList) expect(aabb.intersects(frustum)).toBe(2);
     });
 
     test('Aabb intersecting with a frustum', () => {
@@ -80,9 +77,7 @@ describe('primitives', () => {
             new Aabb(vec3.fromValues(-6, -6, 0), vec3.fromValues(-5, -5, 0))
         ];
 
-        for (const aabb of aabbList)
-            expect(aabb.intersects(frustum)).toBe(1);
-
+        for (const aabb of aabbList) expect(aabb.intersects(frustum)).toBe(1);
     });
 
     test('No intersection between aabb and frustum', () => {
@@ -94,11 +89,8 @@ describe('primitives', () => {
             new Aabb(vec3.fromValues(7, -10, 0), vec3.fromValues(7.1, 20, 0))
         ];
 
-        for (const aabb of aabbList)
-            expect(aabb.intersects(frustum)).toBe(0);
-
+        for (const aabb of aabbList) expect(aabb.intersects(frustum)).toBe(0);
     });
-
 });
 
 describe('frustum', () => {
@@ -119,7 +111,7 @@ describe('frustum', () => {
             [-100.0, 100.0, -100.0, 1.0],
             [100.0, 100.0, -100.0, 1.0],
             [100.0, -100.0, -100.0, 1.0],
-            [-100.0, -100.0, -100.0, 1.0],
+            [-100.0, -100.0, -100.0, 1.0]
         ];
 
         frustum.points = frustum.points.map(array => array.map(n => Math.round(n * 10) / 10)) as vec4[];

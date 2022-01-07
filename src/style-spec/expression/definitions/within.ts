@@ -25,7 +25,7 @@ function mercatorXfromLng(lng: number) {
 }
 
 function mercatorYfromLat(lat: number) {
-    return (180 - (180 / Math.PI * Math.log(Math.tan(Math.PI / 4 + lat * Math.PI / 360)))) / 360;
+    return (180 - (180 / Math.PI) * Math.log(Math.tan(Math.PI / 4 + (lat * Math.PI) / 360))) / 360;
 }
 
 function boxWithinBox(bbox1: BBox, bbox2: BBox) {
@@ -48,11 +48,11 @@ function onBoundary(p, p1, p2) {
     const y1 = p[1] - p1[1];
     const x2 = p[0] - p2[0];
     const y2 = p[1] - p2[1];
-    return (x1 * y2 - x2 * y1 === 0) && (x1 * x2 <= 0) && (y1 * y2 <= 0);
+    return x1 * y2 - x2 * y1 === 0 && x1 * x2 <= 0 && y1 * y2 <= 0;
 }
 
 function rayIntersect(p, p1, p2) {
-    return ((p1[1] > p[1]) !== (p2[1] > p[1])) && (p[0] < (p2[0] - p1[0]) * (p[1] - p1[1]) / (p2[1] - p1[1]) + p1[0]);
+    return p1[1] > p[1] !== p2[1] > p[1] && p[0] < ((p2[0] - p1[0]) * (p[1] - p1[1])) / (p2[1] - p1[1]) + p1[0];
 }
 
 // ray casting algorithm for detecting if point is in polygon
@@ -76,11 +76,11 @@ function pointWithinPolygons(point, polygons) {
 }
 
 function perp(v1, v2) {
-    return (v1[0] * v2[1] - v1[1] * v2[0]);
+    return v1[0] * v2[1] - v1[1] * v2[0];
 }
 
 // check if p1 and p2 are in different sides of line segment q1->q2
-function  twoSided(p1, p2, q1, q2) {
+function twoSided(p1, p2, q1, q2) {
     // q1->p1 (x1, y1), q1->p2 (x2, y2), q1->q2 (x3, y3)
     const x1 = p1[0] - q1[0];
     const y1 = p1[1] - q1[1];
@@ -88,8 +88,8 @@ function  twoSided(p1, p2, q1, q2) {
     const y2 = p2[1] - q1[1];
     const x3 = q2[0] - q1[0];
     const y3 = q2[1] - q1[1];
-    const det1 = (x1 * y3 - x3 * y1);
-    const det2 =  (x2 * y3 - x3 * y2);
+    const det1 = x1 * y3 - x3 * y1;
+    const det2 = x2 * y3 - x3 * y2;
     if ((det1 > 0 && det2 < 0) || (det1 < 0 && det2 > 0)) return true;
     return false;
 }
@@ -171,9 +171,11 @@ function getTilePolygons(coordinates, bbox, canonical) {
 function updatePoint(p, bbox, polyBBox, worldSize) {
     if (p[0] < polyBBox[0] || p[0] > polyBBox[2]) {
         const halfWorldSize = worldSize * 0.5;
-        let shift = (p[0] - polyBBox[0] > halfWorldSize) ? -worldSize : (polyBBox[0] - p[0] > halfWorldSize) ? worldSize : 0;
+        let shift =
+            p[0] - polyBBox[0] > halfWorldSize ? -worldSize : polyBBox[0] - p[0] > halfWorldSize ? worldSize : 0;
         if (shift === 0) {
-            shift = (p[0] - polyBBox[2] > halfWorldSize) ? -worldSize : (polyBBox[2] - p[0] > halfWorldSize) ? worldSize : 0;
+            shift =
+                p[0] - polyBBox[2] > halfWorldSize ? -worldSize : polyBBox[2] - p[0] > halfWorldSize ? worldSize : 0;
         }
         p[0] += shift;
     }
@@ -291,9 +293,11 @@ class Within implements Expression {
 
     static parse(args: ReadonlyArray<unknown>, context: ParsingContext): Expression {
         if (args.length !== 2)
-            return context.error(`'within' expression requires exactly one argument, but found ${args.length - 1} instead.`) as null;
+            return context.error(
+                `'within' expression requires exactly one argument, but found ${args.length - 1} instead.`
+            ) as null;
         if (isValue(args[1])) {
-            const geojson = (args[1] as any);
+            const geojson = args[1] as any;
             if (geojson.type === 'FeatureCollection') {
                 for (let i = 0; i < geojson.features.length; ++i) {
                     const type = geojson.features[i].geometry.type;
@@ -306,11 +310,13 @@ class Within implements Expression {
                 if (type === 'Polygon' || type === 'MultiPolygon') {
                     return new Within(geojson, geojson.geometry);
                 }
-            } else if (geojson.type  === 'Polygon' || geojson.type === 'MultiPolygon') {
+            } else if (geojson.type === 'Polygon' || geojson.type === 'MultiPolygon') {
                 return new Within(geojson, geojson);
             }
         }
-        return context.error('\'within\' expression requires valid geojson object that contains polygon geometry type.') as null;
+        return context.error(
+            "'within' expression requires valid geojson object that contains polygon geometry type."
+        ) as null;
     }
 
     evaluate(ctx: EvaluationContext) {
@@ -333,7 +339,6 @@ class Within implements Expression {
     serialize(): Array<unknown> {
         return ['within', this.geojson];
     }
-
 }
 
 export default Within;

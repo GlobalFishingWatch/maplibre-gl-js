@@ -72,20 +72,18 @@ class LngLatBounds {
         if (obj instanceof LngLat) {
             sw2 = obj;
             ne2 = obj;
-
         } else if (obj instanceof LngLatBounds) {
             sw2 = obj._sw;
             ne2 = obj._ne;
 
             if (!sw2 || !ne2) return this;
-
         } else {
             if (Array.isArray(obj)) {
                 if (obj.length === 4 || (obj as any[]).every(Array.isArray)) {
-                    const lngLatBoundsObj = (obj as any as LngLatBoundsLike);
+                    const lngLatBoundsObj = obj as any as LngLatBoundsLike;
                     return this.extend(LngLatBounds.convert(lngLatBoundsObj));
                 } else {
-                    const lngLatObj = (obj as any as LngLatLike);
+                    const lngLatObj = obj as any as LngLatLike;
                     return this.extend(LngLat.convert(lngLatObj));
                 }
             }
@@ -95,7 +93,6 @@ class LngLatBounds {
         if (!sw && !ne) {
             this._sw = new LngLat(sw2.lng, sw2.lat);
             this._ne = new LngLat(ne2.lng, ne2.lat);
-
         } else {
             sw.lng = Math.min(sw2.lng, sw.lng);
             sw.lat = Math.min(sw2.lat, sw.lat);
@@ -123,56 +120,72 @@ class LngLatBounds {
      *
      * @returns {LngLat} The southwest corner of the bounding box.
      */
-    getSouthWest(): LngLat { return this._sw; }
+    getSouthWest(): LngLat {
+        return this._sw;
+    }
 
     /**
-    * Returns the northeast corner of the bounding box.
-    *
-    * @returns {LngLat} The northeast corner of the bounding box.
+     * Returns the northeast corner of the bounding box.
+     *
+     * @returns {LngLat} The northeast corner of the bounding box.
      */
-    getNorthEast(): LngLat { return this._ne; }
+    getNorthEast(): LngLat {
+        return this._ne;
+    }
 
     /**
-    * Returns the northwest corner of the bounding box.
-    *
-    * @returns {LngLat} The northwest corner of the bounding box.
+     * Returns the northwest corner of the bounding box.
+     *
+     * @returns {LngLat} The northwest corner of the bounding box.
      */
-    getNorthWest(): LngLat { return new LngLat(this.getWest(), this.getNorth()); }
+    getNorthWest(): LngLat {
+        return new LngLat(this.getWest(), this.getNorth());
+    }
 
     /**
-    * Returns the southeast corner of the bounding box.
-    *
-    * @returns {LngLat} The southeast corner of the bounding box.
+     * Returns the southeast corner of the bounding box.
+     *
+     * @returns {LngLat} The southeast corner of the bounding box.
      */
-    getSouthEast(): LngLat { return new LngLat(this.getEast(), this.getSouth()); }
+    getSouthEast(): LngLat {
+        return new LngLat(this.getEast(), this.getSouth());
+    }
 
     /**
-    * Returns the west edge of the bounding box.
-    *
-    * @returns {number} The west edge of the bounding box.
+     * Returns the west edge of the bounding box.
+     *
+     * @returns {number} The west edge of the bounding box.
      */
-    getWest(): number { return this._sw.lng; }
+    getWest(): number {
+        return this._sw.lng;
+    }
 
     /**
-    * Returns the south edge of the bounding box.
-    *
-    * @returns {number} The south edge of the bounding box.
+     * Returns the south edge of the bounding box.
+     *
+     * @returns {number} The south edge of the bounding box.
      */
-    getSouth(): number { return this._sw.lat; }
+    getSouth(): number {
+        return this._sw.lat;
+    }
 
     /**
-    * Returns the east edge of the bounding box.
-    *
-    * @returns {number} The east edge of the bounding box.
+     * Returns the east edge of the bounding box.
+     *
+     * @returns {number} The east edge of the bounding box.
      */
-    getEast(): number { return this._ne.lng; }
+    getEast(): number {
+        return this._ne.lng;
+    }
 
     /**
-    * Returns the north edge of the bounding box.
-    *
-    * @returns {number} The north edge of the bounding box.
+     * Returns the north edge of the bounding box.
+     *
+     * @returns {number} The north edge of the bounding box.
      */
-    getNorth(): number { return this._ne.lat; }
+    getNorth(): number {
+        return this._ne.lat;
+    }
 
     /**
      * Returns the bounding box represented as an array.
@@ -210,26 +223,27 @@ class LngLatBounds {
     }
 
     /**
-    * Check if the point is within the bounding box.
-    *
-    * @param {LngLatLike} lnglat geographic point to check against.
-    * @returns {boolean} True if the point is within the bounding box.
-    * @example
-    * var llb = new maplibregl.LngLatBounds(
-    *   new maplibregl.LngLat(-73.9876, 40.7661),
-    *   new maplibregl.LngLat(-73.9397, 40.8002)
-    * );
-    *
-    * var ll = new maplibregl.LngLat(-73.9567, 40.7789);
-    *
-    * console.log(llb.contains(ll)); // = true
-    */
+     * Check if the point is within the bounding box.
+     *
+     * @param {LngLatLike} lnglat geographic point to check against.
+     * @returns {boolean} True if the point is within the bounding box.
+     * @example
+     * var llb = new maplibregl.LngLatBounds(
+     *   new maplibregl.LngLat(-73.9876, 40.7661),
+     *   new maplibregl.LngLat(-73.9397, 40.8002)
+     * );
+     *
+     * var ll = new maplibregl.LngLat(-73.9567, 40.7789);
+     *
+     * console.log(llb.contains(ll)); // = true
+     */
     contains(lnglat: LngLatLike) {
         const {lng, lat} = LngLat.convert(lnglat);
 
         const containsLatitude = this._sw.lat <= lat && lat <= this._ne.lat;
         let containsLongitude = this._sw.lng <= lng && lng <= this._ne.lng;
-        if (this._sw.lng > this._ne.lng) { // wrapped coordinates
+        if (this._sw.lng > this._ne.lng) {
+            // wrapped coordinates
             containsLongitude = this._sw.lng >= lng && lng >= this._ne.lng;
         }
 

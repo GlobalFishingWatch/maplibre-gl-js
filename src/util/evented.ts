@@ -31,7 +31,7 @@ export class Event {
 }
 
 interface ErrorLike {
-  message: string;
+    message: string;
 }
 
 export class ErrorEvent extends Event {
@@ -118,7 +118,8 @@ export class Evented {
                 listener.call(this, event);
             }
 
-            const oneTimeListeners = this._oneTimeListeners && this._oneTimeListeners[type] ? this._oneTimeListeners[type].slice() : [];
+            const oneTimeListeners =
+                this._oneTimeListeners && this._oneTimeListeners[type] ? this._oneTimeListeners[type].slice() : [];
             for (const listener of oneTimeListeners) {
                 _removeEventListener(type, listener, this._oneTimeListeners);
                 listener.call(this, event);
@@ -133,8 +134,8 @@ export class Evented {
                 parent.fire(event);
             }
 
-        // To ensure that no error events are dropped, print them to the
-        // console if they have no listeners.
+            // To ensure that no error events are dropped, print them to the
+            // console if they have no listeners.
         } else if (event instanceof ErrorEvent) {
             console.error(event.error);
         }

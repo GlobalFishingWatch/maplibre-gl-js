@@ -4,10 +4,7 @@ import DepthMode from '../gl/depth_mode';
 import StencilMode from '../gl/stencil_mode';
 import ColorMode from '../gl/color_mode';
 import CullFaceMode from '../gl/cull_face_mode';
-import {
-    heatmapUniformValues,
-    heatmapTextureUniformValues
-} from './program/heatmap_program';
+import {heatmapUniformValues, heatmapTextureUniformValues} from './program/heatmap_program';
 
 import type Painter from './painter';
 import type SourceCache from '../source/source_cache';
@@ -17,7 +14,12 @@ import type {OverscaledTileID} from '../source/tile_id';
 
 export default drawHeatmap;
 
-function drawHeatmap(painter: Painter, sourceCache: SourceCache, layer: HeatmapStyleLayer, coords: Array<OverscaledTileID>) {
+function drawHeatmap(
+    painter: Painter,
+    sourceCache: SourceCache,
+    layer: HeatmapStyleLayer,
+    coords: Array<OverscaledTileID>
+) {
     if (layer.paint.get('heatmap-opacity') === 0) {
         return;
     }
@@ -45,23 +47,32 @@ function drawHeatmap(painter: Painter, sourceCache: SourceCache, layer: HeatmapS
             if (sourceCache.hasRenderableParent(coord)) continue;
 
             const tile = sourceCache.getTile(coord);
-            const bucket: HeatmapBucket = (tile.getBucket(layer) as any);
+            const bucket: HeatmapBucket = tile.getBucket(layer) as any;
             if (!bucket) continue;
 
             const programConfiguration = bucket.programConfigurations.get(layer.id);
             const program = painter.useProgram('heatmap', programConfiguration);
             const {zoom} = painter.transform;
 
-            program.draw(context, gl.TRIANGLES, DepthMode.disabled, stencilMode, colorMode, CullFaceMode.disabled,
-                heatmapUniformValues(coord.posMatrix,
-                    tile, zoom, layer.paint.get('heatmap-intensity')),
-                layer.id, bucket.layoutVertexBuffer, bucket.indexBuffer,
-                bucket.segments, layer.paint, painter.transform.zoom,
-                programConfiguration);
+            program.draw(
+                context,
+                gl.TRIANGLES,
+                DepthMode.disabled,
+                stencilMode,
+                colorMode,
+                CullFaceMode.disabled,
+                heatmapUniformValues(coord.posMatrix, tile, zoom, layer.paint.get('heatmap-intensity')),
+                layer.id,
+                bucket.layoutVertexBuffer,
+                bucket.indexBuffer,
+                bucket.segments,
+                layer.paint,
+                painter.transform.zoom,
+                programConfiguration
+            );
         }
 
         context.viewport.set([0, 0, painter.width, painter.height]);
-
     } else if (painter.renderPass === 'translucent') {
         painter.context.setColorMode(painter.colorModeForRenderPass());
         renderTextureToMap(painter, layer);
@@ -88,7 +99,6 @@ function bindFramebuffer(context, painter, layer) {
         fbo = layer.heatmapFbo = context.createFramebuffer(painter.width / 4, painter.height / 4, false);
 
         bindTextureToFramebuffer(context, painter, texture, fbo);
-
     } else {
         gl.bindTexture(gl.TEXTURE_2D, fbo.colorAttachment.get());
         context.bindFramebuffer.set(fbo.framebuffer);
@@ -99,7 +109,9 @@ function bindTextureToFramebuffer(context, painter, texture, fbo) {
     const gl = context.gl;
     // Use the higher precision half-float texture where available (producing much smoother looking heatmaps);
     // Otherwise, fall back to a low precision texture
-    const internalFormat = context.extRenderToTextureHalfFloat ? context.extTextureHalfFloat.HALF_FLOAT_OES : gl.UNSIGNED_BYTE;
+    const internalFormat = context.extRenderToTextureHalfFloat
+        ? context.extTextureHalfFloat.HALF_FLOAT_OES
+        : gl.UNSIGNED_BYTE;
     gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, painter.width / 4, painter.height / 4, 0, gl.RGBA, internalFormat, null);
     fbo.colorAttachment.set(texture);
 }
@@ -123,9 +135,21 @@ function renderTextureToMap(painter, layer) {
     }
     colorRampTexture.bind(gl.LINEAR, gl.CLAMP_TO_EDGE);
 
-    painter.useProgram('heatmapTexture').draw(context, gl.TRIANGLES,
-        DepthMode.disabled, StencilMode.disabled, painter.colorModeForRenderPass(), CullFaceMode.disabled,
-        heatmapTextureUniformValues(painter, layer, 0, 1),
-        layer.id, painter.viewportBuffer, painter.quadTriangleIndexBuffer,
-        painter.viewportSegments, layer.paint, painter.transform.zoom);
+    painter
+        .useProgram('heatmapTexture')
+        .draw(
+            context,
+            gl.TRIANGLES,
+            DepthMode.disabled,
+            StencilMode.disabled,
+            painter.colorModeForRenderPass(),
+            CullFaceMode.disabled,
+            heatmapTextureUniformValues(painter, layer, 0, 1),
+            layer.id,
+            painter.viewportBuffer,
+            painter.quadTriangleIndexBuffer,
+            painter.viewportSegments,
+            layer.paint,
+            painter.transform.zoom
+        );
 }

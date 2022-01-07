@@ -1,4 +1,3 @@
-
 import reference from './reference/latest';
 import stringifyPretty from 'json-stringify-pretty-compact';
 
@@ -42,7 +41,7 @@ function format(style, space = 2) {
     style = sortKeysBy(style, reference.$root);
 
     if (style.layers) {
-        style.layers = style.layers.map((layer) => sortKeysBy(layer, reference.layer));
+        style.layers = style.layers.map(layer => sortKeysBy(layer, reference.layer));
     }
 
     return stringifyPretty(style, {indent: space});

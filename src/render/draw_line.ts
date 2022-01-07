@@ -17,7 +17,12 @@ import {clamp, nextPowerOfTwo} from '../util/util';
 import {renderColorRamp} from '../util/color_ramp';
 import EXTENT from '../data/extent';
 
-export default function drawLine(painter: Painter, sourceCache: SourceCache, layer: LineStyleLayer, coords: Array<OverscaledTileID>) {
+export default function drawLine(
+    painter: Painter,
+    sourceCache: SourceCache,
+    layer: LineStyleLayer,
+    coords: Array<OverscaledTileID>
+) {
     if (painter.renderPass !== 'translucent') return;
 
     const opacity = layer.paint.get('line-opacity');
@@ -34,10 +39,7 @@ export default function drawLine(painter: Painter, sourceCache: SourceCache, lay
     const gradient = layer.paint.get('line-gradient');
     const crossfade = layer.getCrossfadeParameters();
 
-    const programId =
-        image ? 'linePattern' :
-        dasharray ? 'lineSDF' :
-        gradient ? 'lineGradient' : 'line';
+    const programId = image ? 'linePattern' : dasharray ? 'lineSDF' : gradient ? 'lineGradient' : 'line';
 
     const context = painter.context;
     const gl = context.gl;
@@ -49,7 +51,7 @@ export default function drawLine(painter: Painter, sourceCache: SourceCache, lay
 
         if (image && !tile.patternsLoaded()) continue;
 
-        const bucket: LineBucket = (tile.getBucket(layer) as any);
+        const bucket: LineBucket = tile.getBucket(layer) as any;
         if (!bucket) continue;
 
         const programConfiguration = bucket.programConfigurations.get(layer.id);
@@ -65,10 +67,13 @@ export default function drawLine(painter: Painter, sourceCache: SourceCache, lay
             if (posTo && posFrom) programConfiguration.setConstantPatternPositions(posTo, posFrom);
         }
 
-        const uniformValues = image ? linePatternUniformValues(painter, tile, layer, crossfade) :
-            dasharray ? lineSDFUniformValues(painter, tile, layer, dasharray, crossfade) :
-            gradient ? lineGradientUniformValues(painter, tile, layer, bucket.lineClipsArray.length) :
-            lineUniformValues(painter, tile, layer);
+        const uniformValues = image
+            ? linePatternUniformValues(painter, tile, layer, crossfade)
+            : dasharray
+            ? lineSDFUniformValues(painter, tile, layer, dasharray, crossfade)
+            : gradient
+            ? lineGradientUniformValues(painter, tile, layer, bucket.lineClipsArray.length)
+            : lineUniformValues(painter, tile, layer);
 
         if (image) {
             context.activeTexture.set(gl.TEXTURE0);
@@ -84,8 +89,10 @@ export default function drawLine(painter: Painter, sourceCache: SourceCache, lay
                 let textureResolution = 256;
                 if (layer.stepInterpolant) {
                     const sourceMaxZoom = sourceCache.getSource().maxzoom;
-                    const potentialOverzoom = coord.canonical.z === sourceMaxZoom ?
-                        Math.ceil(1 << (painter.transform.maxZoom - coord.canonical.z)) : 1;
+                    const potentialOverzoom =
+                        coord.canonical.z === sourceMaxZoom
+                            ? Math.ceil(1 << (painter.transform.maxZoom - coord.canonical.z))
+                            : 1;
                     const lineLength = bucket.maxLineLength / EXTENT;
                     // Logical pixel tile size is 512px, and 1024px right before current zoom + 1
                     const maxTilePixelSize = 1024;
@@ -112,10 +119,23 @@ export default function drawLine(painter: Painter, sourceCache: SourceCache, lay
             gradientTexture.bind(layer.stepInterpolant ? gl.NEAREST : gl.LINEAR, gl.CLAMP_TO_EDGE);
         }
 
-        program.draw(context, gl.TRIANGLES, depthMode,
-            painter.stencilModeForClipping(coord), colorMode, CullFaceMode.disabled, uniformValues,
-            layer.id, bucket.layoutVertexBuffer, bucket.indexBuffer, bucket.segments,
-            layer.paint, painter.transform.zoom, programConfiguration, bucket.layoutVertexBuffer2);
+        program.draw(
+            context,
+            gl.TRIANGLES,
+            depthMode,
+            painter.stencilModeForClipping(coord),
+            colorMode,
+            CullFaceMode.disabled,
+            uniformValues,
+            layer.id,
+            bucket.layoutVertexBuffer,
+            bucket.indexBuffer,
+            bucket.segments,
+            layer.paint,
+            painter.transform.zoom,
+            programConfiguration,
+            bucket.layoutVertexBuffer2
+        );
 
         firstTile = false;
         // once refactored so that bound texture state is managed, we'll also be able to remove this firstTile/programChanged logic

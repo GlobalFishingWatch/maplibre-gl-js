@@ -7,14 +7,22 @@ import {stub as sinonStub} from 'sinon';
 import type Dispatcher from '../util/dispatcher';
 
 function createSource(options?) {
-    const c = options && options.canvas || window.document.createElement('canvas');
+    const c = (options && options.canvas) || window.document.createElement('canvas');
     c.width = 20;
     c.height = 20;
 
-    options = extend({
-        canvas: 'id',
-        coordinates: [[0, 0], [1, 0], [1, 1], [0, 1]],
-    }, options);
+    options = extend(
+        {
+            canvas: 'id',
+            coordinates: [
+                [0, 0],
+                [1, 0],
+                [1, 1],
+                [0, 1]
+            ]
+        },
+        options
+    );
 
     const source = new CanvasSource('id', options, {} as Dispatcher, options.eventedParent);
 
@@ -51,7 +59,7 @@ describe('CanvasSource', () => {
         expect(source.maxzoom).toBe(22);
         expect(source.tileSize).toBe(512);
         expect(source.animate).toBe(true);
-        source.on('data', (e) => {
+        source.on('data', e => {
             if (e.dataType === 'source' && e.sourceDataType === 'metadata') {
                 expect(typeof source.play).toBe('function');
                 done();
@@ -83,7 +91,6 @@ describe('CanvasSource', () => {
         createSource({canvas: canvasEl});
         expect(stub.called).toBeFalsy();
         stub.resetHistory();
-
     });
 
     test('can be initialized with HTML element', done => {
@@ -92,7 +99,7 @@ describe('CanvasSource', () => {
             canvas: el
         });
 
-        source.on('data', (e) => {
+        source.on('data', e => {
             if (e.dataType === 'source' && e.sourceDataType === 'metadata') {
                 expect(source.canvas).toBe(el);
                 done();
@@ -124,7 +131,7 @@ describe('CanvasSource', () => {
             expect(true).toBeFalsy();
         });
 
-        source.on('data', (e) => {
+        source.on('data', e => {
             if (e.sourceDataType === 'metadata' && e.dataType === 'source') {
                 expect(true).toBeTruthy();
                 done();
@@ -148,7 +155,6 @@ describe('CanvasSource', () => {
         source.onAdd(map);
 
         expect(source.hasTransition()).toBe(true);
-
     });
 
     test('play and pause animation', () => {
@@ -165,9 +171,7 @@ describe('CanvasSource', () => {
         source.play();
 
         expect(source.hasTransition()).toBe(true);
-
     });
-
 });
 
 describe('CanvasSource#serialize', () => {
@@ -175,6 +179,10 @@ describe('CanvasSource#serialize', () => {
 
     const serialized = source.serialize();
     expect(serialized.type).toBe('canvas');
-    expect(serialized.coordinates).toEqual([[0, 0], [1, 0], [1, 1], [0, 1]]);
-
+    expect(serialized.coordinates).toEqual([
+        [0, 0],
+        [1, 0],
+        [1, 1],
+        [0, 1]
+    ]);
 });

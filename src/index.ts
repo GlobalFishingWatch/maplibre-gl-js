@@ -170,7 +170,10 @@ const exported = {
      *      return { cancel: () => { } };
      * });
      */
-    addProtocol(customProtocol: string, loadFn: (requestParameters: RequestParameters, callback: ResponseCallback<any>) => Cancelable) {
+    addProtocol(
+        customProtocol: string,
+        loadFn: (requestParameters: RequestParameters, callback: ResponseCallback<any>) => Cancelable
+    ) {
         config.REGISTERED_PROTOCOLS[customProtocol] = loadFn;
     },
 
@@ -227,14 +230,14 @@ Debug.extend(exported, {isSafari, getPerformanceMetrics: PerformanceUtils.getPer
  */
 
 /**
-  * Gets the map's [RTL text plugin](https://www.mapbox.com/mapbox-gl-js/plugins/#mapbox-gl-rtl-text) status.
-  * The status can be `unavailable` (i.e. not requested or removed), `loading`, `loaded` or `error`.
-  * If the status is `loaded` and the plugin is requested again, an error will be thrown.
-  *
-  * @function getRTLTextPluginStatus
-  * @example
-  * const pluginStatus = maplibregl.getRTLTextPluginStatus();
-  */
+ * Gets the map's [RTL text plugin](https://www.mapbox.com/mapbox-gl-js/plugins/#mapbox-gl-rtl-text) status.
+ * The status can be `unavailable` (i.e. not requested or removed), `loading`, `loaded` or `error`.
+ * If the status is `loaded` and the plugin is requested again, an error will be thrown.
+ *
+ * @function getRTLTextPluginStatus
+ * @example
+ * const pluginStatus = maplibregl.getRTLTextPluginStatus();
+ */
 
 export default exported;
 // canary assert: used to confirm that asserts have been removed from production build

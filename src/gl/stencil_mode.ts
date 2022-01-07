@@ -1,7 +1,7 @@
 import type {StencilOpConstant, StencilTestGL} from './types';
 
 const ALWAYS = 0x0207;
-const KEEP = 0x1E00;
+const KEEP = 0x1e00;
 
 class StencilMode {
     test: StencilTestGL;
@@ -11,8 +11,14 @@ class StencilMode {
     depthFail: StencilOpConstant;
     pass: StencilOpConstant;
 
-    constructor(test: StencilTestGL, ref: number, mask: number, fail: StencilOpConstant,
-        depthFail: StencilOpConstant, pass: StencilOpConstant) {
+    constructor(
+        test: StencilTestGL,
+        ref: number,
+        mask: number,
+        fail: StencilOpConstant,
+        depthFail: StencilOpConstant,
+        pass: StencilOpConstant
+    ) {
         this.test = test;
         this.ref = ref;
         this.mask = mask;

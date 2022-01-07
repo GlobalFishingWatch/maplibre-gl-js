@@ -1,4 +1,25 @@
-import {easeCubicInOut, keysDifference, extend, pick, uniqueId, bindAll, asyncAll, clamp, wrap, bezier, mapObject, filterObject, deepEqual, clone, arraysIntersect, isCounterClockwise, isClosedPolygon, parseCacheControl, nextPowerOfTwo, isPowerOfTwo} from './util';
+import {
+    easeCubicInOut,
+    keysDifference,
+    extend,
+    pick,
+    uniqueId,
+    bindAll,
+    asyncAll,
+    clamp,
+    wrap,
+    bezier,
+    mapObject,
+    filterObject,
+    deepEqual,
+    clone,
+    arraysIntersect,
+    isCounterClockwise,
+    isClosedPolygon,
+    parseCacheControl,
+    nextPowerOfTwo,
+    isPowerOfTwo
+} from './util';
 import Point from './point';
 
 describe('util', () => {
@@ -6,11 +27,11 @@ describe('util', () => {
     expect(easeCubicInOut(0.2)).toBe(0.03200000000000001);
     expect(easeCubicInOut(0.5)).toBe(0.5);
     expect(easeCubicInOut(1)).toBe(1);
-    expect(keysDifference({a:1}, {})).toEqual(['a']);
-    expect(keysDifference({a:1}, {a:1})).toEqual([]);
-    expect(extend({a:1}, {b:2})).toEqual({a:1, b:2});
-    expect(pick({a:1, b:2, c:3}, ['a', 'c'])).toEqual({a:1, c:3});
-    expect(pick({a:1, b:2, c:3}, ['a', 'c', 'd'])).toEqual({a:1, c:3});
+    expect(keysDifference({a: 1}, {})).toEqual(['a']);
+    expect(keysDifference({a: 1}, {a: 1})).toEqual([]);
+    expect(extend({a: 1}, {b: 2})).toEqual({a: 1, b: 2});
+    expect(pick({a: 1, b: 2, c: 3}, ['a', 'c'])).toEqual({a: 1, c: 3});
+    expect(pick({a: 1, b: 2, c: 3}, ['a', 'c', 'd'])).toEqual({a: 1, c: 3});
     expect(typeof uniqueId() === 'number').toBeTruthy();
 
     test('bindAll', done => {
@@ -18,7 +39,7 @@ describe('util', () => {
             bindAll(['ontimer'], this);
             this.name = 'Tom';
         }
-        MyClass.prototype.ontimer = function() {
+        MyClass.prototype.ontimer = function () {
             expect(this.name).toBe('Tom');
             done();
         };
@@ -27,46 +48,70 @@ describe('util', () => {
     });
 
     test('asyncAll - sync', done => {
-        expect(asyncAll([0, 1, 2], (data, callback) => {
-            callback(null, data);
-        }, (err, results) => {
-            expect(err).toBeFalsy();
-            expect(results).toEqual([0, 1, 2]);
-        })).toBeUndefined();
+        expect(
+            asyncAll(
+                [0, 1, 2],
+                (data, callback) => {
+                    callback(null, data);
+                },
+                (err, results) => {
+                    expect(err).toBeFalsy();
+                    expect(results).toEqual([0, 1, 2]);
+                }
+            )
+        ).toBeUndefined();
         done();
     });
 
     test('asyncAll - async', done => {
-        expect(asyncAll([4, 0, 1, 2], (data, callback) => {
-            setTimeout(() => {
-                callback(null, data);
-            }, data);
-        }, (err, results) => {
-            expect(err).toBeFalsy();
-            expect(results).toEqual([4, 0, 1, 2]);
-            done();
-        })).toBeUndefined();
+        expect(
+            asyncAll(
+                [4, 0, 1, 2],
+                (data, callback) => {
+                    setTimeout(() => {
+                        callback(null, data);
+                    }, data);
+                },
+                (err, results) => {
+                    expect(err).toBeFalsy();
+                    expect(results).toEqual([4, 0, 1, 2]);
+                    done();
+                }
+            )
+        ).toBeUndefined();
     });
 
     test('asyncAll - error', done => {
-        expect(asyncAll([4, 0, 1, 2], (data, callback) => {
-            setTimeout(() => {
-                callback(new Error('hi'), data);
-            }, data);
-        }, (err, results) => {
-            expect(err && err.message).toBe('hi');
-            expect(results).toEqual([4, 0, 1, 2]);
-            done();
-        })).toBeUndefined();
+        expect(
+            asyncAll(
+                [4, 0, 1, 2],
+                (data, callback) => {
+                    setTimeout(() => {
+                        callback(new Error('hi'), data);
+                    }, data);
+                },
+                (err, results) => {
+                    expect(err && err.message).toBe('hi');
+                    expect(results).toEqual([4, 0, 1, 2]);
+                    done();
+                }
+            )
+        ).toBeUndefined();
     });
 
     test('asyncAll - empty', done => {
-        expect(asyncAll([], (data, callback) => {
-            callback(null, 'foo');
-        }, (err, results) => {
-            expect(err).toBeFalsy();
-            expect(results).toEqual([]);
-        })).toBeUndefined();
+        expect(
+            asyncAll(
+                [],
+                (data, callback) => {
+                    callback(null, 'foo');
+                },
+                (err, results) => {
+                    expect(err).toBeFalsy();
+                    expect(results).toEqual([]);
+                }
+            )
+        ).toBeUndefined();
         done();
     });
 
@@ -130,45 +175,75 @@ describe('util', () => {
 
     test('asyncAll', done => {
         let expectedValue = 1;
-        asyncAll([], (callback) => { callback(); }, () => {
-            expect('immediate callback').toBeTruthy();
-        });
-        asyncAll([1, 2, 3], (number, callback) => {
-            expect(number).toBe(expectedValue++);
-            expect(callback instanceof Function).toBeTruthy();
-            callback(null, 0);
-        }, () => {
-            done();
-        });
+        asyncAll(
+            [],
+            callback => {
+                callback();
+            },
+            () => {
+                expect('immediate callback').toBeTruthy();
+            }
+        );
+        asyncAll(
+            [1, 2, 3],
+            (number, callback) => {
+                expect(number).toBe(expectedValue++);
+                expect(callback instanceof Function).toBeTruthy();
+                callback(null, 0);
+            },
+            () => {
+                done();
+            }
+        );
     });
 
     test('mapObject', () => {
         expect.assertions(6);
-        expect(mapObject({}, () => { expect(false).toBeTruthy(); })).toEqual({});
+        expect(
+            mapObject({}, () => {
+                expect(false).toBeTruthy();
+            })
+        ).toEqual({});
         const that = {};
-        expect(mapObject({map: 'box'}, function(value, key, object) {
-            expect(value).toBe('box');
-            expect(key).toBe('map');
-            expect(object).toEqual({map: 'box'});
-            expect(this).toBe(that);
-            return 'BOX';
-        }, that)).toEqual({map: 'BOX'});
+        expect(
+            mapObject(
+                {map: 'box'},
+                function (value, key, object) {
+                    expect(value).toBe('box');
+                    expect(key).toBe('map');
+                    expect(object).toEqual({map: 'box'});
+                    expect(this).toBe(that);
+                    return 'BOX';
+                },
+                that
+            )
+        ).toEqual({map: 'BOX'});
     });
 
     test('filterObject', done => {
         expect.assertions(6);
-        expect(filterObject({}, () => { expect(false).toBeTruthy(); })).toEqual({});
+        expect(
+            filterObject({}, () => {
+                expect(false).toBeTruthy();
+            })
+        ).toEqual({});
         const that = {};
-        filterObject({map: 'box'}, function(value, key, object) {
-            expect(value).toBe('box');
-            expect(key).toBe('map');
-            expect(object).toEqual({map: 'box'});
-            expect(this).toBe(that);
-            return true;
-        }, that);
-        expect(filterObject({map: 'box', box: 'map'}, (value) => {
-            return value === 'box';
-        })).toEqual({map: 'box'});
+        filterObject(
+            {map: 'box'},
+            function (value, key, object) {
+                expect(value).toBe('box');
+                expect(key).toBe('map');
+                expect(object).toEqual({map: 'box'});
+                expect(this).toBe(that);
+                return true;
+            },
+            that
+        );
+        expect(
+            filterObject({map: 'box', box: 'map'}, value => {
+                return value === 'box';
+            })
+        ).toEqual({map: 'box'});
         done();
     });
 
@@ -244,7 +319,6 @@ describe('util arraysIntersect', () => {
         expect(arraysIntersect(a, b)).toBe(false);
         done();
     });
-
 });
 
 describe('util isCounterClockwise', () => {
@@ -288,7 +362,6 @@ describe('util isClosedPolygon', () => {
         expect(isClosedPolygon(polygon)).toBe(true);
         done();
     });
-
 });
 
 describe('util parseCacheControl', () => {
@@ -305,5 +378,4 @@ describe('util parseCacheControl', () => {
 
         done();
     });
-
 });

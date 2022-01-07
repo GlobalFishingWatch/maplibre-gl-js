@@ -13,7 +13,7 @@ function createSource(options, transformCallback?) {
         _requestManager: new RequestManager(transformCallback)
     } as any);
 
-    source.on('error', (e) => {
+    source.on('error', e => {
         throw e.error;
     });
 
@@ -32,14 +32,17 @@ describe('RasterTileSource', () => {
     });
 
     test('transforms request for TileJSON URL', () => {
-        server.respondWith('/source.json', JSON.stringify({
-            minzoom: 0,
-            maxzoom: 22,
-            attribution: 'MapLibre',
-            tiles: ['http://example.com/{z}/{x}/{y}.png'],
-            bounds: [-47, -7, -45, -5]
-        }));
-        const transformSpy = jest.fn().mockImplementation((url) => {
+        server.respondWith(
+            '/source.json',
+            JSON.stringify({
+                minzoom: 0,
+                maxzoom: 22,
+                attribution: 'MapLibre',
+                tiles: ['http://example.com/{z}/{x}/{y}.png'],
+                bounds: [-47, -7, -45, -5]
+            })
+        );
+        const transformSpy = jest.fn().mockImplementation(url => {
             return {url};
         });
 
@@ -58,7 +61,7 @@ describe('RasterTileSource', () => {
             tiles: ['http://example.com/{z}/{x}/{y}.png'],
             bounds: [-47, -7, -45, -5]
         });
-        source.on('data', (e) => {
+        source.on('data', e => {
             if (e.sourceDataType === 'metadata') {
                 expect(source.hasTile(new OverscaledTileID(8, 0, 8, 96, 132))).toBeFalsy();
                 expect(source.hasTile(new OverscaledTileID(8, 0, 8, 95, 132))).toBeTruthy();
@@ -76,25 +79,28 @@ describe('RasterTileSource', () => {
             bounds: [-47, -7, -45, 91]
         });
 
-        source.on('data', (e) => {
+        source.on('data', e => {
             if (e.sourceDataType === 'metadata') {
-                expect(source.tileBounds.bounds).toEqual({_sw:{lng: -47, lat: -7}, _ne:{lng: -45, lat: 90}});
+                expect(source.tileBounds.bounds).toEqual({_sw: {lng: -47, lat: -7}, _ne: {lng: -45, lat: 90}});
                 done();
             }
         });
     });
 
     test('respects TileJSON.bounds when loaded from TileJSON', done => {
-        server.respondWith('/source.json', JSON.stringify({
-            minzoom: 0,
-            maxzoom: 22,
-            attribution: 'MapLibre',
-            tiles: ['http://example.com/{z}/{x}/{y}.png'],
-            bounds: [-47, -7, -45, -5]
-        }));
+        server.respondWith(
+            '/source.json',
+            JSON.stringify({
+                minzoom: 0,
+                maxzoom: 22,
+                attribution: 'MapLibre',
+                tiles: ['http://example.com/{z}/{x}/{y}.png'],
+                bounds: [-47, -7, -45, -5]
+            })
+        );
         const source = createSource({url: '/source.json'});
 
-        source.on('data', (e) => {
+        source.on('data', e => {
             if (e.sourceDataType === 'metadata') {
                 expect(source.hasTile(new OverscaledTileID(8, 0, 8, 96, 132))).toBeFalsy();
                 expect(source.hasTile(new OverscaledTileID(8, 0, 8, 95, 132))).toBeTruthy();
@@ -105,21 +111,24 @@ describe('RasterTileSource', () => {
     });
 
     test('transforms tile urls before requesting', done => {
-        server.respondWith('/source.json', JSON.stringify({
-            minzoom: 0,
-            maxzoom: 22,
-            attribution: 'MapLibre',
-            tiles: ['http://example.com/{z}/{x}/{y}.png'],
-            bounds: [-47, -7, -45, -5]
-        }));
+        server.respondWith(
+            '/source.json',
+            JSON.stringify({
+                minzoom: 0,
+                maxzoom: 22,
+                attribution: 'MapLibre',
+                tiles: ['http://example.com/{z}/{x}/{y}.png'],
+                bounds: [-47, -7, -45, -5]
+            })
+        );
         const source = createSource({url: '/source.json'});
         const transformSpy = jest.spyOn(source.map._requestManager, 'transformRequest');
-        source.on('data', (e) => {
+        source.on('data', e => {
             if (e.sourceDataType === 'metadata') {
                 const tile = {
                     tileID: new OverscaledTileID(10, 0, 10, 5, 5),
                     state: 'loading',
-                    loadVectorData () {},
+                    loadVectorData() {},
                     setExpiryData() {}
                 } as any as Tile;
                 source.loadTile(tile, () => {});
@@ -137,5 +146,4 @@ describe('RasterTileSource', () => {
         source.onRemove();
         expect((server.requests.pop() as any).aborted).toBe(true);
     });
-
 });

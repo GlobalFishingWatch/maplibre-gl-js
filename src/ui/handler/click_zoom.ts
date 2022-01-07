@@ -2,7 +2,6 @@ import type Point from '../../util/point';
 import type Map from '../map';
 
 export default class ClickZoomHandler {
-
     _enabled: boolean;
     _active: boolean;
 
@@ -18,11 +17,14 @@ export default class ClickZoomHandler {
         e.preventDefault();
         return {
             cameraAnimation: (map: Map) => {
-                map.easeTo({
-                    duration: 300,
-                    zoom: map.getZoom() + (e.shiftKey ? -1 : 1),
-                    around: map.unproject(point)
-                }, {originalEvent: e});
+                map.easeTo(
+                    {
+                        duration: 300,
+                        zoom: map.getZoom() + (e.shiftKey ? -1 : 1),
+                        around: map.unproject(point)
+                    },
+                    {originalEvent: e}
+                );
             }
         };
     }

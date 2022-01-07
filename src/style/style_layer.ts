@@ -1,14 +1,16 @@
 import {filterObject} from '../util/util';
 
 import styleSpec from '../style-spec/reference/latest';
-import {
-    validateStyle,
-    validateLayoutProperty,
-    validatePaintProperty,
-    emitValidationErrors
-} from './validate_style';
+import {validateStyle, validateLayoutProperty, validatePaintProperty, emitValidationErrors} from './validate_style';
 import {Evented} from '../util/evented';
-import {Layout, Transitionable, Transitioning, Properties, PossiblyEvaluated, PossiblyEvaluatedPropertyValue} from './properties';
+import {
+    Layout,
+    Transitionable,
+    Transitioning,
+    Properties,
+    PossiblyEvaluated,
+    PossiblyEvaluatedPropertyValue
+} from './properties';
 import {supportsPropertyExpression} from '../style-spec/util/properties';
 
 import type {FeatureState} from '../style-spec/expression';
@@ -20,10 +22,7 @@ import EvaluationParameters from './evaluation_parameters';
 import type {CrossfadeParameters} from './evaluation_parameters';
 
 import type Transform from '../geo/transform';
-import type {
-    LayerSpecification,
-    FilterSpecification
-} from '../style-spec/types';
+import type {LayerSpecification, FilterSpecification} from '../style-spec/types';
 import type {CustomLayerInterface} from './style_layer/custom_style_layer';
 import type Map from '../ui/map';
 import type {StyleSetterOptions} from './style';
@@ -36,14 +35,14 @@ const TRANSITION_SUFFIX = '-transition';
 interface StyleLayer {
     queryRadius?(bucket: Bucket): number;
     queryIntersectsFeature?(
-      queryGeometry: Array<Point>,
-      feature: VectorTileFeature,
-      featureState: FeatureState,
-      geometry: Array<Array<Point>>,
-      zoom: number,
-      transform: Transform,
-      pixelsToTileUnits: number,
-      pixelPosMatrix: mat4
+        queryGeometry: Array<Point>,
+        feature: VectorTileFeature,
+        featureState: FeatureState,
+        geometry: Array<Array<Point>>,
+        zoom: number,
+        transform: Transform,
+        pixelsToTileUnits: number,
+        pixelPosMatrix: mat4
     ): boolean | number;
 }
 
@@ -68,13 +67,16 @@ abstract class StyleLayer extends Evented {
 
     _featureFilter: FeatureFilter;
 
-    readonly onAdd: ((map: Map) => void);
-    readonly onRemove: ((map: Map) => void);
+    readonly onAdd: (map: Map) => void;
+    readonly onRemove: (map: Map) => void;
 
-    constructor(layer: LayerSpecification | CustomLayerInterface, properties: Readonly<{
-      layout?: Properties<any>;
-      paint?: Properties<any>;
-    }>) {
+    constructor(
+        layer: LayerSpecification | CustomLayerInterface,
+        properties: Readonly<{
+            layout?: Properties<any>;
+            paint?: Properties<any>;
+        }>
+    ) {
         super();
 
         this.id = layer.id;
@@ -83,7 +85,7 @@ abstract class StyleLayer extends Evented {
 
         if (layer.type === 'custom') return;
 
-        layer = (layer as any as LayerSpecification);
+        layer = layer as any as LayerSpecification;
 
         this.metadata = layer.metadata;
         this.minzoom = layer.minzoom;
@@ -160,11 +162,15 @@ abstract class StyleLayer extends Evented {
         }
 
         if (name.endsWith(TRANSITION_SUFFIX)) {
-            this._transitionablePaint.setTransition(name.slice(0, -TRANSITION_SUFFIX.length), (value as any) || undefined);
+            this._transitionablePaint.setTransition(
+                name.slice(0, -TRANSITION_SUFFIX.length),
+                (value as any) || undefined
+            );
             return false;
         } else {
             const transitionable = this._transitionablePaint._values[name];
-            const isCrossFadedProperty = transitionable.property.specification['property-type'] === 'cross-faded-data-driven';
+            const isCrossFadedProperty =
+                transitionable.property.specification['property-type'] === 'cross-faded-data-driven';
             const wasDataDriven = transitionable.value.isDataDriven();
             const oldValue = transitionable.value;
 
@@ -177,7 +183,12 @@ abstract class StyleLayer extends Evented {
             // if a cross-faded value is changed, we need to make sure the new icons get added to each tile's iconAtlas
             // so a call to _updateLayer is necessary, and we return true from this function so it gets called in
             // Style#setPaintProperty
-            return isDataDriven || wasDataDriven || isCrossFadedProperty || this._handleOverridablePaintPropertyUpdate(name, oldValue, newValue);
+            return (
+                isDataDriven ||
+                wasDataDriven ||
+                isCrossFadedProperty ||
+                this._handleOverridablePaintPropertyUpdate(name, oldValue, newValue)
+            );
         }
     }
 
@@ -186,7 +197,11 @@ abstract class StyleLayer extends Evented {
     }
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    _handleOverridablePaintPropertyUpdate<T, R>(name: string, oldValue: PropertyValue<T, R>, newValue: PropertyValue<T, R>): boolean {
+    _handleOverridablePaintPropertyUpdate<T, R>(
+        name: string,
+        oldValue: PropertyValue<T, R>,
+        newValue: PropertyValue<T, R>
+    ): boolean {
         // No-op; can be overridden by derived classes.
         return false;
     }
@@ -219,16 +234,16 @@ abstract class StyleLayer extends Evented {
 
     serialize(): LayerSpecification {
         const output: LayerSpecification = {
-            'id': this.id,
-            'type': this.type as LayerSpecification['type'],
-            'source': this.source,
+            id: this.id,
+            type: this.type as LayerSpecification['type'],
+            source: this.source,
             'source-layer': this.sourceLayer,
-            'metadata': this.metadata,
-            'minzoom': this.minzoom,
-            'maxzoom': this.maxzoom,
-            'filter': this.filter as FilterSpecification,
-            'layout': this._unevaluatedLayout && this._unevaluatedLayout.serialize(),
-            'paint': this._transitionablePaint && this._transitionablePaint.serialize()
+            metadata: this.metadata,
+            minzoom: this.minzoom,
+            maxzoom: this.maxzoom,
+            filter: this.filter as FilterSpecification,
+            layout: this._unevaluatedLayout && this._unevaluatedLayout.serialize(),
+            paint: this._transitionablePaint && this._transitionablePaint.serialize()
         };
 
         if (this.visibility) {
@@ -237,9 +252,11 @@ abstract class StyleLayer extends Evented {
         }
 
         return filterObject(output, (value, key) => {
-            return value !== undefined &&
+            return (
+                value !== undefined &&
                 !(key === 'layout' && !Object.keys(value).length) &&
-                !(key === 'paint' && !Object.keys(value).length);
+                !(key === 'paint' && !Object.keys(value).length)
+            );
         });
     }
 
@@ -247,15 +264,18 @@ abstract class StyleLayer extends Evented {
         if (options && options.validate === false) {
             return false;
         }
-        return emitValidationErrors(this, validate.call(validateStyle, {
-            key,
-            layerType: this.type,
-            objectKey: name,
-            value,
-            styleSpec,
-            // Workaround for https://github.com/mapbox/mapbox-gl-js/issues/2407
-            style: {glyphs: true, sprite: true}
-        }));
+        return emitValidationErrors(
+            this,
+            validate.call(validateStyle, {
+                key,
+                layerType: this.type,
+                objectKey: name,
+                value,
+                styleSpec,
+                // Workaround for https://github.com/mapbox/mapbox-gl-js/issues/2407
+                style: {glyphs: true, sprite: true}
+            })
+        );
     }
 
     is3D() {
@@ -277,12 +297,14 @@ abstract class StyleLayer extends Evented {
     isStateDependent() {
         for (const property in (this as any).paint._values) {
             const value = (this as any).paint.get(property);
-            if (!(value instanceof PossiblyEvaluatedPropertyValue) || !supportsPropertyExpression(value.property.specification)) {
+            if (
+                !(value instanceof PossiblyEvaluatedPropertyValue) ||
+                !supportsPropertyExpression(value.property.specification)
+            ) {
                 continue;
             }
 
-            if ((value.value.kind === 'source' || value.value.kind === 'composite') &&
-                value.value.isStateDependent) {
+            if ((value.value.kind === 'source' || value.value.kind === 'composite') && value.value.isStateDependent) {
                 return true;
             }
         }

@@ -1,8 +1,6 @@
 import type {Cancelable} from '../types/cancelable';
 
-const now = performance && performance.now ?
-    performance.now.bind(performance) :
-    Date.now.bind(Date);
+const now = performance && performance.now ? performance.now.bind(performance) : Date.now.bind(Date);
 
 let linkEl;
 
@@ -32,7 +30,12 @@ const exported = {
         canvas.width = img.width as number;
         canvas.height = img.height as number;
         context.drawImage(img, 0, 0, img.width as number, img.height as number);
-        return context.getImageData(-padding, -padding, img.width as number + 2 * padding, img.height as number + 2 * padding);
+        return context.getImageData(
+            -padding,
+            -padding,
+            (img.width as number) + 2 * padding,
+            (img.height as number) + 2 * padding
+        );
     },
 
     resolveURL(path: string) {
@@ -41,7 +44,7 @@ const exported = {
         return linkEl.href;
     },
 
-    hardwareConcurrency: typeof navigator !== 'undefined' && navigator.hardwareConcurrency || 4,
+    hardwareConcurrency: (typeof navigator !== 'undefined' && navigator.hardwareConcurrency) || 4,
 
     get prefersReducedMotion(): boolean {
         if (!matchMedia) return false;
@@ -50,7 +53,7 @@ const exported = {
             reducedMotionQuery = matchMedia('(prefers-reduced-motion: reduce)');
         }
         return reducedMotionQuery.matches;
-    },
+    }
 };
 
 export default exported;

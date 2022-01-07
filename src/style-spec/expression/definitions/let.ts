@@ -1,7 +1,7 @@
 import type {Type} from '../types';
 import type {Expression} from '../expression';
 import type ParsingContext from '../parsing_context';
-import type EvaluationContext  from '../evaluation_context';
+import type EvaluationContext from '../evaluation_context';
 
 class Let implements Expression {
     type: Type;
@@ -38,7 +38,7 @@ class Let implements Expression {
             }
 
             if (/[^a-zA-Z0-9_]/.test(name)) {
-                return context.error('Variable names must contain only alphanumeric characters or \'_\'.', i) as null;
+                return context.error("Variable names must contain only alphanumeric characters or '_'.", i) as null;
             }
 
             const value = context.parse(args[i + 1], i + 1);

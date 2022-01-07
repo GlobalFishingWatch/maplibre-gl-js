@@ -2,17 +2,13 @@ import Point from '../util/point';
 import PathInterpolator from './path_interpolator';
 
 describe('PathInterpolator', () => {
-
     const pointEquals = (p0, p1) => {
         const e = 0.000001;
         return Math.abs(p0.x - p1.x) < e && Math.abs(p0.y - p1.y) < e;
     };
 
     test('Interpolate single segment path', () => {
-        const line = [
-            new Point(0, 0),
-            new Point(10, 0)
-        ];
+        const line = [new Point(0, 0), new Point(10, 0)];
 
         const interpolator = new PathInterpolator(line);
 
@@ -22,20 +18,14 @@ describe('PathInterpolator', () => {
     });
 
     test('t < 0', () => {
-        const line = [
-            new Point(0, 0),
-            new Point(10, 0)
-        ];
+        const line = [new Point(0, 0), new Point(10, 0)];
 
         const interpolator = new PathInterpolator(line);
         expect(interpolator.lerp(-100.0)).toEqual(line[0]);
     });
 
     test('t > 0', () => {
-        const line = [
-            new Point(0, 0),
-            new Point(10, 0)
-        ];
+        const line = [new Point(0, 0), new Point(10, 0)];
 
         const interpolator = new PathInterpolator(line);
         expect(interpolator.lerp(100.0)).toEqual(line[1]);
@@ -61,10 +51,7 @@ describe('PathInterpolator', () => {
     });
 
     test('Small padding', () => {
-        const line = [
-            new Point(-4, 1),
-            new Point(4, 1)
-        ];
+        const line = [new Point(-4, 1), new Point(4, 1)];
 
         const padding = 0.5;
         const interpolator = new PathInterpolator(line, padding);
@@ -76,10 +63,7 @@ describe('PathInterpolator', () => {
     });
 
     test('Padding cannot be larger than the length / 2', () => {
-        const line = [
-            new Point(-3, 0),
-            new Point(3, 0)
-        ];
+        const line = [new Point(-3, 0), new Point(3, 0)];
 
         const padding = 10.0;
         const interpolator = new PathInterpolator(line, padding);
@@ -96,15 +80,9 @@ describe('PathInterpolator', () => {
     });
 
     test('Interpolator instance can be reused by calling reset()', () => {
-        const line0 = [
-            new Point(0, 0),
-            new Point(10, 0)
-        ];
+        const line0 = [new Point(0, 0), new Point(10, 0)];
 
-        const line1 = [
-            new Point(-10, 10),
-            new Point(10, -10)
-        ];
+        const line1 = [new Point(-10, 10), new Point(10, -10)];
 
         const interpolator = new PathInterpolator(line0);
 
@@ -119,11 +97,7 @@ describe('PathInterpolator', () => {
     });
 
     test('Path with zero length segment', () => {
-        const line = [
-            new Point(-1, 0),
-            new Point(1, 0),
-            new Point(1, 0)
-        ];
+        const line = [new Point(-1, 0), new Point(1, 0), new Point(1, 0)];
 
         const interpolator = new PathInterpolator(line);
         expect(pointEquals(interpolator.lerp(0), line[0])).toBeTruthy();

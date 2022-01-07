@@ -3,13 +3,19 @@ import type {RGBAImage, AlphaImage} from '../util/image';
 import {isImageBitmap} from '../util/util';
 
 export type TextureFormat = WebGLRenderingContext['RGBA'] | WebGLRenderingContext['ALPHA'];
-export type TextureFilter = WebGLRenderingContext['LINEAR'] | WebGLRenderingContext['LINEAR_MIPMAP_NEAREST'] | WebGLRenderingContext['NEAREST'];
-export type TextureWrap = WebGLRenderingContext['REPEAT'] | WebGLRenderingContext['CLAMP_TO_EDGE'] | WebGLRenderingContext['MIRRORED_REPEAT'];
+export type TextureFilter =
+    | WebGLRenderingContext['LINEAR']
+    | WebGLRenderingContext['LINEAR_MIPMAP_NEAREST']
+    | WebGLRenderingContext['NEAREST'];
+export type TextureWrap =
+    | WebGLRenderingContext['REPEAT']
+    | WebGLRenderingContext['CLAMP_TO_EDGE']
+    | WebGLRenderingContext['MIRRORED_REPEAT'];
 
 type EmptyImage = {
-  width: number;
-  height: number;
-  data: null;
+    width: number;
+    height: number;
+    data: null;
 };
 
 type DataTextureImage = RGBAImage | AlphaImage | EmptyImage;
@@ -24,23 +30,32 @@ class Texture {
     wrap: TextureWrap;
     useMipmap: boolean;
 
-    constructor(context: Context, image: TextureImage, format: TextureFormat, options?: {
-      premultiply?: boolean;
-      useMipmap?: boolean;
-    } | null) {
+    constructor(
+        context: Context,
+        image: TextureImage,
+        format: TextureFormat,
+        options?: {
+            premultiply?: boolean;
+            useMipmap?: boolean;
+        } | null
+    ) {
         this.context = context;
         this.format = format;
         this.texture = context.gl.createTexture();
         this.update(image, options);
     }
 
-    update(image: TextureImage, options?: {
-      premultiply?: boolean;
-      useMipmap?: boolean;
-    } | null, position?: {
-      x: number;
-      y: number;
-    }) {
+    update(
+        image: TextureImage,
+        options?: {
+            premultiply?: boolean;
+            useMipmap?: boolean;
+        } | null,
+        position?: {
+            x: number;
+            y: number;
+        }
+    ) {
         const {width, height} = image;
         const resize = (!this.size || this.size[0] !== width || this.size[1] !== height) && !position;
         const {context} = this;
@@ -51,23 +66,56 @@ class Texture {
 
         context.pixelStoreUnpackFlipY.set(false);
         context.pixelStoreUnpack.set(1);
-        context.pixelStoreUnpackPremultiplyAlpha.set(this.format === gl.RGBA && (!options || options.premultiply !== false));
+        context.pixelStoreUnpackPremultiplyAlpha.set(
+            this.format === gl.RGBA && (!options || options.premultiply !== false)
+        );
 
         if (resize) {
             this.size = [width, height];
 
-            if (image instanceof HTMLImageElement || image instanceof HTMLCanvasElement || image instanceof HTMLVideoElement || image instanceof ImageData || isImageBitmap(image)) {
+            if (
+                image instanceof HTMLImageElement ||
+                image instanceof HTMLCanvasElement ||
+                image instanceof HTMLVideoElement ||
+                image instanceof ImageData ||
+                isImageBitmap(image)
+            ) {
                 gl.texImage2D(gl.TEXTURE_2D, 0, this.format, this.format, gl.UNSIGNED_BYTE, image);
             } else {
-                gl.texImage2D(gl.TEXTURE_2D, 0, this.format, width, height, 0, this.format, gl.UNSIGNED_BYTE, (image as DataTextureImage).data);
+                gl.texImage2D(
+                    gl.TEXTURE_2D,
+                    0,
+                    this.format,
+                    width,
+                    height,
+                    0,
+                    this.format,
+                    gl.UNSIGNED_BYTE,
+                    (image as DataTextureImage).data
+                );
             }
-
         } else {
             const {x, y} = position || {x: 0, y: 0};
-            if (image instanceof HTMLImageElement || image instanceof HTMLCanvasElement || image instanceof HTMLVideoElement || image instanceof ImageData || isImageBitmap(image)) {
+            if (
+                image instanceof HTMLImageElement ||
+                image instanceof HTMLCanvasElement ||
+                image instanceof HTMLVideoElement ||
+                image instanceof ImageData ||
+                isImageBitmap(image)
+            ) {
                 gl.texSubImage2D(gl.TEXTURE_2D, 0, x, y, gl.RGBA, gl.UNSIGNED_BYTE, image);
             } else {
-                gl.texSubImage2D(gl.TEXTURE_2D, 0, x, y, width, height, gl.RGBA, gl.UNSIGNED_BYTE, (image as DataTextureImage).data);
+                gl.texSubImage2D(
+                    gl.TEXTURE_2D,
+                    0,
+                    x,
+                    y,
+                    width,
+                    height,
+                    gl.RGBA,
+                    gl.UNSIGNED_BYTE,
+                    (image as DataTextureImage).data
+                );
             }
         }
 

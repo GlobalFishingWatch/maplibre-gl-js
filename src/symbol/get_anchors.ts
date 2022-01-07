@@ -16,28 +16,25 @@ function getLineLength(line: Array<Point>): number {
     return lineLength;
 }
 
-function getAngleWindowSize(
-  shapedText: Shaping,
-  glyphSize: number,
-  boxScale: number
-): number {
-    return shapedText ?
-        3 / 5 * glyphSize * boxScale :
-        0;
+function getAngleWindowSize(shapedText: Shaping, glyphSize: number, boxScale: number): number {
+    return shapedText ? (3 / 5) * glyphSize * boxScale : 0;
 }
 
 function getShapedLabelLength(shapedText?: Shaping | null, shapedIcon?: PositionedIcon | null): number {
     return Math.max(
         shapedText ? shapedText.right - shapedText.left : 0,
-        shapedIcon ? shapedIcon.right - shapedIcon.left : 0);
+        shapedIcon ? shapedIcon.right - shapedIcon.left : 0
+    );
 }
 
-function getCenterAnchor(line: Array<Point>,
-                         maxAngle: number,
-                         shapedText: Shaping,
-                         shapedIcon: PositionedIcon,
-                         glyphSize: number,
-                         boxScale: number) {
+function getCenterAnchor(
+    line: Array<Point>,
+    maxAngle: number,
+    shapedText: Shaping,
+    shapedIcon: PositionedIcon,
+    glyphSize: number,
+    boxScale: number
+) {
     const angleWindowSize = getAngleWindowSize(shapedText, glyphSize, boxScale);
     const labelLength = getShapedLabelLength(shapedText, shapedIcon) * boxScale;
 
@@ -45,7 +42,6 @@ function getCenterAnchor(line: Array<Point>,
     const centerDistance = getLineLength(line) / 2;
 
     for (let i = 0; i < line.length - 1; i++) {
-
         const a = line[i],
             b = line[i + 1];
 
@@ -70,16 +66,17 @@ function getCenterAnchor(line: Array<Point>,
     }
 }
 
-function getAnchors(line: Array<Point>,
-                    spacing: number,
-                    maxAngle: number,
-                    shapedText: Shaping,
-                    shapedIcon: PositionedIcon,
-                    glyphSize: number,
-                    boxScale: number,
-                    overscaling: number,
-                    tileExtent: number) {
-
+function getAnchors(
+    line: Array<Point>,
+    spacing: number,
+    maxAngle: number,
+    shapedText: Shaping,
+    shapedIcon: PositionedIcon,
+    glyphSize: number,
+    boxScale: number,
+    overscaling: number,
+    tileExtent: number
+) {
     // Resample a line to get anchor points for labels and check that each
     // potential label passes text-max-angle check and has enough froom to fit
     // on the line.
@@ -104,15 +101,24 @@ function getAnchors(line: Array<Point>,
     // For non-continued lines, add a bit of fixed extra offset to avoid collisions at T intersections.
     const fixedExtraOffset = glyphSize * 2;
 
-    const offset = !isLineContinued ?
-        ((shapedLabelLength / 2 + fixedExtraOffset) * boxScale * overscaling) % spacing :
-        (spacing / 2 * overscaling) % spacing;
+    const offset = !isLineContinued
+        ? ((shapedLabelLength / 2 + fixedExtraOffset) * boxScale * overscaling) % spacing
+        : ((spacing / 2) * overscaling) % spacing;
 
     return resample(line, offset, spacing, angleWindowSize, maxAngle, labelLength, isLineContinued, false, tileExtent);
 }
 
-function resample(line, offset, spacing, angleWindowSize, maxAngle, labelLength, isLineContinued, placeAtMiddle, tileExtent) {
-
+function resample(
+    line,
+    offset,
+    spacing,
+    angleWindowSize,
+    maxAngle,
+    labelLength,
+    isLineContinued,
+    placeAtMiddle,
+    tileExtent
+) {
     const halfLabelLength = labelLength / 2;
     const lineLength = getLineLength(line);
 
@@ -122,7 +128,6 @@ function resample(line, offset, spacing, angleWindowSize, maxAngle, labelLength,
     let anchors = [];
 
     for (let i = 0; i < line.length - 1; i++) {
-
         const a = line[i],
             b = line[i + 1];
 
@@ -139,9 +144,14 @@ function resample(line, offset, spacing, angleWindowSize, maxAngle, labelLength,
             // Check that the point is within the tile boundaries and that
             // the label would fit before the beginning and end of the line
             // if placed at this point.
-            if (x >= 0 && x < tileExtent && y >= 0 && y < tileExtent &&
-                    markedDistance - halfLabelLength >= 0 &&
-                    markedDistance + halfLabelLength <= lineLength) {
+            if (
+                x >= 0 &&
+                x < tileExtent &&
+                y >= 0 &&
+                y < tileExtent &&
+                markedDistance - halfLabelLength >= 0 &&
+                markedDistance + halfLabelLength <= lineLength
+            ) {
                 const anchor = new Anchor(x, y, angle, i);
                 anchor._round();
 
@@ -160,7 +170,17 @@ function resample(line, offset, spacing, angleWindowSize, maxAngle, labelLength,
         // This has the most effect for short lines in overscaled tiles, since the
         // initial offset used in overscaled tiles is calculated to align labels with positions in
         // parent tiles instead of placing the label as close to the beginning as possible.
-        anchors = resample(line, distance / 2, spacing, angleWindowSize, maxAngle, labelLength, isLineContinued, true, tileExtent);
+        anchors = resample(
+            line,
+            distance / 2,
+            spacing,
+            angleWindowSize,
+            maxAngle,
+            labelLength,
+            isLineContinued,
+            true,
+            tileExtent
+        );
     }
 
     return anchors;

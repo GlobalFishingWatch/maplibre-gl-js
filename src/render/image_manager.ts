@@ -14,8 +14,8 @@ import type {PotpackBox} from 'potpack';
 import type {Callback} from '../types/callback';
 
 type Pattern = {
-  bin: PotpackBox;
-  position: ImagePosition;
+    bin: PotpackBox;
+    position: ImagePosition;
 };
 
 // When copied into the atlas texture, image data is padded by one pixel on each side. Icon
@@ -41,8 +41,8 @@ class ImageManager extends Evented {
     callbackDispatchedThisFrame: {[_: string]: boolean};
     loaded: boolean;
     requestors: Array<{
-      ids: Array<string>;
-      callback: Callback<{[_: string]: StyleImage}>;
+        ids: Array<string>;
+        callback: Callback<{[_: string]: StyleImage}>;
     }>;
 
     patterns: {[_: string]: Pattern};
@@ -198,7 +198,9 @@ class ImageManager extends Evented {
                     hasRenderCallback: Boolean(image.userImage && image.userImage.render)
                 };
             } else {
-                warnOnce(`Image "${id}" could not be loaded. Please make sure you have added the image with map.addImage() or a "sprite" property in your style. You can provide missing images by listening for the "styleimagemissing" map event.`);
+                warnOnce(
+                    `Image "${id}" could not be loaded. Please make sure you have added the image with map.addImage() or a "sprite" property in your style. You can provide missing images by listening for the "styleimagemissing" map event.`
+                );
             }
         }
 
@@ -274,9 +276,9 @@ class ImageManager extends Evented {
 
             // Add 1 pixel wrapped padding on each side of the image.
             RGBAImage.copy(src, dst, {x: 0, y: h - 1}, {x, y: y - 1}, {width: w, height: 1}); // T
-            RGBAImage.copy(src, dst, {x: 0, y:     0}, {x, y: y + h}, {width: w, height: 1}); // B
+            RGBAImage.copy(src, dst, {x: 0, y: 0}, {x, y: y + h}, {width: w, height: 1}); // B
             RGBAImage.copy(src, dst, {x: w - 1, y: 0}, {x: x - 1, y}, {width: 1, height: h}); // L
-            RGBAImage.copy(src, dst, {x: 0,     y: 0}, {x: x + w, y}, {width: 1, height: h}); // R
+            RGBAImage.copy(src, dst, {x: 0, y: 0}, {x: x + w, y}, {width: 1, height: h}); // R
         }
 
         this.dirty = true;
@@ -288,7 +290,6 @@ class ImageManager extends Evented {
 
     dispatchRenderCallbacks(ids: Array<string>) {
         for (const id of ids) {
-
             // the callback for the image was already dispatched for a different frame
             if (this.callbackDispatchedThisFrame[id]) continue;
             this.callbackDispatchedThisFrame[id] = true;

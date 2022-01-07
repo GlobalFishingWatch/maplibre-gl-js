@@ -8,9 +8,9 @@ import type Map from '../map';
 import type {IControl} from './control';
 
 type NavigationOptions = {
-  showCompass?: boolean;
-  showZoom?: boolean;
-  visualizePitch?: boolean;
+    showCompass?: boolean;
+    showZoom?: boolean;
+    visualizePitch?: boolean;
 };
 
 const defaultOptions: NavigationOptions = {
@@ -47,23 +47,28 @@ class NavigationControl implements IControl {
         this.options = extend({}, defaultOptions, options);
 
         this._container = DOM.create('div', 'maplibregl-ctrl maplibregl-ctrl-group mapboxgl-ctrl mapboxgl-ctrl-group');
-        this._container.addEventListener('contextmenu', (e) => e.preventDefault());
+        this._container.addEventListener('contextmenu', e => e.preventDefault());
 
         if (this.options.showZoom) {
-            bindAll([
-                '_setButtonTitle',
-                '_updateZoomButtons'
-            ], this);
-            this._zoomInButton = this._createButton('maplibregl-ctrl-zoom-in mapboxgl-ctrl-zoom-in', (e) => this._map.zoomIn({}, {originalEvent: e}));
-            DOM.create('span', 'maplibregl-ctrl-icon mapboxgl-ctrl-icon', this._zoomInButton).setAttribute('aria-hidden', 'true');
-            this._zoomOutButton = this._createButton('maplibregl-ctrl-zoom-out mapboxgl-ctrl-zoom-out', (e) => this._map.zoomOut({}, {originalEvent: e}));
-            DOM.create('span', 'maplibregl-ctrl-icon mapboxgl-ctrl-icon', this._zoomOutButton).setAttribute('aria-hidden', 'true');
+            bindAll(['_setButtonTitle', '_updateZoomButtons'], this);
+            this._zoomInButton = this._createButton('maplibregl-ctrl-zoom-in mapboxgl-ctrl-zoom-in', e =>
+                this._map.zoomIn({}, {originalEvent: e})
+            );
+            DOM.create('span', 'maplibregl-ctrl-icon mapboxgl-ctrl-icon', this._zoomInButton).setAttribute(
+                'aria-hidden',
+                'true'
+            );
+            this._zoomOutButton = this._createButton('maplibregl-ctrl-zoom-out mapboxgl-ctrl-zoom-out', e =>
+                this._map.zoomOut({}, {originalEvent: e})
+            );
+            DOM.create('span', 'maplibregl-ctrl-icon mapboxgl-ctrl-icon', this._zoomOutButton).setAttribute(
+                'aria-hidden',
+                'true'
+            );
         }
         if (this.options.showCompass) {
-            bindAll([
-                '_rotateCompassArrow'
-            ], this);
-            this._compass = this._createButton('maplibregl-ctrl-compass mapboxgl-ctrl-compass', (e) => {
+            bindAll(['_rotateCompassArrow'], this);
+            this._compass = this._createButton('maplibregl-ctrl-compass mapboxgl-ctrl-compass', e => {
                 if (this.options.visualizePitch) {
                     this._map.resetNorthPitch({}, {originalEvent: e});
                 } else {
@@ -86,9 +91,11 @@ class NavigationControl implements IControl {
     }
 
     _rotateCompassArrow() {
-        const rotate = this.options.visualizePitch ?
-            `scale(${1 / Math.pow(Math.cos(this._map.transform.pitch * (Math.PI / 180)), 0.5)}) rotateX(${this._map.transform.pitch}deg) rotateZ(${this._map.transform.angle * (180 / Math.PI)}deg)` :
-            `rotate(${this._map.transform.angle * (180 / Math.PI)}deg)`;
+        const rotate = this.options.visualizePitch
+            ? `scale(${1 / Math.pow(Math.cos(this._map.transform.pitch * (Math.PI / 180)), 0.5)}) rotateX(${
+                  this._map.transform.pitch
+              }deg) rotateZ(${this._map.transform.angle * (180 / Math.PI)}deg)`
+            : `rotate(${this._map.transform.angle * (180 / Math.PI)}deg)`;
 
         this._compassIcon.style.transform = rotate;
     }
@@ -145,7 +152,6 @@ class NavigationControl implements IControl {
 }
 
 class MouseRotateWrapper {
-
     map: Map;
     _clickTolerance: number;
     element: HTMLElement;
@@ -159,7 +165,8 @@ class MouseRotateWrapper {
         this.element = element;
         this.mouseRotate = new MouseRotateHandler({clickTolerance: map.dragRotate._mouseRotate._clickTolerance});
         this.map = map;
-        if (pitch) this.mousePitch = new MousePitchHandler({clickTolerance: map.dragRotate._mousePitch._clickTolerance});
+        if (pitch)
+            this.mousePitch = new MousePitchHandler({clickTolerance: map.dragRotate._mousePitch._clickTolerance});
 
         bindAll(['mousedown', 'mousemove', 'mouseup', 'touchstart', 'touchmove', 'touchend', 'reset'], this);
         DOM.addEventListener(element, 'mousedown', this.mousedown);
@@ -202,7 +209,10 @@ class MouseRotateWrapper {
     }
 
     mousedown(e: MouseEvent) {
-        this.down(extend({}, e, {ctrlKey: true, preventDefault: () => e.preventDefault()}), DOM.mousePos(this.element, e));
+        this.down(
+            extend({}, e, {ctrlKey: true, preventDefault: () => e.preventDefault()}),
+            DOM.mousePos(this.element, e)
+        );
         DOM.addEventListener(window, 'mousemove', this.mousemove);
         DOM.addEventListener(window, 'mouseup', this.mouseup);
     }
@@ -222,7 +232,15 @@ class MouseRotateWrapper {
             this.reset();
         } else {
             this._startPos = this._lastPos = DOM.touchPos(this.element, e.targetTouches)[0];
-            this.down((({type: 'mousedown', button: 0, ctrlKey: true, preventDefault: () => e.preventDefault()} as any as MouseEvent)), this._startPos);
+            this.down(
+                {
+                    type: 'mousedown',
+                    button: 0,
+                    ctrlKey: true,
+                    preventDefault: () => e.preventDefault()
+                } as any as MouseEvent,
+                this._startPos
+            );
         }
     }
 
@@ -231,15 +249,17 @@ class MouseRotateWrapper {
             this.reset();
         } else {
             this._lastPos = DOM.touchPos(this.element, e.targetTouches)[0];
-            this.move((({preventDefault: () => e.preventDefault()} as any as MouseEvent)), this._lastPos);
+            this.move({preventDefault: () => e.preventDefault()} as any as MouseEvent, this._lastPos);
         }
     }
 
     touchend(e: TouchEvent) {
-        if (e.targetTouches.length === 0 &&
+        if (
+            e.targetTouches.length === 0 &&
             this._startPos &&
             this._lastPos &&
-            this._startPos.dist(this._lastPos) < this._clickTolerance) {
+            this._startPos.dist(this._lastPos) < this._clickTolerance
+        ) {
             this.element.click();
         }
         this.reset();

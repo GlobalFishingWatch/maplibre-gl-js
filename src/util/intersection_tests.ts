@@ -2,7 +2,14 @@ import {isCounterClockwise} from './util';
 
 import Point from './point';
 
-export {polygonIntersectsBufferedPoint, polygonIntersectsMultiPolygon, polygonIntersectsBufferedMultiLine, polygonIntersectsPolygon, distToSegmentSquared, polygonIntersectsBox};
+export {
+    polygonIntersectsBufferedPoint,
+    polygonIntersectsMultiPolygon,
+    polygonIntersectsBufferedMultiLine,
+    polygonIntersectsPolygon,
+    distToSegmentSquared,
+    polygonIntersectsBox
+};
 
 type Line = Array<Point>;
 type MultiLine = Array<Line>;
@@ -31,7 +38,6 @@ function polygonIntersectsBufferedPoint(polygon: Polygon, point: Point, radius: 
 }
 
 function polygonIntersectsMultiPolygon(polygon: Polygon, multiPolygon: MultiPolygon) {
-
     if (polygon.length === 1) {
         return multiPolygonContainsPoint(multiPolygon, polygon[0]);
     }
@@ -70,7 +76,6 @@ function polygonIntersectsBufferedMultiLine(polygon: Polygon, multiLine: MultiLi
 }
 
 function lineIntersectsBufferedLine(lineA: Line, lineB: Line, radius: number) {
-
     if (lineA.length > 1) {
         if (lineIntersectsLine(lineA, lineB)) return true;
 
@@ -102,8 +107,10 @@ function lineIntersectsLine(lineA: Line, lineB: Line) {
 }
 
 function lineSegmentIntersectsLineSegment(a0: Point, a1: Point, b0: Point, b1: Point) {
-    return isCounterClockwise(a0, b0, b1) !== isCounterClockwise(a1, b0, b1) &&
-        isCounterClockwise(a0, a1, b0) !== isCounterClockwise(a0, a1, b1);
+    return (
+        isCounterClockwise(a0, b0, b1) !== isCounterClockwise(a1, b0, b1) &&
+        isCounterClockwise(a0, a1, b0) !== isCounterClockwise(a0, a1, b1)
+    );
 }
 
 function pointIntersectsBufferedLine(p: Point, line: Line, radius: number) {
@@ -114,7 +121,8 @@ function pointIntersectsBufferedLine(p: Point, line: Line, radius: number) {
     for (let i = 1; i < line.length; i++) {
         // Find line segments that have a distance <= radius^2 to p
         // In that case, we treat the line as "containing point p".
-        const v = line[i - 1], w = line[i];
+        const v = line[i - 1],
+            w = line[i];
         if (distToSegmentSquared(p, v, w) < radiusSquared) return true;
     }
     return false;
@@ -133,14 +141,16 @@ function distToSegmentSquared(p: Point, v: Point, w: Point) {
 // point in polygon ray casting algorithm
 function multiPolygonContainsPoint(rings: Array<Ring>, p: Point) {
     let c = false,
-        ring, p1, p2;
+        ring,
+        p1,
+        p2;
 
     for (let k = 0; k < rings.length; k++) {
         ring = rings[k];
         for (let i = 0, j = ring.length - 1; i < ring.length; j = i++) {
             p1 = ring[i];
             p2 = ring[j];
-            if (((p1.y > p.y) !== (p2.y > p.y)) && (p.x < (p2.x - p1.x) * (p.y - p1.y) / (p2.y - p1.y) + p1.x)) {
+            if (p1.y > p.y !== p2.y > p.y && p.x < ((p2.x - p1.x) * (p.y - p1.y)) / (p2.y - p1.y) + p1.x) {
                 c = !c;
             }
         }
@@ -153,7 +163,7 @@ function polygonContainsPoint(ring: Ring, p: Point) {
     for (let i = 0, j = ring.length - 1; i < ring.length; j = i++) {
         const p1 = ring[i];
         const p2 = ring[j];
-        if (((p1.y > p.y) !== (p2.y > p.y)) && (p.x < (p2.x - p1.x) * (p.y - p1.y) / (p2.y - p1.y) + p1.x)) {
+        if (p1.y > p.y !== p2.y > p.y && p.x < ((p2.x - p1.x) * (p.y - p1.y)) / (p2.y - p1.y) + p1.x) {
             c = !c;
         }
     }
@@ -162,17 +172,15 @@ function polygonContainsPoint(ring: Ring, p: Point) {
 
 function polygonIntersectsBox(ring: Ring, boxX1: number, boxY1: number, boxX2: number, boxY2: number) {
     for (const p of ring) {
-        if (boxX1 <= p.x &&
-            boxY1 <= p.y &&
-            boxX2 >= p.x &&
-            boxY2 >= p.y) return true;
+        if (boxX1 <= p.x && boxY1 <= p.y && boxX2 >= p.x && boxY2 >= p.y) return true;
     }
 
     const corners = [
         new Point(boxX1, boxY1),
         new Point(boxX1, boxY2),
         new Point(boxX2, boxY2),
-        new Point(boxX2, boxY1)];
+        new Point(boxX2, boxY1)
+    ];
 
     if (ring.length > 2) {
         for (const corner of corners) {
@@ -193,14 +201,19 @@ function edgeIntersectsBox(e1: Point, e2: Point, corners: Array<Point>) {
     const tl = corners[0];
     const br = corners[2];
     // the edge and box do not intersect in either the x or y dimensions
-    if (((e1.x < tl.x) && (e2.x < tl.x)) ||
-        ((e1.x > br.x) && (e2.x > br.x)) ||
-        ((e1.y < tl.y) && (e2.y < tl.y)) ||
-        ((e1.y > br.y) && (e2.y > br.y))) return false;
+    if (
+        (e1.x < tl.x && e2.x < tl.x) ||
+        (e1.x > br.x && e2.x > br.x) ||
+        (e1.y < tl.y && e2.y < tl.y) ||
+        (e1.y > br.y && e2.y > br.y)
+    )
+        return false;
 
     // check if all corners of the box are on the same side of the edge
     const dir = isCounterClockwise(e1, e2, corners[0]);
-    return dir !== isCounterClockwise(e1, e2, corners[1]) ||
+    return (
+        dir !== isCounterClockwise(e1, e2, corners[1]) ||
         dir !== isCounterClockwise(e1, e2, corners[2]) ||
-        dir !== isCounterClockwise(e1, e2, corners[3]);
+        dir !== isCounterClockwise(e1, e2, corners[3])
+    );
 }

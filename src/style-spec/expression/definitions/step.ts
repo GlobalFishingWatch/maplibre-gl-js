@@ -54,11 +54,17 @@ class Step implements Expression {
             const valueKey = i + 1;
 
             if (typeof label !== 'number') {
-                return context.error('Input/output pairs for "step" expressions must be defined using literal numeric values (not computed expressions) for the input values.', labelKey) as null;
+                return context.error(
+                    'Input/output pairs for "step" expressions must be defined using literal numeric values (not computed expressions) for the input values.',
+                    labelKey
+                ) as null;
             }
 
             if (stops.length && stops[stops.length - 1][0] >= label) {
-                return context.error('Input/output pairs for "step" expressions must be arranged with input values in strictly ascending order.', labelKey) as null;
+                return context.error(
+                    'Input/output pairs for "step" expressions must be arranged with input values in strictly ascending order.',
+                    labelKey
+                ) as null;
             }
 
             const parsed = context.parse(value, valueKey, outputType);
@@ -78,7 +84,7 @@ class Step implements Expression {
             return outputs[0].evaluate(ctx);
         }
 
-        const value = (this.input.evaluate(ctx) as any as number);
+        const value = this.input.evaluate(ctx) as any as number;
         if (value <= labels[0]) {
             return outputs[0].evaluate(ctx);
         }

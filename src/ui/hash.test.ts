@@ -41,8 +41,7 @@ describe('hash', () => {
     });
 
     test('#remove', () => {
-        const hash = createHash()
-            .addTo(map);
+        const hash = createHash().addTo(map);
 
         expect(hash._map).toBeTruthy();
 
@@ -52,8 +51,7 @@ describe('hash', () => {
     });
 
     test('#_onHashChange', () => {
-        const hash = createHash()
-            .addTo(map);
+        const hash = createHash().addTo(map);
 
         window.location.hash = '#10/3.00/-1.00';
 
@@ -117,8 +115,7 @@ describe('hash', () => {
     });
 
     test('#_onHashChange empty', () => {
-        const hash = createHash()
-            .addTo(map);
+        const hash = createHash().addTo(map);
 
         window.location.hash = '#10/3.00/-1.00';
 
@@ -142,8 +139,7 @@ describe('hash', () => {
     });
 
     test('#_onHashChange named', () => {
-        const hash = createHash('map')
-            .addTo(map);
+        const hash = createHash('map').addTo(map);
 
         window.location.hash = '#map=10/3.00/-1.00&foo=bar';
 
@@ -169,8 +165,7 @@ describe('hash', () => {
     });
 
     test('#_getCurrentHash', () => {
-        const hash = createHash()
-            .addTo(map);
+        const hash = createHash().addTo(map);
 
         window.location.hash = '#10/3.00/-1.00';
 
@@ -182,8 +177,7 @@ describe('hash', () => {
     });
 
     test('#_getCurrentHash named', () => {
-        const hash = createHash('map')
-            .addTo(map);
+        const hash = createHash('map').addTo(map);
 
         window.location.hash = '#map=10/3.00/-1.00&foo=bar';
 
@@ -207,8 +201,7 @@ describe('hash', () => {
             return window.location.hash.split('/');
         }
 
-        createHash()
-            .addTo(map);
+        createHash().addTo(map);
 
         expect(window.location.hash).toBeFalsy();
 
@@ -248,8 +241,7 @@ describe('hash', () => {
     });
 
     test('#_updateHash named', () => {
-        createHash('map')
-            .addTo(map);
+        createHash('map').addTo(map);
 
         expect(window.location.hash).toBeFalsy();
 

@@ -11,8 +11,7 @@ export default function classifyRings(rings: Array<Array<Point>>, maxRings: numb
     if (len <= 1) return [rings];
 
     const polygons = [];
-    let polygon,
-        ccw;
+    let polygon, ccw;
 
     for (let i = 0; i < len; i++) {
         const area = calculateSignedArea(rings[i]);
@@ -25,7 +24,6 @@ export default function classifyRings(rings: Array<Array<Point>>, maxRings: numb
         if (ccw === area < 0) {
             if (polygon) polygons.push(polygon);
             polygon = [rings[i]];
-
         } else {
             (polygon as any).push(rings[i]);
         }

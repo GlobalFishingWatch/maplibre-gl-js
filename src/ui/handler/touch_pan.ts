@@ -2,19 +2,16 @@ import Point from '../../util/point';
 import {indexTouches} from './handler_util';
 
 export default class TouchPanHandler {
-
     _enabled: boolean;
     _active: boolean;
     _touches: {
-      [k in string | number]: Point;
+        [k in string | number]: Point;
     };
     _minTouches: number;
     _clickTolerance: number;
     _sum: Point;
 
-    constructor(options: {
-      clickTolerance: number;
-    }) {
+    constructor(options: {clickTolerance: number}) {
         this._minTouches = 1;
         this._clickTolerance = options.clickTolerance || 1;
         this.reset();

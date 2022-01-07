@@ -8,7 +8,7 @@ describe('tile_request_cache', () => {
             has: jest.fn(),
             keys: jest.fn(),
             match: jest.fn(),
-            open: jest.fn(),
+            open: jest.fn()
         };
     });
 
@@ -21,7 +21,7 @@ describe('tile_request_cache', () => {
 
         let result;
         try {
-            result = cachePut({url:''} as Request, undefined, undefined);
+            result = cachePut({url: ''} as Request, undefined, undefined);
             expect(result).toBeFalsy();
         } catch (e) {
             expect(e).toBeFalsy();
@@ -32,7 +32,7 @@ describe('tile_request_cache', () => {
     test('cacheGet, no caches', done => {
         delete global.caches;
 
-        cacheGet({url:''} as Request, (result) => {
+        cacheGet({url: ''} as Request, result => {
             expect(result).toBeFalsy();
             expect(result).toBeNull();
             done();
@@ -42,7 +42,7 @@ describe('tile_request_cache', () => {
     test('cacheGet, cache open error', done => {
         global.caches.open = jest.fn().mockRejectedValue(new Error('The operation is insecure'));
 
-        cacheGet({url:''} as Request, (error) => {
+        cacheGet({url: ''} as Request, error => {
             expect(error).toBeTruthy();
             expect(error.message).toBe('The operation is insecure');
             done();
@@ -51,11 +51,11 @@ describe('tile_request_cache', () => {
 
     test('cacheGet, cache match error', done => {
         const fakeCache = {
-            match: jest.fn().mockRejectedValue(new Error('ohno')),
+            match: jest.fn().mockRejectedValue(new Error('ohno'))
         };
         global.caches.open = jest.fn().mockResolvedValue(fakeCache);
 
-        cacheGet({url:'someurl'} as Request, (error) => {
+        cacheGet({url: 'someurl'} as Request, error => {
             expect(error).toBeTruthy();
             expect(error.message).toBe('ohno');
             done();
@@ -82,11 +82,11 @@ describe('tile_request_cache', () => {
         const fakeCache = {
             match: jest.fn().mockResolvedValue(fakeResponse),
             delete: jest.fn(),
-            put: jest.fn(),
+            put: jest.fn()
         };
         global.caches.open = jest.fn().mockResolvedValue(fakeCache);
 
-        cacheGet({url:'someurl'} as Request, (error, response, fresh) => {
+        cacheGet({url: 'someurl'} as Request, (error, response, fresh) => {
             expect(error).toBeFalsy();
             expect(fakeCache.match).toHaveBeenCalledWith('someurl');
             expect(fakeCache.delete).toHaveBeenCalledWith('someurl');
@@ -97,5 +97,4 @@ describe('tile_request_cache', () => {
             done();
         });
     });
-
 });

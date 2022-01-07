@@ -15,10 +15,7 @@ import type Dispatcher from '../util/dispatcher';
 import type Tile from './tile';
 import type {Callback} from '../types/callback';
 import type {Cancelable} from '../types/cancelable';
-import type {
-    RasterSourceSpecification,
-    RasterDEMSourceSpecification
-} from '../style-spec/types';
+import type {RasterSourceSpecification, RasterDEMSourceSpecification} from '../style-spec/types';
 
 class RasterTileSource extends Evented implements Source {
     type: 'raster' | 'raster-dem';
@@ -40,7 +37,12 @@ class RasterTileSource extends Evented implements Source {
     _options: RasterSourceSpecification | RasterDEMSourceSpecification;
     _tileJSONRequest: Cancelable;
 
-    constructor(id: string, options: RasterSourceSpecification | RasterDEMSourceSpecification, dispatcher: Dispatcher, eventedParent: Evented) {
+    constructor(
+        id: string,
+        options: RasterSourceSpecification | RasterDEMSourceSpecification,
+        dispatcher: Dispatcher,
+        eventedParent: Evented
+    ) {
         super();
         this.id = id;
         this.dispatcher = dispatcher;
@@ -129,7 +131,11 @@ class RasterTileSource extends Evented implements Source {
                     tile.texture.bind(gl.LINEAR, gl.CLAMP_TO_EDGE, gl.LINEAR_MIPMAP_NEAREST);
 
                     if (context.extTextureFilterAnisotropic) {
-                        gl.texParameterf(gl.TEXTURE_2D, context.extTextureFilterAnisotropic.TEXTURE_MAX_ANISOTROPY_EXT, context.extTextureFilterAnisotropicMax);
+                        gl.texParameterf(
+                            gl.TEXTURE_2D,
+                            context.extTextureFilterAnisotropic.TEXTURE_MAX_ANISOTROPY_EXT,
+                            context.extTextureFilterAnisotropicMax
+                        );
                     }
                 }
 

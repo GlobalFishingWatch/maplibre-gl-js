@@ -54,13 +54,13 @@ class ParsingContext {
      * @private
      */
     parse(
-      expr: unknown,
-      index?: number,
-      expectedType?: Type | null,
-      bindings?: Array<[string, Expression]>,
-      options: {
-        typeAnnotation?: 'assert' | 'coerce' | 'omit';
-      } = {}
+        expr: unknown,
+        index?: number,
+        expectedType?: Type | null,
+        bindings?: Array<[string, Expression]>,
+        options: {
+            typeAnnotation?: 'assert' | 'coerce' | 'omit';
+        } = {}
     ): Expression {
         if (index) {
             return this.concat(index, expectedType, bindings)._parse(expr, options);
@@ -69,10 +69,10 @@ class ParsingContext {
     }
 
     _parse(
-      expr: unknown,
-      options: {
-        typeAnnotation?: 'assert' | 'coerce' | 'omit';
-      }
+        expr: unknown,
+        options: {
+            typeAnnotation?: 'assert' | 'coerce' | 'omit';
+        }
     ): Expression {
         if (expr === null || typeof expr === 'string' || typeof expr === 'boolean' || typeof expr === 'number') {
             expr = ['literal', expr];
@@ -90,12 +90,17 @@ class ParsingContext {
 
         if (Array.isArray(expr)) {
             if (expr.length === 0) {
-                return this.error('Expected an array with at least one element. If you wanted a literal array, use ["literal", []].') as null;
+                return this.error(
+                    'Expected an array with at least one element. If you wanted a literal array, use ["literal", []].'
+                ) as null;
             }
 
             const op = expr[0];
             if (typeof op !== 'string') {
-                this.error(`Expression name must be a string, but found ${typeof op} instead. If you wanted a literal array, use ["literal", [...]].`, 0);
+                this.error(
+                    `Expression name must be a string, but found ${typeof op} instead. If you wanted a literal array, use ["literal", [...]].`,
+                    0
+                );
                 return null;
             }
 
@@ -116,9 +121,21 @@ class ParsingContext {
                     //   * The "coalesce" operator, which needs to omit type annotations.
                     //   * String-valued properties (e.g. `text-field`), where coercion is more convenient than assertion.
                     //
-                    if ((expected.kind === 'string' || expected.kind === 'number' || expected.kind === 'boolean' || expected.kind === 'object' || expected.kind === 'array') && actual.kind === 'value') {
+                    if (
+                        (expected.kind === 'string' ||
+                            expected.kind === 'number' ||
+                            expected.kind === 'boolean' ||
+                            expected.kind === 'object' ||
+                            expected.kind === 'array') &&
+                        actual.kind === 'value'
+                    ) {
                         parsed = annotate(parsed, expected, options.typeAnnotation || 'assert');
-                    } else if ((expected.kind === 'color' || expected.kind === 'formatted' || expected.kind === 'resolvedImage') && (actual.kind === 'value' || actual.kind === 'string')) {
+                    } else if (
+                        (expected.kind === 'color' ||
+                            expected.kind === 'formatted' ||
+                            expected.kind === 'resolvedImage') &&
+                        (actual.kind === 'value' || actual.kind === 'string')
+                    ) {
                         parsed = annotate(parsed, expected, options.typeAnnotation || 'coerce');
                     } else if (this.checkSubtype(expected, actual)) {
                         return null;
@@ -129,7 +146,7 @@ class ParsingContext {
                 // it immediately and replace it with a literal value in the
                 // parsed/compiled result. Expressions that expect an image should
                 // not be resolved here so we can later get the available images.
-                if (!(parsed instanceof Literal) && (parsed.type.kind !== 'resolvedImage') && isConstant(parsed)) {
+                if (!(parsed instanceof Literal) && parsed.type.kind !== 'resolvedImage' && isConstant(parsed)) {
                     const ec = new EvaluationContext();
                     try {
                         parsed = new Literal(parsed.type, parsed.evaluate(ec));
@@ -142,9 +159,12 @@ class ParsingContext {
                 return parsed;
             }
 
-            return this.error(`Unknown expression "${op}". If you wanted a literal array, use ["literal", [...]].`, 0) as null;
+            return this.error(
+                `Unknown expression "${op}". If you wanted a literal array, use ["literal", [...]].`,
+                0
+            ) as null;
         } else if (typeof expr === 'undefined') {
-            return this.error('\'undefined\' value invalid. Use null instead.') as null;
+            return this.error("'undefined' value invalid. Use null instead.") as null;
         } else if (typeof expr === 'object') {
             return this.error('Bare objects invalid. Use ["literal", {...}] instead.') as null;
         } else {
@@ -163,13 +183,7 @@ class ParsingContext {
     concat(index: number, expectedType?: Type | null, bindings?: Array<[string, Expression]>) {
         const path = typeof index === 'number' ? this.path.concat(index) : this.path;
         const scope = bindings ? this.scope.concat(bindings) : this.scope;
-        return new ParsingContext(
-            this.registry,
-            path,
-            expectedType || null,
-            scope,
-            this.errors
-        );
+        return new ParsingContext(this.registry, path, expectedType || null, scope, this.errors);
     }
 
     /**
@@ -211,8 +225,7 @@ function isConstant(expression: Expression) {
         return false;
     }
 
-    const isTypeAnnotation = expression instanceof Coercion ||
-        expression instanceof Assertion;
+    const isTypeAnnotation = expression instanceof Coercion || expression instanceof Assertion;
 
     let childrenConstant = true;
     expression.eachChild(child => {
@@ -233,6 +246,14 @@ function isConstant(expression: Expression) {
         return false;
     }
 
-    return isFeatureConstant(expression) &&
-        isGlobalPropertyConstant(expression, ['zoom', 'heatmap-density', 'line-progress', 'accumulated', 'is-supported-script']);
+    return (
+        isFeatureConstant(expression) &&
+        isGlobalPropertyConstant(expression, [
+            'zoom',
+            'heatmap-density',
+            'line-progress',
+            'accumulated',
+            'is-supported-script'
+        ])
+    );
 }

@@ -2,10 +2,7 @@ import DepthMode from '../gl/depth_mode';
 import StencilMode from '../gl/stencil_mode';
 import ColorMode from '../gl/color_mode';
 import CullFaceMode from '../gl/cull_face_mode';
-import {
-    fillExtrusionUniformValues,
-    fillExtrusionPatternUniformValues,
-} from './program/fill_extrusion_program';
+import {fillExtrusionUniformValues, fillExtrusionPatternUniformValues} from './program/fill_extrusion_program';
 
 import type Painter from './painter';
 import type SourceCache from '../source/source_cache';
@@ -27,20 +24,23 @@ function draw(painter: Painter, source: SourceCache, layer: FillExtrusionStyleLa
         if (opacity === 1 && !layer.paint.get('fill-extrusion-pattern').constantOr(1 as any)) {
             const colorMode = painter.colorModeForRenderPass();
             drawExtrusionTiles(painter, source, layer, coords, depthMode, StencilMode.disabled, colorMode);
-
         } else {
             // Draw transparent buildings in two passes so that only the closest surface is drawn.
             // First draw all the extrusions into only the depth buffer. No colors are drawn.
-            drawExtrusionTiles(painter, source, layer, coords, depthMode,
-                StencilMode.disabled,
-                ColorMode.disabled);
+            drawExtrusionTiles(painter, source, layer, coords, depthMode, StencilMode.disabled, ColorMode.disabled);
 
             // Then draw all the extrusions a second type, only coloring fragments if they have the
             // same depth value as the closest fragment in the previous pass. Use the stencil buffer
             // to prevent the second draw in cases where we have coincident polygons.
-            drawExtrusionTiles(painter, source, layer, coords, depthMode,
+            drawExtrusionTiles(
+                painter,
+                source,
+                layer,
+                coords,
+                depthMode,
                 painter.stencilModeFor3D(),
-                painter.colorModeForRenderPass());
+                painter.colorModeForRenderPass()
+            );
         }
     }
 }
@@ -55,7 +55,7 @@ function drawExtrusionTiles(painter, source, layer, coords, depthMode, stencilMo
 
     for (const coord of coords) {
         const tile = source.getTile(coord);
-        const bucket: FillExtrusionBucket = (tile.getBucket(layer) as any);
+        const bucket: FillExtrusionBucket = tile.getBucket(layer) as any;
         if (!bucket) continue;
 
         const programConfiguration = bucket.programConfigurations.get(layer.id);
@@ -78,16 +78,37 @@ function drawExtrusionTiles(painter, source, layer, coords, depthMode, stencilMo
             coord.posMatrix,
             tile,
             layer.paint.get('fill-extrusion-translate'),
-            layer.paint.get('fill-extrusion-translate-anchor'));
+            layer.paint.get('fill-extrusion-translate-anchor')
+        );
 
         const shouldUseVerticalGradient = layer.paint.get('fill-extrusion-vertical-gradient');
-        const uniformValues = image ?
-            fillExtrusionPatternUniformValues(matrix, painter, shouldUseVerticalGradient, opacity, coord, crossfade, tile) :
-            fillExtrusionUniformValues(matrix, painter, shouldUseVerticalGradient, opacity);
+        const uniformValues = image
+            ? fillExtrusionPatternUniformValues(
+                  matrix,
+                  painter,
+                  shouldUseVerticalGradient,
+                  opacity,
+                  coord,
+                  crossfade,
+                  tile
+              )
+            : fillExtrusionUniformValues(matrix, painter, shouldUseVerticalGradient, opacity);
 
-        program.draw(context, context.gl.TRIANGLES, depthMode, stencilMode, colorMode, CullFaceMode.backCCW,
-            uniformValues, layer.id, bucket.layoutVertexBuffer, bucket.indexBuffer,
-            bucket.segments, layer.paint, painter.transform.zoom,
-            programConfiguration);
+        program.draw(
+            context,
+            context.gl.TRIANGLES,
+            depthMode,
+            stencilMode,
+            colorMode,
+            CullFaceMode.backCCW,
+            uniformValues,
+            layer.id,
+            bucket.layoutVertexBuffer,
+            bucket.indexBuffer,
+            bucket.segments,
+            layer.paint,
+            painter.transform.zoom,
+            programConfiguration
+        );
     }
 }

@@ -11,7 +11,7 @@ import type EvaluationContext from '../evaluation_context';
 
 // Map input label values to output expression index
 type Cases = {
-  [k in number | string]: number;
+    [k in number | string]: number;
 };
 
 class Match implements Expression {
@@ -23,7 +23,14 @@ class Match implements Expression {
     outputs: Array<Expression>;
     otherwise: Expression;
 
-    constructor(inputType: Type, outputType: Type, input: Expression, cases: Cases, outputs: Array<Expression>, otherwise: Expression) {
+    constructor(
+        inputType: Type,
+        outputType: Type,
+        input: Expression,
+        cases: Cases,
+        outputs: Array<Expression>,
+        otherwise: Expression
+    ) {
         this.inputType = inputType;
         this.type = outputType;
         this.input = input;
@@ -35,8 +42,7 @@ class Match implements Expression {
     static parse(args: ReadonlyArray<unknown>, context: ParsingContext): Expression {
         if (args.length < 5)
             return context.error(`Expected at least 4 arguments, but found only ${args.length - 1}.`) as null;
-        if (args.length % 2 !== 1)
-            return context.error('Expected an even number of arguments.') as null;
+        if (args.length % 2 !== 1) return context.error('Expected an even number of arguments.') as null;
 
         let inputType;
         let outputType;
@@ -62,11 +68,11 @@ class Match implements Expression {
                 if (typeof label !== 'number' && typeof label !== 'string') {
                     return labelContext.error('Branch labels must be numbers or strings.') as null;
                 } else if (typeof label === 'number' && Math.abs(label) > Number.MAX_SAFE_INTEGER) {
-                    return labelContext.error(`Branch labels must be integers no larger than ${Number.MAX_SAFE_INTEGER}.`) as null;
-
+                    return labelContext.error(
+                        `Branch labels must be integers no larger than ${Number.MAX_SAFE_INTEGER}.`
+                    ) as null;
                 } else if (typeof label === 'number' && Math.floor(label) !== label) {
                     return labelContext.error('Numeric branch labels must be integer values.') as null;
-
                 } else if (!inputType) {
                     inputType = typeOf(label);
                 } else if (labelContext.checkSubtype(inputType, typeOf(label))) {
@@ -94,15 +100,15 @@ class Match implements Expression {
 
         assert(inputType && outputType);
 
-        if (input.type.kind !== 'value' && context.concat(1).checkSubtype(((inputType as any)), input.type)) {
+        if (input.type.kind !== 'value' && context.concat(1).checkSubtype(inputType as any, input.type)) {
             return null;
         }
 
-        return new Match((inputType as any), (outputType as any), input, cases, outputs, otherwise);
+        return new Match(inputType as any, outputType as any, input, cases, outputs, otherwise);
     }
 
     evaluate(ctx: EvaluationContext) {
-        const input = (this.input.evaluate(ctx) as any);
+        const input = this.input.evaluate(ctx) as any;
         const output = (typeOf(input) === this.inputType && this.outputs[this.cases[input]]) || this.otherwise;
         return output.evaluate(ctx);
     }
@@ -128,7 +134,7 @@ class Match implements Expression {
         // serializations of the form [case1, case2, ...] -> matchExpression
         const groupedByOutput: Array<[number, Array<number | string>]> = [];
         const outputLookup: {
-          [index: number]: number;
+            [index: number]: number;
         } = {}; // lookup index into groupedByOutput for a given output expression
         for (const label of sortedLabels) {
             const outputIndex = outputLookup[this.cases[label]];
@@ -142,7 +148,7 @@ class Match implements Expression {
             }
         }
 
-        const coerceLabel = (label) => this.inputType.kind === 'number' ? Number(label) : label;
+        const coerceLabel = label => (this.inputType.kind === 'number' ? Number(label) : label);
 
         for (const [outputIndex, labels] of groupedByOutput) {
             if (labels.length === 1) {

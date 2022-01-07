@@ -10,7 +10,7 @@ describe('FullscreenControl', () => {
     test('appears when fullscreen is enabled', () => {
         Object.defineProperty(window.document, 'fullscreenEnabled', {
             value: true,
-            writable: true,
+            writable: true
         });
         const map = createMap(undefined, undefined);
         const fullscreen = new FullscreenControl(undefined);
@@ -22,10 +22,10 @@ describe('FullscreenControl', () => {
     test('does not appear when fullscreen is not enabled', () => {
         Object.defineProperty(window.document, 'fullscreenEnabled', {
             value: false,
-            writable: true,
+            writable: true
         });
 
-        jest.spyOn(console, 'warn').mockImplementation(() => { });
+        jest.spyOn(console, 'warn').mockImplementation(() => {});
 
         const map = createMap(undefined, undefined);
         const fullscreen = new FullscreenControl(undefined);
@@ -38,13 +38,13 @@ describe('FullscreenControl', () => {
     test('makes optional container element full screen', () => {
         Object.defineProperty(window.document, 'fullscreenEnabled', {
             value: true,
-            writable: true,
+            writable: true
         });
 
         const map = createMap(undefined, undefined);
         const fullscreen = new FullscreenControl({container: window.document.querySelector('body')});
         map.addControl(fullscreen);
-        const control = map._controls.find((ctrl) => {
+        const control = map._controls.find(ctrl => {
             return Object.prototype.hasOwnProperty.call(ctrl, '_fullscreen');
         }) as FullscreenControl;
         control._onClickFullscreen();

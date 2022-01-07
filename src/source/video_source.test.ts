@@ -5,9 +5,19 @@ import {getMockDispatcher} from '../util/test/util';
 import type {Coordinates} from './image_source';
 
 function createSource(options) {
-    const c = options && options.video || window.document.createElement('video');
+    const c = (options && options.video) || window.document.createElement('video');
 
-    options = extend({coordinates: [[0, 0], [1, 0], [1, 1], [0, 1]]}, options);
+    options = extend(
+        {
+            coordinates: [
+                [0, 0],
+                [1, 0],
+                [1, 1],
+                [0, 1]
+            ]
+        },
+        options
+    );
 
     const source = new VideoSource('id', options, getMockDispatcher(), options.eventedParent);
 
@@ -19,7 +29,7 @@ describe('VideoSource', () => {
     // Attribution File:Volcano Lava Sample.webm: U.S. Geological Survey (USGS), Public domain, via Wikimedia Commons
     const source = createSource({
         type: 'video',
-        urls : [ 'cropped.mp4', 'https://upload.wikimedia.org/wikipedia/commons/2/22/Volcano_Lava_Sample.webm' ],
+        urls: ['cropped.mp4', 'https://upload.wikimedia.org/wikipedia/commons/2/22/Volcano_Lava_Sample.webm'],
         coordinates: [
             [-76.54, 39.18],
             [-76.52, 39.18],
@@ -35,12 +45,16 @@ describe('VideoSource', () => {
     });
 
     test('sets coordinates', () => {
-        const newCoordinates = [[0, 0], [-1, 0], [-1, -1], [0, -1]] as Coordinates;
+        const newCoordinates = [
+            [0, 0],
+            [-1, 0],
+            [-1, -1],
+            [0, -1]
+        ] as Coordinates;
         source.setCoordinates(newCoordinates);
         const serialized = source.serialize();
 
         expect(serialized.coordinates).toEqual(newCoordinates);
-
     });
 
     //test video retrieval by first supplying the video element directly
@@ -50,7 +64,7 @@ describe('VideoSource', () => {
         const source = createSource({
             type: 'video',
             video: el,
-            urls : [ 'cropped.mp4', 'https://upload.wikimedia.org/wikipedia/commons/2/22/Volcano_Lava_Sample.webm' ],
+            urls: ['cropped.mp4', 'https://upload.wikimedia.org/wikipedia/commons/2/22/Volcano_Lava_Sample.webm'],
             coordinates: [
                 [-76.54, 39.18],
                 [-76.52, 39.18],

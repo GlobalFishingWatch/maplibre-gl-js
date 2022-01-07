@@ -1,4 +1,3 @@
-
 import URL from 'url';
 import {eachSource, eachLayer, eachProperty} from '../visit';
 
@@ -31,32 +30,33 @@ function isFunction(value) {
 }
 
 function renameProperty(obj, from, to) {
-    obj[to] = obj[from]; delete obj[from];
+    obj[to] = obj[from];
+    delete obj[from];
 }
 
-export default function(style) {
+export default function (style) {
     style.version = 8;
 
     // Rename properties, reverse coordinates in source and layers
-    eachSource(style, (source) => {
+    eachSource(style, source => {
         if (source.type === 'video' && source['url'] !== undefined) {
             renameProperty(source, 'url', 'urls');
         }
         if (source.type === 'video') {
-            source.coordinates.forEach((coord) => {
+            source.coordinates.forEach(coord => {
                 return coord.reverse();
             });
         }
     });
 
-    eachLayer(style, (layer) => {
-        eachLayout(layer, (layout) => {
+    eachLayer(style, layer => {
+        eachLayout(layer, layout => {
             if (layout['symbol-min-distance'] !== undefined) {
                 renameProperty(layout, 'symbol-min-distance', 'symbol-spacing');
             }
         });
 
-        eachPaint(layer, (paint) => {
+        eachPaint(layer, paint => {
             if (paint['background-image'] !== undefined) {
                 renameProperty(paint, 'background-image', 'background-pattern');
             }
@@ -70,11 +70,11 @@ export default function(style) {
     });
 
     // Inline Constants
-    eachProperty(style, {paint: true, layout: true}, (property) => {
+    eachProperty(style, {paint: true, layout: true}, property => {
         const value = resolveConstant(style, property.value);
 
         if (isFunction(value)) {
-            value.stops.forEach((stop) => {
+            value.stops.forEach(stop => {
                 stop[1] = resolveConstant(style, stop[1]);
             });
         }
@@ -83,17 +83,17 @@ export default function(style) {
     });
     delete style.constants;
 
-    eachLayer(style, (layer) => {
+    eachLayer(style, layer => {
         // get rid of text-max-size, icon-max-size
         // turn text-size, icon-size into layout properties
         // https://github.com/mapbox/mapbox-gl-style-spec/issues/255
 
-        eachLayout(layer, (layout) => {
+        eachLayout(layer, layout => {
             delete layout['text-max-size'];
             delete layout['icon-max-size'];
         });
 
-        eachPaint(layer, (paint) => {
+        eachPaint(layer, paint => {
             if (paint['text-size']) {
                 if (!layer.layout) layer.layout = {};
                 layer.layout['text-size'] = paint['text-size'];
@@ -114,17 +114,14 @@ export default function(style) {
 
         if (inputParsed.protocol !== 'mapbox:') {
             return input;
-
         } else if (inputParsed.hostname === 'fontstack') {
             assert(decodeURI(inputParsed.pathname) === '/{fontstack}/{range}.pbf');
             return 'mapbox://fonts/mapbox/{fontstack}/{range}.pbf';
-
         } else if (inputParsed.hostname === 'fonts') {
             assert(inputPathnameParts[1] === 'v1');
             assert(decodeURI(inputPathnameParts[3]) === '{fontstack}');
             assert(decodeURI(inputPathnameParts[4]) === '{range}.pbf');
             return `mapbox://fonts/${inputPathnameParts[2]}/{fontstack}/{range}.pbf`;
-
         } else {
             assert(false);
         }
@@ -142,7 +139,7 @@ export default function(style) {
 
     function migrateFontStack(font) {
         function splitAndTrim(string) {
-            return string.split(',').map((s) => {
+            return string.split(',').map(s => {
                 return s.trim();
             });
         }
@@ -150,23 +147,20 @@ export default function(style) {
         if (Array.isArray(font)) {
             // Assume it's a previously migrated font-array.
             return font;
-
         } else if (typeof font === 'string') {
             return splitAndTrim(font);
-
         } else if (typeof font === 'object') {
-            font.stops.forEach((stop) => {
+            font.stops.forEach(stop => {
                 stop[1] = splitAndTrim(stop[1]);
             });
             return font;
-
         } else {
             throw new Error('unexpected font value');
         }
     }
 
-    eachLayer(style, (layer) => {
-        eachLayout(layer, (layout) => {
+    eachLayer(style, layer => {
+        eachLayout(layer, layout => {
             if (layout['text-font']) {
                 layout['text-font'] = migrateFontStack(layout['text-font']);
             }

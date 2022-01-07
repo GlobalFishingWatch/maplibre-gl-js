@@ -47,7 +47,9 @@ describe('DEMData', () => {
             new DEMData('0', imageData0, 'otherEncoding' as any);
 
             expect(spyOnWarnConsole).toHaveBeenCalledTimes(1);
-            expect(spyOnWarnConsole.mock.calls).toEqual([['\"otherEncoding\" is not a valid encoding type. Valid types include \"mapbox\" and \"terrarium\".']]);
+            expect(spyOnWarnConsole.mock.calls).toEqual([
+                ['"otherEncoding" is not a valid encoding type. Valid types include "mapbox" and "terrarium".']
+            ]);
         });
     });
 });
@@ -101,7 +103,7 @@ describe('DEMData#backfillBorder with encoding', () => {
         test('backfillBorder correctly populates borders with neighboring data', () => {
             dem0.backfillBorder(dem1, -1, 0);
             for (let y = 0; y < 4; y++) {
-            // dx = -1, dy = 0, so the left edge of dem1 should equal the right edge of dem0
+                // dx = -1, dy = 0, so the left edge of dem1 should equal the right edge of dem0
                 expect(dem0.get(-1, y) === dem1.get(3, y)).toBeTruthy();
             }
 

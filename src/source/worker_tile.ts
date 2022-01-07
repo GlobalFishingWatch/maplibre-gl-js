@@ -20,10 +20,7 @@ import type StyleLayer from '../style/style_layer';
 import type StyleLayerIndex from '../style/style_layer_index';
 import type {StyleImage} from '../style/style_image';
 import type {StyleGlyph} from '../style/style_glyph';
-import type {
-    WorkerTileParameters,
-    WorkerTileCallback,
-} from '../source/worker_source';
+import type {WorkerTileParameters, WorkerTileCallback} from '../source/worker_source';
 import type {PromoteIdSpecification} from '../style-spec/types';
 import type {VectorTile} from '@mapbox/vector-tile';
 
@@ -44,12 +41,18 @@ class WorkerTile {
     data: VectorTile;
     collisionBoxArray: CollisionBoxArray;
 
-    abort: (() => void);
+    abort: () => void;
     reloadCallback: WorkerTileCallback;
     vectorTile: VectorTile;
 
     constructor(params: WorkerTileParameters) {
-        this.tileID = new OverscaledTileID(params.tileID.overscaledZ, params.tileID.wrap, params.tileID.canonical.z, params.tileID.canonical.x, params.tileID.canonical.y);
+        this.tileID = new OverscaledTileID(
+            params.tileID.overscaledZ,
+            params.tileID.wrap,
+            params.tileID.canonical.z,
+            params.tileID.canonical.x,
+            params.tileID.canonical.y
+        );
         this.uid = params.uid;
         this.zoom = params.zoom;
         this.pixelRatio = params.pixelRatio;
@@ -62,7 +65,13 @@ class WorkerTile {
         this.promoteId = params.promoteId;
     }
 
-    parse(data: VectorTile, layerIndex: StyleLayerIndex, availableImages: Array<string>, actor: Actor, callback: WorkerTileCallback) {
+    parse(
+        data: VectorTile,
+        layerIndex: StyleLayerIndex,
+        availableImages: Array<string>,
+        actor: Actor,
+        callback: WorkerTileCallback
+    ) {
         this.status = 'parsing';
         this.data = data;
 
@@ -90,8 +99,10 @@ class WorkerTile {
             }
 
             if (sourceLayer.version === 1) {
-                warnOnce(`Vector tile source "${this.source}" layer "${sourceLayerId}" ` +
-                    'does not use vector tile spec v2 and therefore may have some rendering errors.');
+                warnOnce(
+                    `Vector tile source "${this.source}" layer "${sourceLayerId}" ` +
+                        'does not use vector tile spec v2 and therefore may have some rendering errors.'
+                );
             }
 
             const sourceLayerIndex = sourceLayerCoder.encode(sourceLayerId);
@@ -112,7 +123,7 @@ class WorkerTile {
 
                 recalculateLayers(family, this.zoom, availableImages);
 
-                const bucket = buckets[layer.id] = layer.createBucket({
+                const bucket = (buckets[layer.id] = layer.createBucket({
                     index: featureIndex.bucketLayerIDs.length,
                     layers: family,
                     zoom: this.zoom,
@@ -121,23 +132,23 @@ class WorkerTile {
                     collisionBoxArray: this.collisionBoxArray,
                     sourceLayerIndex,
                     sourceID: this.source
-                });
+                }));
 
                 bucket.populate(features, options, this.tileID.canonical);
-                featureIndex.bucketLayerIDs.push(family.map((l) => l.id));
+                featureIndex.bucketLayerIDs.push(family.map(l => l.id));
             }
         }
 
         let error: Error;
         let glyphMap: {
-          [_: string]: {
-            [_: number]: StyleGlyph;
-          };
+            [_: string]: {
+                [_: number]: StyleGlyph;
+            };
         };
         let iconMap: {[_: string]: StyleImage};
         let patternMap: {[_: string]: StyleImage};
 
-        const stacks = mapObject(options.glyphDependencies, (glyphs) => Object.keys(glyphs).map(Number));
+        const stacks = mapObject(options.glyphDependencies, glyphs => Object.keys(glyphs).map(Number));
         if (Object.keys(stacks).length) {
             actor.send('getGlyphs', {uid: this.uid, stacks}, (err, result) => {
                 if (!error) {
@@ -165,13 +176,17 @@ class WorkerTile {
 
         const patterns = Object.keys(options.patternDependencies);
         if (patterns.length) {
-            actor.send('getImages', {icons: patterns, source: this.source, tileID: this.tileID, type: 'patterns'}, (err, result) => {
-                if (!error) {
-                    error = err;
-                    patternMap = result;
-                    maybePrepare.call(this);
+            actor.send(
+                'getImages',
+                {icons: patterns, source: this.source, tileID: this.tileID, type: 'patterns'},
+                (err, result) => {
+                    if (!error) {
+                        error = err;
+                        patternMap = result;
+                        maybePrepare.call(this);
+                    }
                 }
-            });
+            );
         } else {
             patternMap = {};
         }
@@ -189,11 +204,21 @@ class WorkerTile {
                     const bucket = buckets[key];
                     if (bucket instanceof SymbolBucket) {
                         recalculateLayers(bucket.layers, this.zoom, availableImages);
-                        performSymbolLayout(bucket, glyphMap, glyphAtlas.positions, iconMap, imageAtlas.iconPositions, this.showCollisionBoxes, this.tileID.canonical);
-                    } else if (bucket.hasPattern &&
+                        performSymbolLayout(
+                            bucket,
+                            glyphMap,
+                            glyphAtlas.positions,
+                            iconMap,
+                            imageAtlas.iconPositions,
+                            this.showCollisionBoxes,
+                            this.tileID.canonical
+                        );
+                    } else if (
+                        bucket.hasPattern &&
                         (bucket instanceof LineBucket ||
-                         bucket instanceof FillBucket ||
-                         bucket instanceof FillExtrusionBucket)) {
+                            bucket instanceof FillBucket ||
+                            bucket instanceof FillExtrusionBucket)
+                    ) {
                         recalculateLayers(bucket.layers, this.zoom, availableImages);
                         bucket.addFeatures(options, this.tileID.canonical, imageAtlas.patternPositions);
                     }

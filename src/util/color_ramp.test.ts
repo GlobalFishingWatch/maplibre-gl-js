@@ -1,12 +1,11 @@
-
 import {renderColorRamp} from './color_ramp';
 import {createPropertyExpression, StylePropertyExpression} from '../style-spec/expression';
 import {StylePropertySpecification} from '../style-spec/style-spec';
 
 const spec = {
-    'function': true,
+    function: true,
     'property-function': true,
-    'type': 'color'
+    type: 'color'
 } as any as StylePropertySpecification;
 
 function pixelAt(image, i) {
@@ -23,17 +22,24 @@ function nearlyEquals(a, b) {
 
 describe('renderColorRamp', () => {
     test('renderColorRamp linear', () => {
-
-        const expression = createPropertyExpression([
-            'interpolate',
-            ['linear'],
-            ['line-progress'],
-            0, 'rgba(0,0,255,0)',
-            0.25, 'white',
-            0.5, 'rgba(0,255,255,0.5)',
-            0.75, 'black',
-            1, 'red'
-        ], spec).value as StylePropertyExpression;
+        const expression = createPropertyExpression(
+            [
+                'interpolate',
+                ['linear'],
+                ['line-progress'],
+                0,
+                'rgba(0,0,255,0)',
+                0.25,
+                'white',
+                0.5,
+                'rgba(0,255,255,0.5)',
+                0.75,
+                'black',
+                1,
+                'red'
+            ],
+            spec
+        ).value as StylePropertyExpression;
 
         const ramp = renderColorRamp({expression, evaluationKey: 'lineProgress'});
 
@@ -48,17 +54,24 @@ describe('renderColorRamp', () => {
     });
 
     test('renderColorRamp step', () => {
-
-        const expression = createPropertyExpression([
-            'step',
-            ['line-progress'],
-            'rgba(0, 0, 255, 0.1)',
-            0.1, 'red',
-            0.2, 'yellow',
-            0.3, 'white',
-            0.5, 'black',
-            1, 'black'
-        ], spec).value as StylePropertyExpression;
+        const expression = createPropertyExpression(
+            [
+                'step',
+                ['line-progress'],
+                'rgba(0, 0, 255, 0.1)',
+                0.1,
+                'red',
+                0.2,
+                'yellow',
+                0.3,
+                'white',
+                0.5,
+                'black',
+                1,
+                'black'
+            ],
+            spec
+        ).value as StylePropertyExpression;
 
         const ramp = renderColorRamp({expression, evaluationKey: 'lineProgress', resolution: 512});
 
@@ -71,21 +84,27 @@ describe('renderColorRamp', () => {
         expect(nearlyEquals(pixelAt(ramp, 103), [255, 255, 0, 255])).toBeTruthy();
         expect(nearlyEquals(pixelAt(ramp, 160), [255, 255, 255, 255])).toBeTruthy();
         expect(nearlyEquals(pixelAt(ramp, 256), [0, 0, 0, 255])).toBeTruthy();
-
     });
 
     test('renderColorRamp usePlacement', () => {
-
-        const expression = createPropertyExpression([
-            'step',
-            ['line-progress'],
-            'rgba(255, 0, 0, 0.5)',
-            0.1, 'black',
-            0.2, 'red',
-            0.3, 'blue',
-            0.5, 'white',
-            1, 'white'
-        ], spec).value as StylePropertyExpression;
+        const expression = createPropertyExpression(
+            [
+                'step',
+                ['line-progress'],
+                'rgba(255, 0, 0, 0.5)',
+                0.1,
+                'black',
+                0.2,
+                'red',
+                0.3,
+                'blue',
+                0.5,
+                'white',
+                1,
+                'white'
+            ],
+            spec
+        ).value as StylePropertyExpression;
 
         const ramp = renderColorRamp({expression, evaluationKey: 'lineProgress', resolution: 512});
 
@@ -100,7 +119,5 @@ describe('renderColorRamp', () => {
         expect(nearlyEquals(pixelAt(ramp, 103), [255, 0, 0, 255])).toBeTruthy();
         expect(nearlyEquals(pixelAt(ramp, 160), [0, 0, 255, 255])).toBeTruthy();
         expect(nearlyEquals(pixelAt(ramp, 256), [255, 255, 255, 255])).toBeTruthy();
-
     });
-
 });

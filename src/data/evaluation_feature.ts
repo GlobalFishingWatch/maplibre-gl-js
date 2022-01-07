@@ -3,17 +3,27 @@ import type Point from '../util/point';
 import type {VectorTileFeature} from '@mapbox/vector-tile';
 
 type EvaluationFeature = {
-  readonly type: 1 | 2 | 3 | 'Unknown' | 'Point' | 'MultiPoint' | 'LineString' | 'MultiLineString' | 'Polygon' | 'MultiPolygon';
-  readonly id?: any;
-  readonly properties: {[_: string]: any};
-  readonly patterns?: {
-    [_: string]: {
-      'min': string;
-      'mid': string;
-      'max': string;
+    readonly type:
+        | 1
+        | 2
+        | 3
+        | 'Unknown'
+        | 'Point'
+        | 'MultiPoint'
+        | 'LineString'
+        | 'MultiLineString'
+        | 'Polygon'
+        | 'MultiPolygon';
+    readonly id?: any;
+    readonly properties: {[_: string]: any};
+    readonly patterns?: {
+        [_: string]: {
+            min: string;
+            mid: string;
+            max: string;
+        };
     };
-  };
-  geometry: Array<Array<Point>>;
+    geometry: Array<Array<Point>>;
 };
 
 /**
@@ -24,8 +34,10 @@ type EvaluationFeature = {
  * @private
  */
 export default function toEvaluationFeature(feature: VectorTileFeature, needGeometry: boolean): EvaluationFeature {
-    return {type: feature.type,
+    return {
+        type: feature.type,
         id: feature.id,
-        properties:feature.properties,
-        geometry: needGeometry ? loadGeometry(feature) : []};
+        properties: feature.properties,
+        geometry: needGeometry ? loadGeometry(feature) : []
+    };
 }

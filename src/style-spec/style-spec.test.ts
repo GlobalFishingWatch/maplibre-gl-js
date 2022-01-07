@@ -1,10 +1,9 @@
-
 /* eslint-disable import/namespace */
 import * as spec from './style-spec';
 
 describe('style-spec', () => {
-    ['v8', 'latest'].forEach((version) => {
-        ['', 'min'].forEach((kind) => {
+    ['v8', 'latest'].forEach(version => {
+        ['', 'min'].forEach(kind => {
             const v = version + kind;
             test(v, () => {
                 for (const k in spec[v]) {
@@ -22,10 +21,10 @@ describe('style-spec', () => {
     test('v8 Spec SDK Support section', () => {
         const v = 'v8';
         const propObjs = [].concat(spec[v].paint).concat(spec[v].layout);
-        propObjs.forEach((objKey) => {
+        propObjs.forEach(objKey => {
             const props = spec[v][objKey];
             const propKeys = Object.keys(props);
-            propKeys.forEach((key) => {
+            propKeys.forEach(key => {
                 expect(props[key]['sdk-support']).toBeTruthy();
                 if (props[key]['sdk-support']) {
                     expect(props[key]['sdk-support']['basic functionality']).toBeTruthy();
@@ -40,7 +39,7 @@ describe('style-spec', () => {
 
         const expressions = spec[v].expression_name.values;
         const expressionNames = Object.keys(expressions);
-        expressionNames.forEach((expr) => {
+        expressionNames.forEach(expr => {
             expect(expressions[expr]['sdk-support']).toBeTruthy();
             if (expressions[expr]['sdk-support']) {
                 expect(expressions[expr]['sdk-support']['basic functionality']).toBeTruthy();
@@ -51,10 +50,21 @@ describe('style-spec', () => {
 
 function validSchema(k, v, obj, ref, version, kind) {
     const scalar = ['boolean', 'string', 'number'];
-    const types = Object.keys(ref).concat(['boolean', 'string', 'number',
-        'array', 'enum', 'color', '*',
+    const types = Object.keys(ref).concat([
+        'boolean',
+        'string',
+        'number',
+        'array',
+        'enum',
+        'color',
+        '*',
         // new in v8
-        'opacity', 'translate-array', 'dash-array', 'offset-array', 'font-array', 'field-template',
+        'opacity',
+        'translate-array',
+        'dash-array',
+        'offset-array',
+        'font-array',
+        'field-template',
         // new enums in v8
         'line-cap-enum',
         'line-join-enum',
@@ -110,13 +120,17 @@ function validSchema(k, v, obj, ref, version, kind) {
         // objects (>=v8) or scalars (<=v7). If objects, check that doc key
         // (if present) is a string.
         if (obj.type === 'enum') {
-            const values = (ref.$version >= 8 ? Object.keys(obj.values) : obj.values);
-            expect(Array.isArray(values) && values.every((v) => {
-                return scalar.indexOf(typeof v) !== -1;
-            })).toBeTruthy();
+            const values = ref.$version >= 8 ? Object.keys(obj.values) : obj.values;
+            expect(
+                Array.isArray(values) &&
+                    values.every(v => {
+                        return scalar.indexOf(typeof v) !== -1;
+                    })
+            ).toBeTruthy();
             if (ref.$version >= 8) {
                 for (const v in obj.values) {
-                    if (Array.isArray(obj.values) === false) { // skips $root.version
+                    if (Array.isArray(obj.values) === false) {
+                        // skips $root.version
                         if (obj.values[v].doc !== undefined) {
                             expect('string').toBe(typeof obj.values[v].doc);
                             expect(kind).not.toBe('min');
@@ -131,7 +145,7 @@ function validSchema(k, v, obj, ref, version, kind) {
         // schema type is array, it must have 'value' and it must be a type.
         if (obj.value !== undefined) {
             if (Array.isArray(obj.value)) {
-                obj.value.forEach((i) => {
+                obj.value.forEach(i => {
                     expect(types.indexOf(i) !== -1).toBeTruthy();
                 });
             } else if (typeof obj.value === 'object') {
@@ -167,9 +181,10 @@ function validSchema(k, v, obj, ref, version, kind) {
             expect(ref['property-type'][obj['property-type']]).toBeTruthy();
             expect('boolean').toBe(typeof expression.interpolated);
             expect(true).toBe(Array.isArray(expression.parameters));
-            if (obj['property-type'] !== 'color-ramp') expect(true).toBe(
-                expression.parameters.every(k => k === 'zoom' || k === 'feature' || k === 'feature-state')
-            );
+            if (obj['property-type'] !== 'color-ramp')
+                expect(true).toBe(
+                    expression.parameters.every(k => k === 'zoom' || k === 'feature' || k === 'feature-state')
+                );
         }
 
         // schema key required checks

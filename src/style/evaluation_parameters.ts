@@ -5,9 +5,9 @@ import {plugin as rtlTextPlugin} from '../source/rtl_text_plugin';
 import type {TransitionSpecification} from '../style-spec/types';
 
 export type CrossfadeParameters = {
-  fromScale: number;
-  toScale: number;
-  t: number;
+    fromScale: number;
+    toScale: number;
+    t: number;
 };
 
 class EvaluationParameters {
@@ -51,9 +51,9 @@ class EvaluationParameters {
         const fraction = z - Math.floor(z);
         const t = this.crossFadingFactor();
 
-        return z > this.zoomHistory.lastIntegerZoom ?
-            {fromScale: 2, toScale: 1, t: fraction + (1 - fraction) * t} :
-            {fromScale: 0.5, toScale: 1, t: 1 - (1 - t) * fraction};
+        return z > this.zoomHistory.lastIntegerZoom
+            ? {fromScale: 2, toScale: 1, t: fraction + (1 - fraction) * t}
+            : {fromScale: 0.5, toScale: 1, t: 1 - (1 - t) * fraction};
     }
 }
 

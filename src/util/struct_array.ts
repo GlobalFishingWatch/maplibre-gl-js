@@ -5,13 +5,13 @@ import assert from 'assert';
 import type {Transferable} from '../types/transferable';
 
 const viewTypes = {
-    'Int8': Int8Array,
-    'Uint8': Uint8Array,
-    'Int16': Int16Array,
-    'Uint16': Uint16Array,
-    'Int32': Int32Array,
-    'Uint32': Uint32Array,
-    'Float32': Float32Array
+    Int8: Int8Array,
+    Uint8: Uint8Array,
+    Int16: Int16Array,
+    Uint16: Uint16Array,
+    Int32: Int32Array,
+    Uint32: Uint32Array,
+    Float32: Float32Array
 };
 
 export type ViewType = keyof typeof viewTypes;
@@ -47,21 +47,21 @@ const DEFAULT_CAPACITY = 128;
 const RESIZE_MULTIPLIER = 5;
 
 export type StructArrayMember = {
-  name: string;
-  type: ViewType;
-  components: number;
-  offset: number;
+    name: string;
+    type: ViewType;
+    components: number;
+    offset: number;
 };
 
 export type StructArrayLayout = {
-  members: Array<StructArrayMember>;
-  size: number;
-  alignment: number;
+    members: Array<StructArrayMember>;
+    size: number;
+    alignment: number;
 };
 
 export type SerializedStructArray = {
-  length: number;
-  arrayBuffer: ArrayBuffer;
+    length: number;
+    arrayBuffer: ArrayBuffer;
 };
 
 /**
@@ -122,7 +122,7 @@ abstract class StructArray {
 
         return {
             length: array.length,
-            arrayBuffer: array.arrayBuffer,
+            arrayBuffer: array.arrayBuffer
         };
     }
 
@@ -198,20 +198,19 @@ abstract class StructArray {
  * @private
  */
 function createLayout(
-  members: Array<{
-    name: string;
-    type: ViewType;
-    readonly components?: number;
-  }>,
-  alignment: number = 1
+    members: Array<{
+        name: string;
+        type: ViewType;
+        readonly components?: number;
+    }>,
+    alignment: number = 1
 ): StructArrayLayout {
-
     let offset = 0;
     let maxSize = 0;
-    const layoutMembers = members.map((member) => {
+    const layoutMembers = members.map(member => {
         assert(member.name.length);
         const typeSize = sizeOf(member.type);
-        const memberOffset = offset = align(offset, Math.max(alignment, typeSize));
+        const memberOffset = (offset = align(offset, Math.max(alignment, typeSize)));
         const components = member.components || 1;
 
         maxSize = Math.max(maxSize, typeSize);
@@ -221,7 +220,7 @@ function createLayout(
             name: member.name,
             type: member.type,
             components,
-            offset: memberOffset,
+            offset: memberOffset
         };
     });
 

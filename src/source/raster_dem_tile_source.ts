@@ -38,7 +38,10 @@ class RasterDEMTileSource extends RasterTileSource implements Source {
 
     loadTile(tile: Tile, callback: Callback<void>) {
         const url = tile.tileID.canonical.url(this.tiles, this.scheme);
-        tile.request = getImage(this.map._requestManager.transformRequest(url, ResourceType.Tile), imageLoaded.bind(this));
+        tile.request = getImage(
+            this.map._requestManager.transformRequest(url, ResourceType.Tile),
+            imageLoaded.bind(this)
+        );
 
         tile.neighboringTiles = this._getNeighboringTiles(tile.tileID);
         function imageLoaded(err, img) {
@@ -96,20 +99,36 @@ class RasterDEMTileSource extends RasterTileSource implements Source {
 
         const neighboringTiles = {};
         // add adjacent tiles
-        neighboringTiles[new OverscaledTileID(tileID.overscaledZ, pxw, canonical.z, px, canonical.y).key] = {backfilled: false};
-        neighboringTiles[new OverscaledTileID(tileID.overscaledZ, nxw, canonical.z, nx, canonical.y).key] = {backfilled: false};
+        neighboringTiles[new OverscaledTileID(tileID.overscaledZ, pxw, canonical.z, px, canonical.y).key] = {
+            backfilled: false
+        };
+        neighboringTiles[new OverscaledTileID(tileID.overscaledZ, nxw, canonical.z, nx, canonical.y).key] = {
+            backfilled: false
+        };
 
         // Add upper neighboringTiles
         if (canonical.y > 0) {
-            neighboringTiles[new OverscaledTileID(tileID.overscaledZ, pxw, canonical.z, px, canonical.y - 1).key] = {backfilled: false};
-            neighboringTiles[new OverscaledTileID(tileID.overscaledZ, tileID.wrap, canonical.z, canonical.x, canonical.y - 1).key] = {backfilled: false};
-            neighboringTiles[new OverscaledTileID(tileID.overscaledZ, nxw, canonical.z, nx, canonical.y - 1).key] = {backfilled: false};
+            neighboringTiles[new OverscaledTileID(tileID.overscaledZ, pxw, canonical.z, px, canonical.y - 1).key] = {
+                backfilled: false
+            };
+            neighboringTiles[
+                new OverscaledTileID(tileID.overscaledZ, tileID.wrap, canonical.z, canonical.x, canonical.y - 1).key
+            ] = {backfilled: false};
+            neighboringTiles[new OverscaledTileID(tileID.overscaledZ, nxw, canonical.z, nx, canonical.y - 1).key] = {
+                backfilled: false
+            };
         }
         // Add lower neighboringTiles
         if (canonical.y + 1 < dim) {
-            neighboringTiles[new OverscaledTileID(tileID.overscaledZ, pxw, canonical.z, px, canonical.y + 1).key] = {backfilled: false};
-            neighboringTiles[new OverscaledTileID(tileID.overscaledZ, tileID.wrap, canonical.z, canonical.x, canonical.y + 1).key] = {backfilled: false};
-            neighboringTiles[new OverscaledTileID(tileID.overscaledZ, nxw, canonical.z, nx, canonical.y + 1).key] = {backfilled: false};
+            neighboringTiles[new OverscaledTileID(tileID.overscaledZ, pxw, canonical.z, px, canonical.y + 1).key] = {
+                backfilled: false
+            };
+            neighboringTiles[
+                new OverscaledTileID(tileID.overscaledZ, tileID.wrap, canonical.z, canonical.x, canonical.y + 1).key
+            ] = {backfilled: false};
+            neighboringTiles[new OverscaledTileID(tileID.overscaledZ, nxw, canonical.z, nx, canonical.y + 1).key] = {
+                backfilled: false
+            };
         }
 
         return neighboringTiles;
@@ -129,7 +148,6 @@ class RasterDEMTileSource extends RasterTileSource implements Source {
             tile.actor.send('removeDEMTile', {uid: tile.uid, source: this.id});
         }
     }
-
 }
 
 export default RasterDEMTileSource;

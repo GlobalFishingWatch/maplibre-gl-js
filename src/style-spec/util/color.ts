@@ -51,12 +51,7 @@ class Color {
             return undefined;
         }
 
-        return new Color(
-            rgba[0] / 255 * rgba[3],
-            rgba[1] / 255 * rgba[3],
-            rgba[2] / 255 * rgba[3],
-            rgba[3]
-        );
+        return new Color((rgba[0] / 255) * rgba[3], (rgba[1] / 255) * rgba[3], (rgba[2] / 255) * rgba[3], rgba[3]);
     }
 
     /**
@@ -76,12 +71,7 @@ class Color {
 
     toArray(): [number, number, number, number] {
         const {r, g, b, a} = this;
-        return a === 0 ? [0, 0, 0, 0] : [
-            r * 255 / a,
-            g * 255 / a,
-            b * 255 / a,
-            a
-        ];
+        return a === 0 ? [0, 0, 0, 0] : [(r * 255) / a, (g * 255) / a, (b * 255) / a, a];
     }
 }
 

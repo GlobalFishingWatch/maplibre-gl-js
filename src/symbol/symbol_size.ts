@@ -10,40 +10,39 @@ const SIZE_PACK_FACTOR = 128;
 
 export {getSizeData, evaluateSizeForFeature, evaluateSizeForZoom, SIZE_PACK_FACTOR};
 
-export type SizeData = {
-  kind: 'constant';
-  layoutSize: number;
-} | {
-  kind: 'source';
-} | {
-  kind: 'camera';
-  minZoom: number;
-  maxZoom: number;
-  minSize: number;
-  maxSize: number;
-  interpolationType: InterpolationType;
-} | {
-  kind: 'composite';
-  minZoom: number;
-  maxZoom: number;
-  interpolationType: InterpolationType;
-};
+export type SizeData =
+    | {
+          kind: 'constant';
+          layoutSize: number;
+      }
+    | {
+          kind: 'source';
+      }
+    | {
+          kind: 'camera';
+          minZoom: number;
+          maxZoom: number;
+          minSize: number;
+          maxSize: number;
+          interpolationType: InterpolationType;
+      }
+    | {
+          kind: 'composite';
+          minZoom: number;
+          maxZoom: number;
+          interpolationType: InterpolationType;
+      };
 
 // For {text,icon}-size, get the bucket-level data that will be needed by
 // the painter to set symbol-size-related uniforms
-function getSizeData(
-  tileZoom: number,
-  value: PropertyValue<number, PossiblyEvaluatedPropertyValue<number>>
-): SizeData {
+function getSizeData(tileZoom: number, value: PropertyValue<number, PossiblyEvaluatedPropertyValue<number>>): SizeData {
     const {expression} = value;
 
     if (expression.kind === 'constant') {
         const layoutSize = expression.evaluate(new EvaluationParameters(tileZoom + 1));
         return {kind: 'constant', layoutSize};
-
     } else if (expression.kind === 'source') {
         return {kind: 'source'};
-
     } else {
         const {zoomStops, interpolationType} = expression;
 
@@ -74,21 +73,23 @@ function getSizeData(
     }
 }
 
-function evaluateSizeForFeature(sizeData: SizeData,
-                                {
-                                    uSize,
-                                    uSizeT
-                                }: {
-                                  uSize: number;
-                                  uSizeT: number;
-                                },
-                                {
-                                    lowerSize,
-                                    upperSize
-                                }: {
-                                  lowerSize: number;
-                                  upperSize: number;
-                                }) {
+function evaluateSizeForFeature(
+    sizeData: SizeData,
+    {
+        uSize,
+        uSizeT
+    }: {
+        uSize: number;
+        uSizeT: number;
+    },
+    {
+        lowerSize,
+        upperSize
+    }: {
+        lowerSize: number;
+        upperSize: number;
+    }
+) {
     if (sizeData.kind === 'source') {
         return lowerSize / SIZE_PACK_FACTOR;
     } else if (sizeData.kind === 'composite') {
@@ -103,7 +104,6 @@ function evaluateSizeForZoom(sizeData: SizeData, zoom: number) {
 
     if (sizeData.kind === 'constant') {
         uSize = sizeData.layoutSize;
-
     } else if (sizeData.kind !== 'source') {
         const {interpolationType, minZoom, maxZoom} = sizeData;
 
@@ -112,8 +112,9 @@ function evaluateSizeForZoom(sizeData: SizeData, zoom: number) {
         // between the camera function values at a pair of zoom stops covering
         // [tileZoom, tileZoom + 1] in order to be consistent with this
         // restriction on composite functions
-        const t = !interpolationType ? 0 : clamp(
-            Interpolate.interpolationFactor(interpolationType, zoom, minZoom, maxZoom), 0, 1);
+        const t = !interpolationType
+            ? 0
+            : clamp(Interpolate.interpolationFactor(interpolationType, zoom, minZoom, maxZoom), 0, 1);
 
         if (sizeData.kind === 'camera') {
             uSize = interpolate(sizeData.minSize, sizeData.maxSize, t);

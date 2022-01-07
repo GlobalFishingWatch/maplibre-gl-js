@@ -19,22 +19,22 @@ describe('reloadTile', () => {
             {
                 id: 'mylayer',
                 source: 'sourceId',
-                type: 'symbol',
+                type: 'symbol'
             }
         ] as LayerSpecification[];
         const layerIndex = new StyleLayerIndex(layers);
         const source = new GeoJSONWorkerSource(actor, layerIndex, []);
         const originalLoadVectorData = source.loadVectorData;
         let loadVectorCallCount = 0;
-        source.loadVectorData = function(params, callback) {
+        source.loadVectorData = function (params, callback) {
             loadVectorCallCount++;
             return originalLoadVectorData.call(this, params, callback);
         };
         const geoJson = {
-            'type': 'Feature',
-            'geometry': {
-                'type': 'Point',
-                'coordinates': [0, 0]
+            type: 'Feature',
+            geometry: {
+                type: 'Point',
+                coordinates: [0, 0]
             }
         };
         const tileParams = {
@@ -45,7 +45,7 @@ describe('reloadTile', () => {
         };
 
         function addData(callback) {
-            source.loadData({source: 'sourceId', data: JSON.stringify(geoJson)} as LoadGeoJSONParameters, (err) => {
+            source.loadData({source: 'sourceId', data: JSON.stringify(geoJson)} as LoadGeoJSONParameters, err => {
                 source.coalesce();
                 expect(err).toBeNull();
                 callback();
@@ -89,23 +89,21 @@ describe('reloadTile', () => {
             });
         });
     });
-
 });
 
 describe('resourceTiming', () => {
-
     const layers = [
         {
             id: 'mylayer',
             source: 'sourceId',
-            type: 'symbol',
+            type: 'symbol'
         }
     ] as LayerSpecification[];
     const geoJson = {
-        'type': 'Feature',
-        'geometry': {
-            'type': 'Point',
-            'coordinates': [0, 0]
+        type: 'Feature',
+        geometry: {
+            type: 'Point',
+            coordinates: [0, 0]
         }
     } as GeoJSON.GeoJSON;
 
@@ -131,24 +129,34 @@ describe('resourceTiming', () => {
             secureConnectionStart: 0
         } as any as PerformanceEntry;
 
-        window.performance.getEntriesByName = jest.fn().mockReturnValue([ exampleResourceTiming ]);
+        window.performance.getEntriesByName = jest.fn().mockReturnValue([exampleResourceTiming]);
 
         const layerIndex = new StyleLayerIndex(layers);
-        const source = new GeoJSONWorkerSource(actor, layerIndex, [], (params, callback) => { return callback(null, geoJson); });
-
-        source.loadData({source: 'testSource', request: {url: 'http://localhost/nonexistent', collectResourceTiming: true}} as LoadGeoJSONParameters, (err, result) => {
-            expect(err).toBeNull();
-            expect(result.resourceTiming.testSource).toEqual([ exampleResourceTiming ]);
-            done();
+        const source = new GeoJSONWorkerSource(actor, layerIndex, [], (params, callback) => {
+            return callback(null, geoJson);
         });
+
+        source.loadData(
+            {
+                source: 'testSource',
+                request: {url: 'http://localhost/nonexistent', collectResourceTiming: true}
+            } as LoadGeoJSONParameters,
+            (err, result) => {
+                expect(err).toBeNull();
+                expect(result.resourceTiming.testSource).toEqual([exampleResourceTiming]);
+                done();
+            }
+        );
     });
 
     test('loadData - url (resourceTiming fallback method)', done => {
         const sampleMarks = [100, 350];
         const marks = {};
         const measures = {};
-        window.performance.getEntriesByName = jest.fn().mockImplementation((name) => { return measures[name] || []; });
-        jest.spyOn(perf, 'mark').mockImplementation((name) => {
+        window.performance.getEntriesByName = jest.fn().mockImplementation(name => {
+            return measures[name] || [];
+        });
+        jest.spyOn(perf, 'mark').mockImplementation(name => {
             marks[name] = sampleMarks.shift();
             return null;
         });
@@ -162,32 +170,46 @@ describe('resourceTiming', () => {
             });
             return null;
         });
-        jest.spyOn(perf, 'clearMarks').mockImplementation(() => { return null; });
-        jest.spyOn(perf, 'clearMeasures').mockImplementation(() => { return null; });
+        jest.spyOn(perf, 'clearMarks').mockImplementation(() => {
+            return null;
+        });
+        jest.spyOn(perf, 'clearMeasures').mockImplementation(() => {
+            return null;
+        });
 
         const layerIndex = new StyleLayerIndex(layers);
-        const source = new GeoJSONWorkerSource(actor, layerIndex, [], (params, callback) => { return callback(null, geoJson); });
-
-        source.loadData({source: 'testSource', request: {url: 'http://localhost/nonexistent', collectResourceTiming: true}} as LoadGeoJSONParameters, (err, result) => {
-            expect(err).toBeNull();
-            expect(result.resourceTiming.testSource).toEqual(
-                [{'duration': 250, 'entryType': 'measure', 'name': 'http://localhost/nonexistent', 'startTime': 100}]
-            );
-            done();
+        const source = new GeoJSONWorkerSource(actor, layerIndex, [], (params, callback) => {
+            return callback(null, geoJson);
         });
+
+        source.loadData(
+            {
+                source: 'testSource',
+                request: {url: 'http://localhost/nonexistent', collectResourceTiming: true}
+            } as LoadGeoJSONParameters,
+            (err, result) => {
+                expect(err).toBeNull();
+                expect(result.resourceTiming.testSource).toEqual([
+                    {duration: 250, entryType: 'measure', name: 'http://localhost/nonexistent', startTime: 100}
+                ]);
+                done();
+            }
+        );
     });
 
     test('loadData - data', done => {
         const layerIndex = new StyleLayerIndex(layers);
         const source = new GeoJSONWorkerSource(actor, layerIndex, []);
 
-        source.loadData({source: 'testSource', data: JSON.stringify(geoJson)} as LoadGeoJSONParameters, (err, result) => {
-            expect(err).toBeNull();
-            expect(result.resourceTiming).toBeUndefined();
-            done();
-        });
+        source.loadData(
+            {source: 'testSource', data: JSON.stringify(geoJson)} as LoadGeoJSONParameters,
+            (err, result) => {
+                expect(err).toBeNull();
+                expect(result.resourceTiming).toBeUndefined();
+                done();
+            }
+        );
     });
-
 });
 
 describe('loadData', () => {
@@ -195,20 +217,20 @@ describe('loadData', () => {
         {
             id: 'layer1',
             source: 'source1',
-            type: 'symbol',
+            type: 'symbol'
         },
         {
             id: 'layer2',
             source: 'source2',
-            type: 'symbol',
+            type: 'symbol'
         }
     ] as LayerSpecification[];
 
     const geoJson = {
-        'type': 'Feature',
-        'geometry': {
-            'type': 'Point',
-            'coordinates': [0, 0]
+        type: 'Feature',
+        geometry: {
+            type: 'Point',
+            coordinates: [0, 0]
         }
     } as GeoJSON.GeoJSON;
 
@@ -220,7 +242,7 @@ describe('loadData', () => {
         // allows these tests to mimic a message queue building up
         // (regardless of timing)
         const originalLoadGeoJSON = worker.loadGeoJSON;
-        worker.loadGeoJSON = function(params, callback) {
+        worker.loadGeoJSON = function (params, callback) {
             setTimeout(() => {
                 originalLoadGeoJSON(params, callback);
             }, 0);
@@ -268,10 +290,8 @@ describe('loadData', () => {
             expect(result && result.abandoned).toBeTruthy();
         });
 
-        worker.removeSource({source: 'source1'}, (err) => {
+        worker.removeSource({source: 'source1'}, err => {
             expect(err).toBeFalsy();
         });
-
     });
-
 });

@@ -14,7 +14,10 @@ import type CullFaceMode from '../gl/cull_face_mode';
 import type {UniformBindings, UniformValues, UniformLocations} from './uniform_binding';
 import type {BinderUniform} from '../data/program_configuration';
 
-export type DrawMode = WebGLRenderingContext['LINES'] | WebGLRenderingContext['TRIANGLES'] | WebGLRenderingContext['LINE_STRIP'];
+export type DrawMode =
+    | WebGLRenderingContext['LINES']
+    | WebGLRenderingContext['TRIANGLES']
+    | WebGLRenderingContext['LINE_STRIP'];
 
 function getTokenizedAttributesAndUniforms(array: Array<string>): Array<string> {
     const result = [];
@@ -34,17 +37,19 @@ class Program<Us extends UniformBindings> {
     binderUniforms: Array<BinderUniform>;
     failedToCreate: boolean;
 
-    constructor(context: Context,
-            name: string,
-            source: {
-              fragmentSource: string;
-              vertexSource: string;
-              staticAttributes: Array<string>;
-              staticUniforms: Array<string>;
-            },
-            configuration: ProgramConfiguration,
-            fixedUniforms: (b: Context, a: UniformLocations) => Us,
-            showOverdrawInspector: boolean) {
+    constructor(
+        context: Context,
+        name: string,
+        source: {
+            fragmentSource: string;
+            vertexSource: string;
+            staticAttributes: Array<string>;
+            staticUniforms: Array<string>;
+        },
+        configuration: ProgramConfiguration,
+        fixedUniforms: (b: Context, a: UniformLocations) => Us,
+        showOverdrawInspector: boolean
+    ) {
         const gl = context.gl;
         this.program = gl.createProgram();
 
@@ -52,7 +57,9 @@ class Program<Us extends UniformBindings> {
         const dynamicAttrInfo = configuration ? configuration.getBinderAttributes() : [];
         const allAttrInfo = staticAttrInfo.concat(dynamicAttrInfo);
 
-        const staticUniformsInfo = source.staticUniforms ? getTokenizedAttributesAndUniforms(source.staticUniforms) : [];
+        const staticUniformsInfo = source.staticUniforms
+            ? getTokenizedAttributesAndUniforms(source.staticUniforms)
+            : [];
         const dynamicUniformsInfo = configuration ? configuration.getBinderUniforms() : [];
         // remove duplicate uniforms
         const uniformList = staticUniformsInfo.concat(dynamicUniformsInfo);
@@ -75,7 +82,7 @@ class Program<Us extends UniformBindings> {
         }
         gl.shaderSource(fragmentShader, fragmentSource);
         gl.compileShader(fragmentShader);
-        assert(gl.getShaderParameter(fragmentShader, gl.COMPILE_STATUS), (gl.getShaderInfoLog(fragmentShader) as any));
+        assert(gl.getShaderParameter(fragmentShader, gl.COMPILE_STATUS), gl.getShaderInfoLog(fragmentShader) as any);
         gl.attachShader(this.program, fragmentShader);
 
         const vertexShader = gl.createShader(gl.VERTEX_SHADER);
@@ -85,7 +92,7 @@ class Program<Us extends UniformBindings> {
         }
         gl.shaderSource(vertexShader, vertexSource);
         gl.compileShader(vertexShader);
-        assert(gl.getShaderParameter(vertexShader, gl.COMPILE_STATUS), (gl.getShaderInfoLog(vertexShader) as any));
+        assert(gl.getShaderParameter(vertexShader, gl.COMPILE_STATUS), gl.getShaderInfoLog(vertexShader) as any);
         gl.attachShader(this.program, vertexShader);
 
         this.attributes = {};
@@ -101,7 +108,7 @@ class Program<Us extends UniformBindings> {
         }
 
         gl.linkProgram(this.program);
-        assert(gl.getProgramParameter(this.program, gl.LINK_STATUS), (gl.getProgramInfoLog(this.program) as any));
+        assert(gl.getProgramParameter(this.program, gl.LINK_STATUS), gl.getProgramInfoLog(this.program) as any);
 
         gl.deleteShader(vertexShader);
         gl.deleteShader(fragmentShader);
@@ -120,23 +127,24 @@ class Program<Us extends UniformBindings> {
         this.binderUniforms = configuration ? configuration.getUniforms(context, uniformLocations) : [];
     }
 
-    draw(context: Context,
-         drawMode: DrawMode,
-         depthMode: Readonly<DepthMode>,
-         stencilMode: Readonly<StencilMode>,
-         colorMode: Readonly<ColorMode>,
-         cullFaceMode: Readonly<CullFaceMode>,
-         uniformValues: UniformValues<Us>,
-         layerID: string,
-         layoutVertexBuffer: VertexBuffer,
-         indexBuffer: IndexBuffer,
-         segments: SegmentVector,
-         currentProperties?: any,
-         zoom?: number | null,
-         configuration?: ProgramConfiguration | null,
-         dynamicLayoutBuffer?: VertexBuffer | null,
-         dynamicLayoutBuffer2?: VertexBuffer | null) {
-
+    draw(
+        context: Context,
+        drawMode: DrawMode,
+        depthMode: Readonly<DepthMode>,
+        stencilMode: Readonly<StencilMode>,
+        colorMode: Readonly<ColorMode>,
+        cullFaceMode: Readonly<CullFaceMode>,
+        uniformValues: UniformValues<Us>,
+        layerID: string,
+        layoutVertexBuffer: VertexBuffer,
+        indexBuffer: IndexBuffer,
+        segments: SegmentVector,
+        currentProperties?: any,
+        zoom?: number | null,
+        configuration?: ProgramConfiguration | null,
+        dynamicLayoutBuffer?: VertexBuffer | null,
+        dynamicLayoutBuffer2?: VertexBuffer | null
+    ) {
         const gl = context.gl;
 
         if (this.failedToCreate) return;
@@ -152,7 +160,7 @@ class Program<Us extends UniformBindings> {
         }
 
         if (configuration) {
-            configuration.setUniforms(context, this.binderUniforms, currentProperties, {zoom: (zoom as any)});
+            configuration.setUniforms(context, this.binderUniforms, currentProperties, {zoom: zoom as any});
         }
 
         const primitiveSize = {
@@ -180,7 +188,8 @@ class Program<Us extends UniformBindings> {
                 drawMode,
                 segment.primitiveLength * primitiveSize,
                 gl.UNSIGNED_SHORT,
-                segment.primitiveOffset * primitiveSize * 2);
+                segment.primitiveOffset * primitiveSize * 2
+            );
         }
     }
 }

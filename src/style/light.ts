@@ -2,11 +2,7 @@ import styleSpec from '../style-spec/reference/latest';
 
 import {extend, sphericalToCartesian} from '../util/util';
 import {Evented} from '../util/evented';
-import {
-    validateStyle,
-    validateLight,
-    emitValidationErrors
-} from './validate_style';
+import {validateStyle, validateLight, emitValidationErrors} from './validate_style';
 import Color from '../style-spec/util/color';
 import {number as interpolate} from '../style-spec/util/interpolate';
 
@@ -15,18 +11,14 @@ import type EvaluationParameters from './evaluation_parameters';
 import type {StyleSetterOptions} from '../style/style';
 import {Properties, Transitionable, Transitioning, PossiblyEvaluated, DataConstantProperty} from './properties';
 
-import type {
-    Property,
-    PropertyValue,
-    TransitionParameters
-} from './properties';
+import type {Property, PropertyValue, TransitionParameters} from './properties';
 
 import type {LightSpecification} from '../style-spec/types';
 
 type LightPosition = {
-  x: number;
-  y: number;
-  z: number;
+    x: number;
+    y: number;
+    z: number;
 };
 
 class LightPositionProperty implements Property<[number, number, number], LightPosition> {
@@ -37,8 +29,8 @@ class LightPositionProperty implements Property<[number, number, number], LightP
     }
 
     possiblyEvaluate(
-      value: PropertyValue<[number, number, number], LightPosition>,
-      parameters: EvaluationParameters
+        value: PropertyValue<[number, number, number], LightPosition>,
+        parameters: EvaluationParameters
     ): LightPosition {
         return sphericalToCartesian(value.expression.evaluate(parameters));
     }
@@ -47,30 +39,30 @@ class LightPositionProperty implements Property<[number, number, number], LightP
         return {
             x: interpolate(a.x, b.x, t),
             y: interpolate(a.y, b.y, t),
-            z: interpolate(a.z, b.z, t),
+            z: interpolate(a.z, b.z, t)
         };
     }
 }
 
 type Props = {
-  'anchor': DataConstantProperty<'map' | 'viewport'>;
-  'position': LightPositionProperty;
-  'color': DataConstantProperty<Color>;
-  'intensity': DataConstantProperty<number>;
+    anchor: DataConstantProperty<'map' | 'viewport'>;
+    position: LightPositionProperty;
+    color: DataConstantProperty<Color>;
+    intensity: DataConstantProperty<number>;
 };
 
 type PropsPossiblyEvaluated = {
-    'anchor': 'map' | 'viewport';
-    'position': LightPosition;
-    'color': Color;
-    'intensity': number;
+    anchor: 'map' | 'viewport';
+    position: LightPosition;
+    color: Color;
+    intensity: number;
 };
 
 const properties: Properties<Props> = new Properties({
-    'anchor': new DataConstantProperty(styleSpec.light.anchor as StylePropertySpecification),
-    'position': new LightPositionProperty(),
-    'color': new DataConstantProperty(styleSpec.light.color as StylePropertySpecification),
-    'intensity': new DataConstantProperty(styleSpec.light.intensity as StylePropertySpecification),
+    anchor: new DataConstantProperty(styleSpec.light.anchor as StylePropertySpecification),
+    position: new LightPositionProperty(),
+    color: new DataConstantProperty(styleSpec.light.color as StylePropertySpecification),
+    intensity: new DataConstantProperty(styleSpec.light.intensity as StylePropertySpecification)
 });
 
 const TRANSITION_SUFFIX = '-transition';
@@ -121,19 +113,29 @@ class Light extends Evented {
         this.properties = this._transitioning.possiblyEvaluate(parameters);
     }
 
-    _validate(validate: Function, value: unknown, options?: {
-      validate?: boolean;
-    }) {
+    _validate(
+        validate: Function,
+        value: unknown,
+        options?: {
+            validate?: boolean;
+        }
+    ) {
         if (options && options.validate === false) {
             return false;
         }
 
-        return emitValidationErrors(this, validate.call(validateStyle, extend({
-            value,
-            // Workaround for https://github.com/mapbox/mapbox-gl-js/issues/2407
-            style: {glyphs: true, sprite: true},
-            styleSpec
-        })));
+        return emitValidationErrors(
+            this,
+            validate.call(
+                validateStyle,
+                extend({
+                    value,
+                    // Workaround for https://github.com/mapbox/mapbox-gl-js/issues/2407
+                    style: {glyphs: true, sprite: true},
+                    styleSpec
+                })
+            )
+        );
     }
 }
 

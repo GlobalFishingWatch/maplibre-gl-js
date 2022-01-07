@@ -15,7 +15,6 @@ beforeEach(() => {
 });
 
 describe('Map#isZooming', () => {
-
     test('returns false by default', done => {
         const map = createMap();
         expect(map.isZooming()).toBe(false);
@@ -53,7 +52,9 @@ describe('Map#isZooming', () => {
         });
 
         let now = 0;
-        jest.spyOn(browser, 'now').mockImplementation(() => { return now; });
+        jest.spyOn(browser, 'now').mockImplementation(() => {
+            return now;
+        });
 
         simulate.wheel(map.getCanvas(), {type: 'wheel', deltaY: -simulate.magicWheelZoomDelta});
         map._renderTaskQueue.run();
@@ -78,7 +79,9 @@ describe('Map#isZooming', () => {
         });
 
         let now = 0;
-        jest.spyOn(browser, 'now').mockImplementation(() => { return now; });
+        jest.spyOn(browser, 'now').mockImplementation(() => {
+            return now;
+        });
 
         simulate.dblclick(map.getCanvas());
         map._renderTaskQueue.run();

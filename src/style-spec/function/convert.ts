@@ -18,7 +18,7 @@ function convertFunction(parameters: any, propertySpec: StylePropertySpecificati
     const featureDependent = zoomAndFeatureDependent || parameters.property !== undefined;
     const zoomDependent = zoomAndFeatureDependent || !featureDependent;
 
-    stops = stops.map((stop) => {
+    stops = stops.map(stop => {
         if (!featureDependent && (propertySpec as any).tokens && typeof stop[1] === 'string') {
             return [stop[0], convertTokenString(stop[1])];
         }
@@ -42,15 +42,13 @@ function convertIdentityFunction(parameters, propertySpec): Array<unknown> {
         // legacy function semantics, insert an explicit assertion instead.
         return propertySpec.type === 'string' ? ['string', get] : get;
     } else if (propertySpec.type === 'enum') {
-        return [
-            'match',
-            get,
-            Object.keys(propertySpec.values),
-            get,
-            parameters.default
-        ];
+        return ['match', get, Object.keys(propertySpec.values), get, parameters.default];
     } else {
-        const expression = [propertySpec.type === 'color' ? 'to-color' : propertySpec.type, get, convertLiteral(parameters.default)];
+        const expression = [
+            propertySpec.type === 'color' ? 'to-color' : propertySpec.type,
+            get,
+            convertLiteral(parameters.default)
+        ];
         if (propertySpec.type === 'array') {
             expression.splice(1, 0, propertySpec.value, propertySpec.length || null);
         }
@@ -60,9 +58,12 @@ function convertIdentityFunction(parameters, propertySpec): Array<unknown> {
 
 function getInterpolateOperator(parameters) {
     switch (parameters.colorSpace) {
-    case 'hcl': return 'interpolate-hcl';
-    case 'lab': return 'interpolate-lab';
-    default: return 'interpolate';
+        case 'hcl':
+            return 'interpolate-hcl';
+        case 'lab':
+            return 'interpolate-lab';
+        default:
+            return 'interpolate';
     }
 }
 
@@ -78,7 +79,7 @@ function convertZoomAndPropertyFunction(parameters, propertySpec, stops) {
                 zoom,
                 type: parameters.type,
                 property: parameters.property,
-                default: parameters.default,
+                default: parameters.default
             };
             featureFunctionStops[zoom] = [];
             zoomStops.push(zoom);
@@ -159,12 +160,9 @@ function convertPropertyFunction(parameters, propertySpec, stops) {
             appendStopPair(expression, stop[0], stop[1], true);
         }
         fixupDegenerateStepCurve(expression);
-        return parameters.default === undefined ? expression : [
-            'case',
-            ['==', ['typeof', get], 'number'],
-            expression,
-            convertLiteral(parameters.default)
-        ];
+        return parameters.default === undefined
+            ? expression
+            : ['case', ['==', ['typeof', get], 'number'], expression, convertLiteral(parameters.default)];
     } else if (type === 'exponential') {
         const base = parameters.base !== undefined ? parameters.base : 1;
         const expression = [
@@ -176,12 +174,9 @@ function convertPropertyFunction(parameters, propertySpec, stops) {
         for (const stop of stops) {
             appendStopPair(expression, stop[0], stop[1], false);
         }
-        return parameters.default === undefined ? expression : [
-            'case',
-            ['==', ['typeof', get], 'number'],
-            expression,
-            convertLiteral(parameters.default)
-        ];
+        return parameters.default === undefined
+            ? expression
+            : ['case', ['==', ['typeof', get], 'number'], expression, convertLiteral(parameters.default)];
     } else {
         throw new Error(`Unknown property function type ${type}`);
     }
@@ -197,7 +192,6 @@ function convertZoomFunction(parameters, propertySpec, stops, input = ['zoom']) 
     } else if (type === 'exponential') {
         const base = parameters.base !== undefined ? parameters.base : 1;
         expression = [getInterpolateOperator(parameters), base === 1 ? ['linear'] : ['exponential', base], input];
-
     } else {
         throw new Error(`Unknown zoom function type "${type}"`);
     }
@@ -265,4 +259,3 @@ export function convertTokenString(s: string) {
 
     return result;
 }
-

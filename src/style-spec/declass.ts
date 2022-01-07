@@ -1,4 +1,3 @@
-
 import extend from './util/extend';
 
 export default declassStyle;
@@ -20,7 +19,7 @@ export default declassStyle;
  */
 function declassStyle(style, classes) {
     return extend({}, style, {
-        layers: style.layers.map((layer) => {
+        layers: style.layers.map(layer => {
             const result = classes.reduce(declassLayer, layer);
 
             // strip away all `paint.CLASS` definitions

@@ -1,9 +1,6 @@
 import assert from 'assert';
 
-import type {
-    StructArray,
-    StructArrayMember
-} from '../util/struct_array';
+import type {StructArray, StructArrayMember} from '../util/struct_array';
 
 import type Program from '../render/program';
 import type Context from '../gl/context';
@@ -14,11 +11,11 @@ import type Context from '../gl/context';
  * @readonly
  */
 const AttributeType = {
-    Int8:   'BYTE',
-    Uint8:  'UNSIGNED_BYTE',
-    Int16:  'SHORT',
+    Int8: 'BYTE',
+    Uint8: 'UNSIGNED_BYTE',
+    Int16: 'SHORT',
     Uint16: 'UNSIGNED_SHORT',
-    Int32:  'INT',
+    Int32: 'INT',
     Uint32: 'UNSIGNED_INT',
     Float32: 'FLOAT'
 };
@@ -40,7 +37,12 @@ class VertexBuffer {
      * @param dynamicDraw Whether this buffer will be repeatedly updated.
      * @private
      */
-    constructor(context: Context, array: StructArray, attributes: ReadonlyArray<StructArrayMember>, dynamicDraw?: boolean) {
+    constructor(
+        context: Context,
+        array: StructArray,
+        attributes: ReadonlyArray<StructArrayMember>,
+        dynamicDraw?: boolean
+    ) {
         this.length = array.length;
         this.attributes = attributes;
         this.itemSize = array.bytesPerElement;
@@ -96,7 +98,7 @@ class VertexBuffer {
                     (gl as any)[AttributeType[member.type]],
                     false,
                     this.itemSize,
-                    member.offset + (this.itemSize * (vertexOffset || 0))
+                    member.offset + this.itemSize * (vertexOffset || 0)
                 );
             }
         }

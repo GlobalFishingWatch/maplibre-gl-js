@@ -36,7 +36,7 @@ export class CanonicalTileID {
             .replace(/{prefix}/g, (this.x % 16).toString(16) + (this.y % 16).toString(16))
             .replace(/{z}/g, String(this.z))
             .replace(/{x}/g, String(this.x))
-            .replace(/{y}/g, String(scheme === 'tms' ? (Math.pow(2, this.z) - this.y - 1) : this.y))
+            .replace(/{y}/g, String(scheme === 'tms' ? Math.pow(2, this.z) - this.y - 1 : this.y))
             .replace(/{ratio}/g, devicePixelRatio > 1 ? '@2x' : '')
             .replace(/{quadkey}/g, quadkey)
             .replace(/{bbox-epsg-3857}/g, bbox);
@@ -44,9 +44,7 @@ export class CanonicalTileID {
 
     getTilePoint(coord: MercatorCoordinate) {
         const tilesAtZoom = Math.pow(2, this.z);
-        return new Point(
-            (coord.x * tilesAtZoom - this.x) * EXTENT,
-            (coord.y * tilesAtZoom - this.y) * EXTENT);
+        return new Point((coord.x * tilesAtZoom - this.x) * EXTENT, (coord.y * tilesAtZoom - this.y) * EXTENT);
     }
 
     toString() {
@@ -91,7 +89,13 @@ export class OverscaledTileID {
         if (targetZ > this.canonical.z) {
             return new OverscaledTileID(targetZ, this.wrap, this.canonical.z, this.canonical.x, this.canonical.y);
         } else {
-            return new OverscaledTileID(targetZ, this.wrap, targetZ, this.canonical.x >> zDifference, this.canonical.y >> zDifference);
+            return new OverscaledTileID(
+                targetZ,
+                this.wrap,
+                targetZ,
+                this.canonical.x >> zDifference,
+                this.canonical.y >> zDifference
+            );
         }
     }
 
@@ -106,7 +110,13 @@ export class OverscaledTileID {
         if (targetZ > this.canonical.z) {
             return calculateKey(this.wrap * +withWrap, targetZ, this.canonical.z, this.canonical.x, this.canonical.y);
         } else {
-            return calculateKey(this.wrap * +withWrap, targetZ, targetZ, this.canonical.x >> zDifference, this.canonical.y >> zDifference);
+            return calculateKey(
+                this.wrap * +withWrap,
+                targetZ,
+                targetZ,
+                this.canonical.x >> zDifference,
+                this.canonical.y >> zDifference
+            );
         }
     }
 
@@ -117,16 +127,26 @@ export class OverscaledTileID {
         }
         const zDifference = this.canonical.z - parent.canonical.z;
         // We're first testing for z == 0, to avoid a 32 bit shift, which is undefined.
-        return parent.overscaledZ === 0 || (
-            parent.overscaledZ < this.overscaledZ &&
-                parent.canonical.x === (this.canonical.x >> zDifference) &&
-                parent.canonical.y === (this.canonical.y >> zDifference));
+        return (
+            parent.overscaledZ === 0 ||
+            (parent.overscaledZ < this.overscaledZ &&
+                parent.canonical.x === this.canonical.x >> zDifference &&
+                parent.canonical.y === this.canonical.y >> zDifference)
+        );
     }
 
     children(sourceMaxZoom: number) {
         if (this.overscaledZ >= sourceMaxZoom) {
             // return a single tile coord representing a an overscaled tile
-            return [new OverscaledTileID(this.overscaledZ + 1, this.wrap, this.canonical.z, this.canonical.x, this.canonical.y)];
+            return [
+                new OverscaledTileID(
+                    this.overscaledZ + 1,
+                    this.wrap,
+                    this.canonical.z,
+                    this.canonical.x,
+                    this.canonical.y
+                )
+            ];
         }
 
         const z = this.canonical.z + 1;
@@ -187,10 +207,11 @@ function calculateKey(wrap: number, overscaledZ: number, z: number, x: number, y
 }
 
 function getQuadkey(z, x, y) {
-    let quadkey = '', mask;
+    let quadkey = '',
+        mask;
     for (let i = z; i > 0; i--) {
         mask = 1 << (i - 1);
-        quadkey += ((x & mask ? 1 : 0) + (y & mask ? 2 : 0));
+        quadkey += (x & mask ? 1 : 0) + (y & mask ? 2 : 0);
     }
     return quadkey;
 }

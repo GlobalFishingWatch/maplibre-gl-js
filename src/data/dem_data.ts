@@ -30,7 +30,7 @@ export default class DEMData {
             return;
         }
         this.stride = data.height;
-        const dim = this.dim = data.height - 2;
+        const dim = (this.dim = data.height - 2);
         this.data = new Uint32Array(data.data.buffer);
         this.encoding = encoding || 'mapbox';
 
@@ -66,20 +66,21 @@ export default class DEMData {
     }
 
     _idx(x: number, y: number) {
-        if (x < -1 || x >= this.dim + 1 ||  y < -1 || y >= this.dim + 1) throw new RangeError('out of range source coordinates for DEM data');
+        if (x < -1 || x >= this.dim + 1 || y < -1 || y >= this.dim + 1)
+            throw new RangeError('out of range source coordinates for DEM data');
         return (y + 1) * this.stride + (x + 1);
     }
 
     _unpackMapbox(r: number, g: number, b: number) {
         // unpacking formula for mapbox.terrain-rgb:
         // https://www.mapbox.com/help/access-elevation-data/#mapbox-terrain-rgb
-        return ((r * 256 * 256 + g * 256.0 + b) / 10.0 - 10000.0);
+        return (r * 256 * 256 + g * 256.0 + b) / 10.0 - 10000.0;
     }
 
     _unpackTerrarium(r: number, g: number, b: number) {
         // unpacking formula for mapzen terrarium:
         // https://aws.amazon.com/public-datasets/terrain/
-        return ((r * 256 + g + b / 256) - 32768.0);
+        return r * 256 + g + b / 256 - 32768.0;
     }
 
     getPixels() {
@@ -95,21 +96,21 @@ export default class DEMData {
             yMax = dy * this.dim + this.dim;
 
         switch (dx) {
-        case -1:
-            xMin = xMax - 1;
-            break;
-        case 1:
-            xMax = xMin + 1;
-            break;
+            case -1:
+                xMin = xMax - 1;
+                break;
+            case 1:
+                xMax = xMin + 1;
+                break;
         }
 
         switch (dy) {
-        case -1:
-            yMin = yMax - 1;
-            break;
-        case 1:
-            yMax = yMin + 1;
-            break;
+            case -1:
+                yMin = yMax - 1;
+                break;
+            case 1:
+                yMax = yMin + 1;
+                break;
         }
 
         const ox = -dx * this.dim;

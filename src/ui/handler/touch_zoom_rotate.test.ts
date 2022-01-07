@@ -15,34 +15,48 @@ beforeEach(() => {
 });
 
 describe('touch zoom rotate', () => {
-
     test('TouchZoomRotateHandler fires zoomstart, zoom, and zoomend events at appropriate times in response to a pinch-zoom gesture', () => {
         const map = createMap();
         const target = map.getCanvas();
 
         const zoomstart = jest.fn();
-        const zoom      = jest.fn();
-        const zoomend   = jest.fn();
+        const zoom = jest.fn();
+        const zoomend = jest.fn();
 
         map.handlers._handlersById.tapZoom.disable();
         map.touchPitch.disable();
         map.on('zoomstart', zoomstart);
-        map.on('zoom',      zoom);
-        map.on('zoomend',   zoomend);
+        map.on('zoom', zoom);
+        map.on('zoomend', zoomend);
 
-        simulate.touchstart(map.getCanvas(), {touches: [{target, identifier: 1, clientX: 0, clientY: -50}, {target, identifier: 2, clientX: 0, clientY: 50}]});
+        simulate.touchstart(map.getCanvas(), {
+            touches: [
+                {target, identifier: 1, clientX: 0, clientY: -50},
+                {target, identifier: 2, clientX: 0, clientY: 50}
+            ]
+        });
         map._renderTaskQueue.run();
         expect(zoomstart).toHaveBeenCalledTimes(0);
         expect(zoom).toHaveBeenCalledTimes(0);
         expect(zoomend).toHaveBeenCalledTimes(0);
 
-        simulate.touchmove(map.getCanvas(), {touches: [{target, identifier: 1, clientX: 0, clientY: -100}, {target, identifier: 2, clientX: 0, clientY: 100}]});
+        simulate.touchmove(map.getCanvas(), {
+            touches: [
+                {target, identifier: 1, clientX: 0, clientY: -100},
+                {target, identifier: 2, clientX: 0, clientY: 100}
+            ]
+        });
         map._renderTaskQueue.run();
         expect(zoomstart).toHaveBeenCalledTimes(1);
         expect(zoom).toHaveBeenCalledTimes(1);
         expect(zoomend).toHaveBeenCalledTimes(0);
 
-        simulate.touchmove(map.getCanvas(), {touches: [{target, identifier: 1, clientX: 0, clientY: -60}, {target, identifier: 2, clientX: 0, clientY: 60}]});
+        simulate.touchmove(map.getCanvas(), {
+            touches: [
+                {target, identifier: 1, clientX: 0, clientY: -60},
+                {target, identifier: 2, clientX: 0, clientY: 60}
+            ]
+        });
         map._renderTaskQueue.run();
         expect(zoomstart).toHaveBeenCalledTimes(1);
         expect(zoom).toHaveBeenCalledTimes(2);
@@ -65,26 +79,41 @@ describe('touch zoom rotate', () => {
         const target = map.getCanvas();
 
         const rotatestart = jest.fn();
-        const rotate      = jest.fn();
-        const rotateend   = jest.fn();
+        const rotate = jest.fn();
+        const rotateend = jest.fn();
 
         map.on('rotatestart', rotatestart);
-        map.on('rotate',      rotate);
-        map.on('rotateend',   rotateend);
+        map.on('rotate', rotate);
+        map.on('rotateend', rotateend);
 
-        simulate.touchstart(map.getCanvas(), {touches: [{target, identifier: 0, clientX: 0, clientY: -50}, {target, identifier: 1, clientX: 0, clientY: 50}]});
+        simulate.touchstart(map.getCanvas(), {
+            touches: [
+                {target, identifier: 0, clientX: 0, clientY: -50},
+                {target, identifier: 1, clientX: 0, clientY: 50}
+            ]
+        });
         map._renderTaskQueue.run();
         expect(rotatestart).toHaveBeenCalledTimes(0);
         expect(rotate).toHaveBeenCalledTimes(0);
         expect(rotateend).toHaveBeenCalledTimes(0);
 
-        simulate.touchmove(map.getCanvas(), {touches: [{target, identifier: 0, clientX: -50, clientY: 0}, {target, identifier: 1, clientX: 50, clientY: 0}]});
+        simulate.touchmove(map.getCanvas(), {
+            touches: [
+                {target, identifier: 0, clientX: -50, clientY: 0},
+                {target, identifier: 1, clientX: 50, clientY: 0}
+            ]
+        });
         map._renderTaskQueue.run();
         expect(rotatestart).toHaveBeenCalledTimes(1);
         expect(rotate).toHaveBeenCalledTimes(1);
         expect(rotateend).toHaveBeenCalledTimes(0);
 
-        simulate.touchmove(map.getCanvas(), {touches: [{target, identifier: 0, clientX: 0, clientY: -50}, {target, identifier: 1, clientX: 0, clientY: 50}]});
+        simulate.touchmove(map.getCanvas(), {
+            touches: [
+                {target, identifier: 0, clientX: 0, clientY: -50},
+                {target, identifier: 1, clientX: 0, clientY: 50}
+            ]
+        });
         map._renderTaskQueue.run();
         expect(rotatestart).toHaveBeenCalledTimes(1);
         expect(rotate).toHaveBeenCalledTimes(2);
@@ -108,10 +137,20 @@ describe('touch zoom rotate', () => {
         const move = jest.fn();
         map.on('move', move);
 
-        simulate.touchstart(map.getCanvas(), {touches: [{target, clientX: 0, clientY: 0}, {target, clientX: 5, clientY: 0}]});
+        simulate.touchstart(map.getCanvas(), {
+            touches: [
+                {target, clientX: 0, clientY: 0},
+                {target, clientX: 5, clientY: 0}
+            ]
+        });
         map._renderTaskQueue.run();
 
-        simulate.touchmove(map.getCanvas(), {touches: [{target, clientX: 0, clientY: 0}, {target, clientX: 0, clientY: 5}]});
+        simulate.touchmove(map.getCanvas(), {
+            touches: [
+                {target, clientX: 0, clientY: 0},
+                {target, clientX: 0, clientY: 5}
+            ]
+        });
         map._renderTaskQueue.run();
 
         simulate.touchend(map.getCanvas(), {touches: []});
@@ -129,26 +168,41 @@ describe('touch zoom rotate', () => {
         map.handlers._handlersById.tapZoom.disable();
 
         const zoomstart = jest.fn();
-        const zoom      = jest.fn();
-        const zoomend   = jest.fn();
+        const zoom = jest.fn();
+        const zoomend = jest.fn();
 
         map.on('zoomstart', zoomstart);
-        map.on('zoom',      zoom);
-        map.on('zoomend',   zoomend);
+        map.on('zoom', zoom);
+        map.on('zoomend', zoomend);
 
-        simulate.touchstart(map.getCanvas(), {touches: [{target, identifier: 0, clientX: 0, clientY: -5}, {target, identifier: 2, clientX: 0, clientY: 5}]});
+        simulate.touchstart(map.getCanvas(), {
+            touches: [
+                {target, identifier: 0, clientX: 0, clientY: -5},
+                {target, identifier: 2, clientX: 0, clientY: 5}
+            ]
+        });
         map._renderTaskQueue.run();
         expect(zoomstart).toHaveBeenCalledTimes(0);
         expect(zoom).toHaveBeenCalledTimes(0);
         expect(zoomend).toHaveBeenCalledTimes(0);
 
-        simulate.touchmove(map.getCanvas(), {touches: [{target, identifier: 0, clientX: 0, clientY: -5}, {target, identifier: 2, clientX: 0, clientY: 6}]});
+        simulate.touchmove(map.getCanvas(), {
+            touches: [
+                {target, identifier: 0, clientX: 0, clientY: -5},
+                {target, identifier: 2, clientX: 0, clientY: 6}
+            ]
+        });
         map._renderTaskQueue.run();
         expect(zoomstart).toHaveBeenCalledTimes(1);
         expect(zoom).toHaveBeenCalledTimes(1);
         expect(zoomend).toHaveBeenCalledTimes(0);
 
-        simulate.touchmove(map.getCanvas(), {touches: [{target, identifier: 0, clientX: 0, clientY: -5}, {target, identifier: 2, clientX: 0, clientY: 4}]});
+        simulate.touchmove(map.getCanvas(), {
+            touches: [
+                {target, identifier: 0, clientX: 0, clientY: -5},
+                {target, identifier: 2, clientX: 0, clientY: 4}
+            ]
+        });
         map._renderTaskQueue.run();
         expect(zoomstart).toHaveBeenCalledTimes(1);
         expect(zoom).toHaveBeenCalledTimes(2);
@@ -179,39 +233,50 @@ describe('touch zoom rotate', () => {
     test('TouchZoomRotateHandler zooms when touching two markers on the same map', () => {
         const map = createMap();
 
-        const marker1 = new Marker()
-            .setLngLat([0, 0])
-            .addTo(map);
-        const marker2 = new Marker()
-            .setLngLat([0, 0])
-            .addTo(map);
+        const marker1 = new Marker().setLngLat([0, 0]).addTo(map);
+        const marker2 = new Marker().setLngLat([0, 0]).addTo(map);
         const target1 = marker1.getElement();
         const target2 = marker2.getElement();
 
         const zoomstart = jest.fn();
-        const zoom      = jest.fn();
-        const zoomend   = jest.fn();
+        const zoom = jest.fn();
+        const zoomend = jest.fn();
 
         map.handlers._handlersById.tapZoom.disable();
         map.touchPitch.disable();
         map.on('zoomstart', zoomstart);
-        map.on('zoom',      zoom);
-        map.on('zoomend',   zoomend);
+        map.on('zoom', zoom);
+        map.on('zoomend', zoomend);
 
         simulate.touchstart(map.getCanvas(), {touches: [{target: target1, identifier: 1, clientX: 0, clientY: -50}]});
-        simulate.touchstart(map.getCanvas(), {touches: [{target: target1, identifier: 1, clientX: 0, clientY: -50}, {target: target2, identifier: 2, clientX: 0, clientY: 50}]});
+        simulate.touchstart(map.getCanvas(), {
+            touches: [
+                {target: target1, identifier: 1, clientX: 0, clientY: -50},
+                {target: target2, identifier: 2, clientX: 0, clientY: 50}
+            ]
+        });
         map._renderTaskQueue.run();
         expect(zoomstart).toHaveBeenCalledTimes(0);
         expect(zoom).toHaveBeenCalledTimes(0);
         expect(zoomend).toHaveBeenCalledTimes(0);
 
-        simulate.touchmove(map.getCanvas(), {touches: [{target: target1, identifier: 1, clientX: 0, clientY: -100}, {target: target2, identifier: 2, clientX: 0, clientY: 100}]});
+        simulate.touchmove(map.getCanvas(), {
+            touches: [
+                {target: target1, identifier: 1, clientX: 0, clientY: -100},
+                {target: target2, identifier: 2, clientX: 0, clientY: 100}
+            ]
+        });
         map._renderTaskQueue.run();
         expect(zoomstart).toHaveBeenCalledTimes(1);
         expect(zoom).toHaveBeenCalledTimes(1);
         expect(zoomend).toHaveBeenCalledTimes(0);
 
-        simulate.touchmove(map.getCanvas(), {touches: [{target: target1, identifier: 1, clientX: 0, clientY: -60}, {target: target2, identifier: 2, clientX: 0, clientY: 60}]});
+        simulate.touchmove(map.getCanvas(), {
+            touches: [
+                {target: target1, identifier: 1, clientX: 0, clientY: -60},
+                {target: target2, identifier: 2, clientX: 0, clientY: 60}
+            ]
+        });
         map._renderTaskQueue.run();
         expect(zoomstart).toHaveBeenCalledTimes(1);
         expect(zoom).toHaveBeenCalledTimes(2);
@@ -232,40 +297,52 @@ describe('touch zoom rotate', () => {
     test('TouchZoomRotateHandler does not zoom when touching an element not on the map', () => {
         const map = createMap();
 
-        const marker1 = new Marker()
-            .setLngLat([0, 0])
-            .addTo(map);
-        const marker2 = new Marker()
-            .setLngLat([0, 0]);
+        const marker1 = new Marker().setLngLat([0, 0]).addTo(map);
+        const marker2 = new Marker().setLngLat([0, 0]);
 
         const target1 = marker1.getElement(); // on map
         const target2 = marker2.getElement(); // not on map
 
         const zoomstart = jest.fn();
-        const zoom      = jest.fn();
-        const zoomend   = jest.fn();
+        const zoom = jest.fn();
+        const zoomend = jest.fn();
 
         map.handlers._handlersById.tapZoom.disable();
         map.touchPitch.disable();
         map.dragPan.disable();
         map.on('zoomstart', zoomstart);
-        map.on('zoom',      zoom);
-        map.on('zoomend',   zoomend);
+        map.on('zoom', zoom);
+        map.on('zoomend', zoomend);
 
         simulate.touchstart(map.getCanvas(), {touches: [{target: target1, identifier: 1, clientX: 0, clientY: -50}]});
-        simulate.touchstart(map.getCanvas(), {touches: [{target: target1, identifier: 1, clientX: 0, clientY: -50}, {target: target2, identifier: 2, clientX: 0, clientY: 50}]});
+        simulate.touchstart(map.getCanvas(), {
+            touches: [
+                {target: target1, identifier: 1, clientX: 0, clientY: -50},
+                {target: target2, identifier: 2, clientX: 0, clientY: 50}
+            ]
+        });
         map._renderTaskQueue.run();
         expect(zoomstart).toHaveBeenCalledTimes(0);
         expect(zoom).toHaveBeenCalledTimes(0);
         expect(zoomend).toHaveBeenCalledTimes(0);
 
-        simulate.touchmove(map.getCanvas(), {touches: [{target: target1, identifier: 1, clientX: 0, clientY: -100}, {target: target2, identifier: 2, clientX: 0, clientY: 100}]});
+        simulate.touchmove(map.getCanvas(), {
+            touches: [
+                {target: target1, identifier: 1, clientX: 0, clientY: -100},
+                {target: target2, identifier: 2, clientX: 0, clientY: 100}
+            ]
+        });
         map._renderTaskQueue.run();
         expect(zoomstart).toHaveBeenCalledTimes(0);
         expect(zoom).toHaveBeenCalledTimes(0);
         expect(zoomend).toHaveBeenCalledTimes(0);
 
-        simulate.touchmove(map.getCanvas(), {touches: [{target: target1, identifier: 1, clientX: 0, clientY: -60}, {target: target2, identifier: 2, clientX: 0, clientY: 60}]});
+        simulate.touchmove(map.getCanvas(), {
+            touches: [
+                {target: target1, identifier: 1, clientX: 0, clientY: -60},
+                {target: target2, identifier: 2, clientX: 0, clientY: 60}
+            ]
+        });
         map._renderTaskQueue.run();
         expect(zoomstart).toHaveBeenCalledTimes(0);
         expect(zoom).toHaveBeenCalledTimes(0);

@@ -12,7 +12,7 @@ export default class WorkerPool {
     static workerCount: number;
 
     active: {
-      [_ in number | string]: boolean;
+        [_ in number | string]: boolean;
     };
     workers: Array<WorkerInterface>;
 
@@ -37,7 +37,7 @@ export default class WorkerPool {
     release(mapId: number | string) {
         delete this.active[mapId];
         if (this.numActive() === 0) {
-            this.workers.forEach((w) => {
+            this.workers.forEach(w => {
                 w.terminate();
             });
             this.workers = null;

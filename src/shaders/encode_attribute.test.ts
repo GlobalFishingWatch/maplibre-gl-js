@@ -7,5 +7,4 @@ test('packUint8ToFloat', () => {
 
     expect(packUint8ToFloat(-1, -1)).toBe(0);
     expect(packUint8ToFloat(256, 256)).toBe(65535);
-
 });

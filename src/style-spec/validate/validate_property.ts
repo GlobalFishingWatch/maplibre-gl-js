@@ -1,4 +1,3 @@
-
 import validate from './validate';
 import ValidationError from '../error/validation_error';
 import getType from '../util/get_type';
@@ -17,7 +16,12 @@ export default function validateProperty(options, propertyType) {
     if (!layerSpec) return [];
 
     const transitionMatch = propertyKey.match(/^(.*)-transition$/);
-    if (propertyType === 'paint' && transitionMatch && layerSpec[transitionMatch[1]] && layerSpec[transitionMatch[1]].transition) {
+    if (
+        propertyType === 'paint' &&
+        transitionMatch &&
+        layerSpec[transitionMatch[1]] &&
+        layerSpec[transitionMatch[1]].transition
+    ) {
         return validate({
             key,
             value,
@@ -33,11 +37,22 @@ export default function validateProperty(options, propertyType) {
     }
 
     let tokenMatch;
-    if (getType(value) === 'string' && supportsPropertyExpression(valueSpec) && !valueSpec.tokens && (tokenMatch = /^{([^}]+)}$/.exec(value))) {
-        return [new ValidationError(
-            key, value,
-            `"${propertyKey}" does not support interpolation syntax\n` +
-                `Use an identity property function instead: \`{ "type": "identity", "property": ${JSON.stringify(tokenMatch[1])} }\`.`)];
+    if (
+        getType(value) === 'string' &&
+        supportsPropertyExpression(valueSpec) &&
+        !valueSpec.tokens &&
+        (tokenMatch = /^{([^}]+)}$/.exec(value))
+    ) {
+        return [
+            new ValidationError(
+                key,
+                value,
+                `"${propertyKey}" does not support interpolation syntax\n` +
+                    `Use an identity property function instead: \`{ "type": "identity", "property": ${JSON.stringify(
+                        tokenMatch[1]
+                    )} }\`.`
+            )
+        ];
     }
 
     const errors = [];
@@ -51,14 +66,16 @@ export default function validateProperty(options, propertyType) {
         }
     }
 
-    return errors.concat(validate({
-        key: options.key,
-        value,
-        valueSpec,
-        style,
-        styleSpec,
-        expressionContext: 'property',
-        propertyType,
-        propertyKey
-    }));
+    return errors.concat(
+        validate({
+            key: options.key,
+            value,
+            valueSpec,
+            style,
+            styleSpec,
+            expressionContext: 'property',
+            propertyType,
+            propertyKey
+        })
+    );
 }

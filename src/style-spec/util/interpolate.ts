@@ -1,7 +1,7 @@
 import Color from './color';
 
 export function number(a: number, b: number, t: number) {
-    return (a * (1 - t)) + (b * t);
+    return a * (1 - t) + b * t;
 }
 
 export function color(from: Color, to: Color, t: number) {

@@ -25,7 +25,8 @@ class GeoJSONFeature {
             this._geometry = this._vectorTileFeature.toGeoJSON(
                 (this._vectorTileFeature as any)._x,
                 (this._vectorTileFeature as any)._y,
-                (this._vectorTileFeature as any)._z).geometry;
+                (this._vectorTileFeature as any)._z
+            ).geometry;
         }
         return this._geometry;
     }

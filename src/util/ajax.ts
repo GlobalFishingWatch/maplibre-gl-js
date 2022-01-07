@@ -64,20 +64,20 @@ if (typeof Object.freeze == 'function') {
  *
  */
 export type RequestParameters = {
-  url: string;
-  headers?: any;
-  method?: 'GET' | 'POST' | 'PUT';
-  body?: string;
-  type?: 'string' | 'json' | 'arrayBuffer';
-  credentials?: 'same-origin' | 'include';
-  collectResourceTiming?: boolean;
+    url: string;
+    headers?: any;
+    method?: 'GET' | 'POST' | 'PUT';
+    body?: string;
+    type?: 'string' | 'json' | 'arrayBuffer';
+    credentials?: 'same-origin' | 'include';
+    collectResourceTiming?: boolean;
 };
 
 export type ResponseCallback<T> = (
-  error?: Error | null,
-  data?: T | null,
-  cacheControl?: string | null,
-  expires?: string | null
+    error?: Error | null,
+    data?: T | null,
+    cacheControl?: string | null,
+    expires?: string | null
 ) => void;
 
 class AJAXError extends Error {
@@ -103,9 +103,9 @@ class AJAXError extends Error {
 // to the string(!) "null" (Firefox), or "file://" (Chrome, Safari, Edge, IE),
 // and we will set an empty referrer. Otherwise, we're using the document's URL.
 /* global self */
-export const getReferrer = isWorker() ?
-    () => (self as any).worker && (self as any).worker.referrer :
-    () => (window.location.protocol === 'blob:' ? window.parent : window).location.href;
+export const getReferrer = isWorker()
+    ? () => (self as any).worker && (self as any).worker.referrer
+    : () => (window.location.protocol === 'blob:' ? window.parent : window).location.href;
 
 // Determines whether a URL is a file:// URL. This is obviously the case if it begins
 // with file://. Relative URLs are also file:// URLs iff the original document was loaded
@@ -153,43 +153,47 @@ function makeFetchRequest(requestParameters: RequestParameters, callback: Respon
 
         const requestTime = Date.now();
 
-        fetch(request).then(response => {
-            if (response.ok) {
-                const cacheableResponse = cacheIgnoringSearch ? response.clone() : null;
-                return finishRequest(response, cacheableResponse, requestTime);
-
-            } else {
-                return callback(new AJAXError(response.statusText, response.status, requestParameters.url));
-            }
-        }).catch(error => {
-            if (error.code === 20) {
-                // silence expected AbortError
-                return;
-            }
-            callback(new Error(error.message));
-        });
+        fetch(request)
+            .then(response => {
+                if (response.ok) {
+                    const cacheableResponse = cacheIgnoringSearch ? response.clone() : null;
+                    return finishRequest(response, cacheableResponse, requestTime);
+                } else {
+                    return callback(new AJAXError(response.statusText, response.status, requestParameters.url));
+                }
+            })
+            .catch(error => {
+                if (error.code === 20) {
+                    // silence expected AbortError
+                    return;
+                }
+                callback(new Error(error.message));
+            });
     };
 
     const finishRequest = (response, cacheableResponse?, requestTime?) => {
-        (
-            requestParameters.type === 'arrayBuffer' ? response.arrayBuffer() :
-            requestParameters.type === 'json' ? response.json() :
-            response.text()
-        ).then(result => {
-            if (aborted) return;
-            if (cacheableResponse && requestTime) {
-                // The response needs to be inserted into the cache after it has completely loaded.
-                // Until it is fully loaded there is a chance it will be aborted. Aborting while
-                // reading the body can cause the cache insertion to error. We could catch this error
-                // in most browsers but in Firefox it seems to sometimes crash the tab. Adding
-                // it to the cache here avoids that error.
-                cachePut(request, cacheableResponse, requestTime);
-            }
-            complete = true;
-            callback(null, result, response.headers.get('Cache-Control'), response.headers.get('Expires'));
-        }).catch(err => {
-            if (!aborted) callback(new Error(err.message));
-        });
+        (requestParameters.type === 'arrayBuffer'
+            ? response.arrayBuffer()
+            : requestParameters.type === 'json'
+            ? response.json()
+            : response.text()
+        )
+            .then(result => {
+                if (aborted) return;
+                if (cacheableResponse && requestTime) {
+                    // The response needs to be inserted into the cache after it has completely loaded.
+                    // Until it is fully loaded there is a chance it will be aborted. Aborting while
+                    // reading the body can cause the cache insertion to error. We could catch this error
+                    // in most browsers but in Firefox it seems to sometimes crash the tab. Adding
+                    // it to the cache here avoids that error.
+                    cachePut(request, cacheableResponse, requestTime);
+                }
+                complete = true;
+                callback(null, result, response.headers.get('Cache-Control'), response.headers.get('Expires'));
+            })
+            .catch(err => {
+                if (!aborted) callback(new Error(err.message));
+            });
     };
 
     if (cacheIgnoringSearch) {
@@ -198,10 +202,12 @@ function makeFetchRequest(requestParameters: RequestParameters, callback: Respon
         validateOrFetch(null, null);
     }
 
-    return {cancel: () => {
-        aborted = true;
-        if (!complete) controller.abort();
-    }};
+    return {
+        cancel: () => {
+            aborted = true;
+            if (!complete) controller.abort();
+        }
+    };
 }
 
 function makeXMLHttpRequest(requestParameters: RequestParameters, callback: ResponseCallback<any>): Cancelable {
@@ -242,7 +248,10 @@ function makeXMLHttpRequest(requestParameters: RequestParameters, callback: Resp
     return {cancel: () => xhr.abort()};
 }
 
-export const makeRequest = function(requestParameters: RequestParameters, callback: ResponseCallback<any>): Cancelable {
+export const makeRequest = function (
+    requestParameters: RequestParameters,
+    callback: ResponseCallback<any>
+): Cancelable {
     // We're trying to use the Fetch API if possible. However, in some situations we can't use it:
     // - IE11 doesn't support it at all. In this case, we dispatch the request to the main thread so
     //   that we can get an accruate referrer header.
@@ -250,7 +259,7 @@ export const makeRequest = function(requestParameters: RequestParameters, callba
     //   some versions (see https://bugs.webkit.org/show_bug.cgi?id=174980#c2)
     // - Requests for resources with the file:// URI scheme don't work with the Fetch API either. In
     //   this case we unconditionally use XHR on the current thread since referrers don't matter.
-    if (/:\/\//.test(requestParameters.url) && !(/^https?:|^file:/.test(requestParameters.url))) {
+    if (/:\/\//.test(requestParameters.url) && !/^https?:|^file:/.test(requestParameters.url)) {
         if (isWorker() && (self as any).worker && (self as any).worker.actor) {
             return (self as any).worker.actor.send('getResource', requestParameters, callback);
         }
@@ -266,24 +275,33 @@ export const makeRequest = function(requestParameters: RequestParameters, callba
         }
         if (isWorker() && (self as any).worker && (self as any).worker.actor) {
             const queueOnMainThread = true;
-            return (self as any).worker.actor.send('getResource', requestParameters, callback, undefined, queueOnMainThread);
+            return (self as any).worker.actor.send(
+                'getResource',
+                requestParameters,
+                callback,
+                undefined,
+                queueOnMainThread
+            );
         }
     }
     return makeXMLHttpRequest(requestParameters, callback);
 };
 
-export const getJSON = function(requestParameters: RequestParameters, callback: ResponseCallback<any>): Cancelable {
+export const getJSON = function (requestParameters: RequestParameters, callback: ResponseCallback<any>): Cancelable {
     return makeRequest(extend(requestParameters, {type: 'json'}), callback);
 };
 
-export const getArrayBuffer = function(
-  requestParameters: RequestParameters,
-  callback: ResponseCallback<ArrayBuffer>
+export const getArrayBuffer = function (
+    requestParameters: RequestParameters,
+    callback: ResponseCallback<ArrayBuffer>
 ): Cancelable {
     return makeRequest(extend(requestParameters, {type: 'arrayBuffer'}), callback);
 };
 
-export const postData = function(requestParameters: RequestParameters, callback: ResponseCallback<string>): Cancelable {
+export const postData = function (
+    requestParameters: RequestParameters,
+    callback: ResponseCallback<string>
+): Cancelable {
     return makeRequest(extend(requestParameters, {method: 'POST'}), callback);
 };
 
@@ -293,9 +311,15 @@ function sameOrigin(url) {
     return a.protocol === window.document.location.protocol && a.host === window.document.location.host;
 }
 
-const transparentPngUrl = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAC0lEQVQYV2NgAAIAAAUAAarVyFEAAAAASUVORK5CYII=';
+const transparentPngUrl =
+    'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAC0lEQVQYV2NgAAIAAAUAAarVyFEAAAAASUVORK5CYII=';
 
-function arrayBufferToImage(data: ArrayBuffer, callback: (err?: Error | null, image?: HTMLImageElement | null) => void, cacheControl?: string | null, expires?: string | null) {
+function arrayBufferToImage(
+    data: ArrayBuffer,
+    callback: (err?: Error | null, image?: HTMLImageElement | null) => void,
+    cacheControl?: string | null,
+    expires?: string | null
+) {
     const img: HTMLImageElement = new Image();
     img.onload = () => {
         callback(null, img);
@@ -304,25 +328,46 @@ function arrayBufferToImage(data: ArrayBuffer, callback: (err?: Error | null, im
         // but don't free the image immediately because it might be uploaded in the next frame
         // https://github.com/mapbox/mapbox-gl-js/issues/10226
         img.onload = null;
-        window.requestAnimationFrame(() => { img.src = transparentPngUrl; });
+        window.requestAnimationFrame(() => {
+            img.src = transparentPngUrl;
+        });
     };
-    img.onerror = () => callback(new Error('Could not load image. Please make sure to use a supported image type such as PNG or JPEG. Note that SVGs are not supported.'));
+    img.onerror = () =>
+        callback(
+            new Error(
+                'Could not load image. Please make sure to use a supported image type such as PNG or JPEG. Note that SVGs are not supported.'
+            )
+        );
     const blob: Blob = new Blob([new Uint8Array(data)], {type: 'image/png'});
     (img as any).cacheControl = cacheControl;
     (img as any).expires = expires;
     img.src = data.byteLength ? URL.createObjectURL(blob) : transparentPngUrl;
 }
 
-function arrayBufferToImageBitmap(data: ArrayBuffer, callback: (err?: Error | null, image?: ImageBitmap | null) => void) {
+function arrayBufferToImageBitmap(
+    data: ArrayBuffer,
+    callback: (err?: Error | null, image?: ImageBitmap | null) => void
+) {
     const blob: Blob = new Blob([new Uint8Array(data)], {type: 'image/png'});
-    createImageBitmap(blob).then((imgBitmap) => {
-        callback(null, imgBitmap);
-    }).catch((e) => {
-        callback(new Error(`Could not load image because of ${e.message}. Please make sure to use a supported image type such as PNG or JPEG. Note that SVGs are not supported.`));
-    });
+    createImageBitmap(blob)
+        .then(imgBitmap => {
+            callback(null, imgBitmap);
+        })
+        .catch(e => {
+            callback(
+                new Error(
+                    `Could not load image because of ${e.message}. Please make sure to use a supported image type such as PNG or JPEG. Note that SVGs are not supported.`
+                )
+            );
+        });
 }
 
-function arrayBufferToCanvasImageSource(data: ArrayBuffer, callback: (err?: Error | null, image?: CanvasImageSource | null) => void, cacheControl?: string | null, expires?: string | null) {
+function arrayBufferToCanvasImageSource(
+    data: ArrayBuffer,
+    callback: (err?: Error | null, image?: CanvasImageSource | null) => void,
+    cacheControl?: string | null,
+    expires?: string | null
+) {
     const imageBitmapSupported = typeof createImageBitmap === 'function';
     if (imageBitmapSupported) {
         arrayBufferToImageBitmap(data, callback);
@@ -338,9 +383,9 @@ export const resetImageRequestQueue = () => {
 };
 resetImageRequestQueue();
 
-export const getImage = function(
-  requestParameters: RequestParameters,
-  callback: Callback<HTMLImageElement | ImageBitmap>
+export const getImage = function (
+    requestParameters: RequestParameters,
+    callback: Callback<HTMLImageElement | ImageBitmap>
 ): Cancelable {
     if (webpSupported.supported) {
         if (!requestParameters.headers) {
@@ -355,7 +400,9 @@ export const getImage = function(
             requestParameters,
             callback,
             cancelled: false,
-            cancel() { this.cancelled = true; }
+            cancel() {
+                this.cancelled = true;
+            }
         };
         imageQueue.push(queued);
         return queued;
@@ -368,7 +415,8 @@ export const getImage = function(
         advanced = true;
         numImageRequests--;
         assert(numImageRequests >= 0);
-        while (imageQueue.length && numImageRequests < config.MAX_PARALLEL_IMAGE_REQUESTS) { // eslint-disable-line
+        while (imageQueue.length && numImageRequests < config.MAX_PARALLEL_IMAGE_REQUESTS) {
+            // eslint-disable-line
             const request = imageQueue.shift();
             const {requestParameters, callback, cancelled} = request;
             if (!cancelled) {
@@ -379,16 +427,18 @@ export const getImage = function(
 
     // request the image with XHR to work around caching issues
     // see https://github.com/mapbox/mapbox-gl-js/issues/1470
-    const request = getArrayBuffer(requestParameters, (err?: Error | null, data?: ArrayBuffer | null, cacheControl?: string | null, expires?: string | null) => {
+    const request = getArrayBuffer(
+        requestParameters,
+        (err?: Error | null, data?: ArrayBuffer | null, cacheControl?: string | null, expires?: string | null) => {
+            advanceImageRequestQueue();
 
-        advanceImageRequestQueue();
-
-        if (err) {
-            callback(err);
-        } else if (data) {
-            arrayBufferToCanvasImageSource(data, callback, cacheControl, expires);
+            if (err) {
+                callback(err);
+            } else if (data) {
+                arrayBufferToCanvasImageSource(data, callback, cacheControl, expires);
+            }
         }
-    });
+    );
 
     return {
         cancel: () => {
@@ -398,10 +448,10 @@ export const getImage = function(
     };
 };
 
-export const getVideo = function(urls: Array<string>, callback: Callback<HTMLVideoElement>): Cancelable {
+export const getVideo = function (urls: Array<string>, callback: Callback<HTMLVideoElement>): Cancelable {
     const video: HTMLVideoElement = window.document.createElement('video');
     video.muted = true;
-    video.onloadstart = function() {
+    video.onloadstart = function () {
         callback(null, video);
     };
     for (let i = 0; i < urls.length; i++) {

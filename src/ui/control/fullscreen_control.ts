@@ -6,7 +6,7 @@ import type Map from '../map';
 import type {IControl} from './control';
 
 type FullscreenOptions = {
-  container?: HTMLElement;
+    container?: HTMLElement;
 };
 
 /**
@@ -35,13 +35,10 @@ class FullscreenControl implements IControl {
             if (options.container instanceof HTMLElement) {
                 this._container = options.container;
             } else {
-                warnOnce('Full screen control \'container\' must be a DOM element.');
+                warnOnce("Full screen control 'container' must be a DOM element.");
             }
         }
-        bindAll([
-            '_onClickFullscreen',
-            '_changeIcon'
-        ], this);
+        bindAll(['_onClickFullscreen', '_changeIcon'], this);
         if ('onfullscreenchange' in document) {
             this._fullscreenchange = 'fullscreenchange';
         } else if ('onmozfullscreenchange' in document) {
@@ -56,7 +53,10 @@ class FullscreenControl implements IControl {
     onAdd(map: Map) {
         this._map = map;
         if (!this._container) this._container = this._map.getContainer();
-        this._controlContainer = DOM.create('div', 'maplibregl-ctrl maplibregl-ctrl-group mapboxgl-ctrl mapboxgl-ctrl-group');
+        this._controlContainer = DOM.create(
+            'div',
+            'maplibregl-ctrl maplibregl-ctrl-group mapboxgl-ctrl mapboxgl-ctrl-group'
+        );
         if (this._checkFullscreenSupport()) {
             this._setupUI();
         } else {
@@ -82,7 +82,11 @@ class FullscreenControl implements IControl {
     }
 
     _setupUI() {
-        const button = this._fullscreenButton = DOM.create('button', (('maplibregl-ctrl-fullscreen mapboxgl-ctrl-fullscreen')), this._controlContainer);
+        const button = (this._fullscreenButton = DOM.create(
+            'button',
+            'maplibregl-ctrl-fullscreen mapboxgl-ctrl-fullscreen',
+            this._controlContainer
+        ));
         DOM.create('span', 'maplibregl-ctrl-icon mapboxgl-ctrl-icon', button).setAttribute('aria-hidden', 'true');
         button.type = 'button';
         this._updateTitle();

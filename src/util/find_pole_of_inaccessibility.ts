@@ -13,13 +13,12 @@ import {distToSegmentSquared} from './intersection_tests';
  * @returns Pole of Inaccessibiliy.
  * @private
  */
-export default function(
-  polygonRings: Array<Array<Point>>,
-  precision: number = 1,
-  debug: boolean = false
-): Point {
+export default function (polygonRings: Array<Array<Point>>, precision: number = 1, debug: boolean = false): Point {
     // find the bounding box of the outer ring
-    let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+    let minX = Infinity,
+        minY = Infinity,
+        maxX = -Infinity,
+        maxY = -Infinity;
     const outerRing = polygonRings[0];
     for (let i = 0; i < outerRing.length; i++) {
         const p = outerRing[i];
@@ -103,8 +102,7 @@ function pointToPolygonDist(p, polygon) {
             const a = ring[i];
             const b = ring[j];
 
-            if ((a.y > p.y !== b.y > p.y) &&
-                (p.x < (b.x - a.x) * (p.y - a.y) / (b.y - a.y) + a.x)) inside = !inside;
+            if (a.y > p.y !== b.y > p.y && p.x < ((b.x - a.x) * (p.y - a.y)) / (b.y - a.y) + a.x) inside = !inside;
 
             minDistSq = Math.min(minDistSq, distToSegmentSquared(p, a, b));
         }

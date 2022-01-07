@@ -35,7 +35,7 @@ export function charAllowsLetterSpacing(char: number) {
 
 export function charAllowsIdeographicBreaking(char: number) {
     // Return early for characters outside all ideographic ranges.
-    if (char < 0x2E80) return false;
+    if (char < 0x2e80) return false;
 
     if (isChar['Bopomofo Extended'](char)) return true;
     if (isChar['Bopomofo'](char)) return true;
@@ -84,8 +84,10 @@ export function charAllowsIdeographicBreaking(char: number) {
  * @private
  */
 export function charHasUprightVerticalOrientation(char: number) {
-    if (char === 0x02EA /* modifier letter yin departing tone mark */ ||
-        char === 0x02EB /* modifier letter yang departing tone mark */) {
+    if (
+        char === 0x02ea /* modifier letter yin departing tone mark */ ||
+        char === 0x02eb /* modifier letter yang departing tone mark */
+    ) {
         return true;
     }
 
@@ -96,7 +98,7 @@ export function charHasUprightVerticalOrientation(char: number) {
     if (isChar['Bopomofo Extended'](char)) return true;
     if (isChar['Bopomofo'](char)) return true;
     if (isChar['CJK Compatibility Forms'](char)) {
-        if (!((char >= 0xFE49 /* dashed overline */ && char <= 0xFE4F) /* wavy low line */)) {
+        if (!((char >= 0xfe49 /* dashed overline */ && char <= 0xfe4f) /* wavy low line */)) {
             return true;
         }
     }
@@ -105,9 +107,15 @@ export function charHasUprightVerticalOrientation(char: number) {
     if (isChar['CJK Radicals Supplement'](char)) return true;
     if (isChar['CJK Strokes'](char)) return true;
     if (isChar['CJK Symbols and Punctuation'](char)) {
-        if (!((char >= 0x3008 /* left angle bracket */ && char <= 0x3011) /* right black lenticular bracket */) &&
-            !((char >= 0x3014 /* left tortoise shell bracket */ && char <= 0x301F) /* low double prime quotation mark */) &&
-            char !== 0x3030 /* wavy dash */) {
+        if (
+            !((char >= 0x3008 /* left angle bracket */ && char <= 0x3011) /* right black lenticular bracket */) &&
+            !(
+                (
+                    char >= 0x3014 /* left tortoise shell bracket */ && char <= 0x301f
+                ) /* low double prime quotation mark */
+            ) &&
+            char !== 0x3030 /* wavy dash */
+        ) {
             return true;
         }
     }
@@ -125,27 +133,31 @@ export function charHasUprightVerticalOrientation(char: number) {
     if (isChar['Kangxi Radicals'](char)) return true;
     if (isChar['Katakana Phonetic Extensions'](char)) return true;
     if (isChar['Katakana'](char)) {
-        if (char !== 0x30FC /* katakana-hiragana prolonged sound mark */) {
+        if (char !== 0x30fc /* katakana-hiragana prolonged sound mark */) {
             return true;
         }
     }
     if (isChar['Halfwidth and Fullwidth Forms'](char)) {
-        if (char !== 0xFF08 /* fullwidth left parenthesis */ &&
-            char !== 0xFF09 /* fullwidth right parenthesis */ &&
-            char !== 0xFF0D /* fullwidth hyphen-minus */ &&
-            !((char >= 0xFF1A /* fullwidth colon */ && char <= 0xFF1E) /* fullwidth greater-than sign */) &&
-            char !== 0xFF3B /* fullwidth left square bracket */ &&
-            char !== 0xFF3D /* fullwidth right square bracket */ &&
-            char !== 0xFF3F /* fullwidth low line */ &&
-            !(char >= 0xFF5B /* fullwidth left curly bracket */ && char <= 0xFFDF) &&
-            char !== 0xFFE3 /* fullwidth macron */ &&
-            !(char >= 0xFFE8 /* halfwidth forms light vertical */ && char <= 0xFFEF)) {
+        if (
+            char !== 0xff08 /* fullwidth left parenthesis */ &&
+            char !== 0xff09 /* fullwidth right parenthesis */ &&
+            char !== 0xff0d /* fullwidth hyphen-minus */ &&
+            !((char >= 0xff1a /* fullwidth colon */ && char <= 0xff1e) /* fullwidth greater-than sign */) &&
+            char !== 0xff3b /* fullwidth left square bracket */ &&
+            char !== 0xff3d /* fullwidth right square bracket */ &&
+            char !== 0xff3f /* fullwidth low line */ &&
+            !(char >= 0xff5b /* fullwidth left curly bracket */ && char <= 0xffdf) &&
+            char !== 0xffe3 /* fullwidth macron */ &&
+            !(char >= 0xffe8 /* halfwidth forms light vertical */ && char <= 0xffef)
+        ) {
             return true;
         }
     }
     if (isChar['Small Form Variants'](char)) {
-        if (!((char >= 0xFE58 /* small em dash */ && char <= 0xFE5E) /* small right tortoise shell bracket */) &&
-            !((char >= 0xFE63 /* small hyphen-minus */ && char <= 0xFE66) /* small equals sign */)) {
+        if (
+            !((char >= 0xfe58 /* small em dash */ && char <= 0xfe5e) /* small right tortoise shell bracket */) &&
+            !((char >= 0xfe63 /* small hyphen-minus */ && char <= 0xfe66) /* small equals sign */)
+        ) {
             return true;
         }
     }
@@ -173,46 +185,52 @@ export function charHasUprightVerticalOrientation(char: number) {
  */
 export function charHasNeutralVerticalOrientation(char: number) {
     if (isChar['Latin-1 Supplement'](char)) {
-        if (char === 0x00A7 /* section sign */ ||
-            char === 0x00A9 /* copyright sign */ ||
-            char === 0x00AE /* registered sign */ ||
-            char === 0x00B1 /* plus-minus sign */ ||
-            char === 0x00BC /* vulgar fraction one quarter */ ||
-            char === 0x00BD /* vulgar fraction one half */ ||
-            char === 0x00BE /* vulgar fraction three quarters */ ||
-            char === 0x00D7 /* multiplication sign */ ||
-            char === 0x00F7 /* division sign */) {
+        if (
+            char === 0x00a7 /* section sign */ ||
+            char === 0x00a9 /* copyright sign */ ||
+            char === 0x00ae /* registered sign */ ||
+            char === 0x00b1 /* plus-minus sign */ ||
+            char === 0x00bc /* vulgar fraction one quarter */ ||
+            char === 0x00bd /* vulgar fraction one half */ ||
+            char === 0x00be /* vulgar fraction three quarters */ ||
+            char === 0x00d7 /* multiplication sign */ ||
+            char === 0x00f7 /* division sign */
+        ) {
             return true;
         }
     }
     if (isChar['General Punctuation'](char)) {
-        if (char === 0x2016 /* double vertical line */ ||
+        if (
+            char === 0x2016 /* double vertical line */ ||
             char === 0x2020 /* dagger */ ||
             char === 0x2021 /* double dagger */ ||
             char === 0x2030 /* per mille sign */ ||
             char === 0x2031 /* per ten thousand sign */ ||
-            char === 0x203B /* reference mark */ ||
-            char === 0x203C /* double exclamation mark */ ||
+            char === 0x203b /* reference mark */ ||
+            char === 0x203c /* double exclamation mark */ ||
             char === 0x2042 /* asterism */ ||
             char === 0x2047 /* double question mark */ ||
             char === 0x2048 /* question exclamation mark */ ||
             char === 0x2049 /* exclamation question mark */ ||
-            char === 0x2051 /* two asterisks aligned vertically */) {
+            char === 0x2051 /* two asterisks aligned vertically */
+        ) {
             return true;
         }
     }
     if (isChar['Letterlike Symbols'](char)) return true;
     if (isChar['Number Forms'](char)) return true;
     if (isChar['Miscellaneous Technical'](char)) {
-        if ((char >= 0x2300 /* diameter sign */ && char <= 0x2307 /* wavy line */) ||
-            (char >= 0x230C /* bottom right crop */ && char <= 0x231F /* bottom right corner */) ||
-            (char >= 0x2324 /* up arrowhead between two horizontal bars */ && char <= 0x2328 /* keyboard */) ||
-            char === 0x232B /* erase to the left */ ||
-            (char >= 0x237D /* shouldered open box */ && char <= 0x239A /* clear screen symbol */) ||
-            (char >= 0x23BE /* dentistry symbol light vertical and top right */ && char <= 0x23CD /* square foot */) ||
-            char === 0x23CF /* eject symbol */ ||
-            (char >= 0x23D1 /* metrical breve */ && char <= 0x23DB /* fuse */) ||
-            (char >= 0x23E2 /* white trapezium */ && char <= 0x23FF)) {
+        if (
+            (char >= 0x2300 /* diameter sign */ && char <= 0x2307) /* wavy line */ ||
+            (char >= 0x230c /* bottom right crop */ && char <= 0x231f) /* bottom right corner */ ||
+            (char >= 0x2324 /* up arrowhead between two horizontal bars */ && char <= 0x2328) /* keyboard */ ||
+            char === 0x232b /* erase to the left */ ||
+            (char >= 0x237d /* shouldered open box */ && char <= 0x239a) /* clear screen symbol */ ||
+            (char >= 0x23be /* dentistry symbol light vertical and top right */ && char <= 0x23cd) /* square foot */ ||
+            char === 0x23cf /* eject symbol */ ||
+            (char >= 0x23d1 /* metrical breve */ && char <= 0x23db) /* fuse */ ||
+            (char >= 0x23e2 /* white trapezium */ && char <= 0x23ff)
+        ) {
             return true;
         }
     }
@@ -221,14 +239,16 @@ export function charHasNeutralVerticalOrientation(char: number) {
     if (isChar['Enclosed Alphanumerics'](char)) return true;
     if (isChar['Geometric Shapes'](char)) return true;
     if (isChar['Miscellaneous Symbols'](char)) {
-        if (!((char >= 0x261A /* black left pointing index */ && char <= 0x261F) /* white down pointing index */)) {
+        if (!((char >= 0x261a /* black left pointing index */ && char <= 0x261f) /* white down pointing index */)) {
             return true;
         }
     }
     if (isChar['Miscellaneous Symbols and Arrows'](char)) {
-        if ((char >= 0x2B12 /* square with top half black */ && char <= 0x2B2F /* white vertical ellipse */) ||
-            (char >= 0x2B50 /* white medium star */ && char <= 0x2B59 /* heavy circled saltire */) ||
-            (char >= 0x2BB8 /* upwards white arrow from bar with horizontal bar */ && char <= 0x2BEB)) {
+        if (
+            (char >= 0x2b12 /* square with top half black */ && char <= 0x2b2f) /* white vertical ellipse */ ||
+            (char >= 0x2b50 /* white medium star */ && char <= 0x2b59) /* heavy circled saltire */ ||
+            (char >= 0x2bb8 /* upwards white arrow from bar with horizontal bar */ && char <= 0x2beb)
+        ) {
             return true;
         }
     }
@@ -239,13 +259,16 @@ export function charHasNeutralVerticalOrientation(char: number) {
     if (isChar['Small Form Variants'](char)) return true;
     if (isChar['Halfwidth and Fullwidth Forms'](char)) return true;
 
-    if (char === 0x221E /* infinity */ ||
+    if (
+        char === 0x221e /* infinity */ ||
         char === 0x2234 /* therefore */ ||
         char === 0x2235 /* because */ ||
-        (char >= 0x2700 /* black safety scissors */ && char <= 0x2767 /* rotated floral heart bullet */) ||
-        (char >= 0x2776 /* dingbat negative circled digit one */ && char <= 0x2793 /* dingbat negative circled sans-serif number ten */) ||
-        char === 0xFFFC /* object replacement character */ ||
-        char === 0xFFFD /* replacement character */) {
+        (char >= 0x2700 /* black safety scissors */ && char <= 0x2767) /* rotated floral heart bullet */ ||
+        (char >= 0x2776 /* dingbat negative circled digit one */ &&
+            char <= 0x2793) /* dingbat negative circled sans-serif number ten */ ||
+        char === 0xfffc /* object replacement character */ ||
+        char === 0xfffd /* replacement character */
+    ) {
         return true;
     }
 
@@ -263,23 +286,26 @@ export function charHasNeutralVerticalOrientation(char: number) {
  * @private
  */
 export function charHasRotatedVerticalOrientation(char: number) {
-    return !(charHasUprightVerticalOrientation(char) ||
-             charHasNeutralVerticalOrientation(char));
+    return !(charHasUprightVerticalOrientation(char) || charHasNeutralVerticalOrientation(char));
 }
 
 export function charInComplexShapingScript(char: number) {
-    return isChar['Arabic'](char) ||
-           isChar['Arabic Supplement'](char) ||
-           isChar['Arabic Extended-A'](char) ||
-           isChar['Arabic Presentation Forms-A'](char) ||
-           isChar['Arabic Presentation Forms-B'](char);
+    return (
+        isChar['Arabic'](char) ||
+        isChar['Arabic Supplement'](char) ||
+        isChar['Arabic Extended-A'](char) ||
+        isChar['Arabic Presentation Forms-A'](char) ||
+        isChar['Arabic Presentation Forms-B'](char)
+    );
 }
 
 export function charInRTLScript(char: number) {
     // Main blocks for Hebrew, Arabic, Thaana and other RTL scripts
-    return (char >= 0x0590 && char <= 0x08FF) ||
+    return (
+        (char >= 0x0590 && char <= 0x08ff) ||
         isChar['Arabic Presentation Forms-A'](char) ||
-        isChar['Arabic Presentation Forms-B'](char);
+        isChar['Arabic Presentation Forms-B'](char)
+    );
 }
 
 export function charInSupportedScript(char: number, canRenderRTL: boolean) {
@@ -293,11 +319,13 @@ export function charInSupportedScript(char: number, canRenderRTL: boolean) {
     if (!canRenderRTL && charInRTLScript(char)) {
         return false;
     }
-    if ((char >= 0x0900 && char <= 0x0DFF) ||
+    if (
+        (char >= 0x0900 && char <= 0x0dff) ||
         // Main blocks for Indic scripts and Sinhala
-        (char >= 0x0F00 && char <= 0x109F) ||
+        (char >= 0x0f00 && char <= 0x109f) ||
         // Main blocks for Tibetan and Myanmar
-        isChar['Khmer'](char)) {
+        isChar['Khmer'](char)
+    ) {
         // These blocks cover common scripts that require
         // complex text shaping, based on unicode script metadata:
         // http://www.unicode.org/repos/cldr/trunk/common/properties/scriptMetadata.txt

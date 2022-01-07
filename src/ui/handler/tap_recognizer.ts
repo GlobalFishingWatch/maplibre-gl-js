@@ -14,18 +14,15 @@ const MAX_TOUCH_TIME = 500;
 const MAX_DIST = 30;
 
 export class SingleTapRecognizer {
-
     numTouches: number;
     centroid: Point;
     startTime: number;
     aborted: boolean;
     touches: {
-      [k in number | string]: Point;
+        [k in number | string]: Point;
     };
 
-    constructor(options: {
-      numTouches: number;
-    }) {
+    constructor(options: {numTouches: number}) {
         this.reset();
         this.numTouches = options.numTouches;
     }
@@ -38,7 +35,6 @@ export class SingleTapRecognizer {
     }
 
     touchstart(e: TouchEvent, points: Array<Point>, mapTouches: Array<Touch>) {
-
         if (this.centroid || mapTouches.length > this.numTouches) {
             this.aborted = true;
         }
@@ -80,21 +76,16 @@ export class SingleTapRecognizer {
             if (centroid) return centroid;
         }
     }
-
 }
 
 export class TapRecognizer {
-
     singleTap: SingleTapRecognizer;
     numTaps: number;
     lastTime: number;
     lastTap: Point;
     count: number;
 
-    constructor(options: {
-      numTaps: number;
-      numTouches: number;
-    }) {
+    constructor(options: {numTaps: number; numTouches: number}) {
         this.singleTap = new SingleTapRecognizer(options);
         this.numTaps = options.numTaps;
         this.reset();

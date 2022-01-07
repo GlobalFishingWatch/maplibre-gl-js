@@ -6,26 +6,30 @@ import Actor from '../../util/actor';
 jest.mock('../../util/actor');
 
 function createMap(logoPosition, logoRequired) {
-    return globalCreateMap({
-        style: {
-            version: 8,
-            sources: {
-                'composite': createSource({
-                    minzoom: 1,
-                    maxzoom: 10,
-                    attribution: 'Maplibre',
-                    tiles: [
-                        'http://example.com/{z}/{x}/{y}.png'
-                    ]
-                }, logoRequired)
+    return globalCreateMap(
+        {
+            style: {
+                version: 8,
+                sources: {
+                    composite: createSource(
+                        {
+                            minzoom: 1,
+                            maxzoom: 10,
+                            attribution: 'Maplibre',
+                            tiles: ['http://example.com/{z}/{x}/{y}.png']
+                        },
+                        logoRequired
+                    )
+                },
+                layers: []
             },
-            layers: []
+            logoPosition: logoPosition || undefined
         },
-        logoPosition: logoPosition || undefined
-    }, undefined);
+        undefined
+    );
 }
 
-const mockDispatcher = (Actor.prototype.send as jest.Mock).mockImplementation(() => { }) as any as Dispatcher;
+const mockDispatcher = (Actor.prototype.send as jest.Mock).mockImplementation(() => {}) as any as Dispatcher;
 
 function createSource(options, logoRequired) {
     const source = new VectorTileSource('id', options, mockDispatcher, undefined);
@@ -36,8 +40,8 @@ function createSource(options, logoRequired) {
         },
         transform: {angle: 0, pitch: 0, showCollisionBoxes: false},
         _getMapId: () => 1
-    }as any as Map);
-    source.on('error', (e) => {
+    } as any as Map);
+    source.on('error', e => {
         throw e.error;
     });
     const logoFlag = 'maplibreLogo';
@@ -54,9 +58,9 @@ describe('LogoControl', () => {
     test('appears in bottom-left by default', done => {
         const map = createMap(undefined, undefined);
         map.on('load', () => {
-            expect(map.getContainer().querySelectorAll(
-            '.maplibregl-ctrl-bottom-left .maplibregl-ctrl-logo'
-            )).toHaveLength(1);
+            expect(
+                map.getContainer().querySelectorAll('.maplibregl-ctrl-bottom-left .maplibregl-ctrl-logo')
+            ).toHaveLength(1);
             done();
         });
     });
@@ -64,9 +68,9 @@ describe('LogoControl', () => {
     test('appears in the position specified by the position option', done => {
         const map = createMap('top-left', undefined);
         map.on('load', () => {
-            expect(map.getContainer().querySelectorAll(
-            '.maplibregl-ctrl-top-left .maplibregl-ctrl-logo'
-            )).toHaveLength(1);
+            expect(map.getContainer().querySelectorAll('.maplibregl-ctrl-top-left .maplibregl-ctrl-logo')).toHaveLength(
+                1
+            );
             done();
         });
     });
@@ -74,7 +78,9 @@ describe('LogoControl', () => {
     test('is not displayed when the maplibreLogo property is false', done => {
         const map = createMap('top-left', false);
         map.on('load', () => {
-            const container = map.getContainer().querySelectorAll('.maplibregl-ctrl-top-left > .maplibregl-ctrl')[0] as HTMLBaseElement;
+            const container = map
+                .getContainer()
+                .querySelectorAll('.maplibregl-ctrl-top-left > .maplibregl-ctrl')[0] as HTMLBaseElement;
             const containerStyle = container.style;
             expect(containerStyle).toHaveProperty('display', 'none');
             done();
@@ -83,25 +89,25 @@ describe('LogoControl', () => {
 
     test('is not added more than once', done => {
         const map = createMap(undefined, undefined);
-        const source = createSource({
-            minzoom: 1,
-            maxzoom: 10,
-            attribution: 'Maplibre',
-            tiles: [
-                'http://example.com/{z}/{x}/{y}.png'
-            ]
-        }, undefined);
+        const source = createSource(
+            {
+                minzoom: 1,
+                maxzoom: 10,
+                attribution: 'Maplibre',
+                tiles: ['http://example.com/{z}/{x}/{y}.png']
+            },
+            undefined
+        );
         map.on('load', () => {
             expect(map.getContainer().querySelectorAll('.maplibregl-ctrl-logo')).toHaveLength(1);
             map.addSource('source2', source as any);
-            map.on('sourcedata', (e) => {
+            map.on('sourcedata', e => {
                 if (e.isSourceLoaded && e.sourceId === 'source2' && e.sourceDataType === 'metadata') {
                     expect(map.getContainer().querySelectorAll('.maplibregl-ctrl-logo')).toHaveLength(1);
                 }
             });
             done();
         });
-
     });
 
     test('appears in compact mode if container is less then 250 pixel wide', () => {
@@ -110,15 +116,11 @@ describe('LogoControl', () => {
 
         Object.defineProperty(map.getCanvasContainer(), 'offsetWidth', {value: 255, configurable: true});
         map.resize();
-        expect(
-        container.querySelectorAll('.maplibregl-ctrl-logo:not(.maplibregl-compact)')
-        ).toHaveLength(1);
+        expect(container.querySelectorAll('.maplibregl-ctrl-logo:not(.maplibregl-compact)')).toHaveLength(1);
 
         Object.defineProperty(map.getCanvasContainer(), 'offsetWidth', {value: 245, configurable: true});
         map.resize();
-        expect(
-        container.querySelectorAll('.maplibregl-ctrl-logo.maplibregl-compact')
-        ).toHaveLength(1);
+        expect(container.querySelectorAll('.maplibregl-ctrl-logo.maplibregl-compact')).toHaveLength(1);
     });
 
     test('has `rel` nooper and nofollow', done => {

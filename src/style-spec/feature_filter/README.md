@@ -12,26 +12,21 @@ passes its test.
 
 #### Parameters
 
-| parameter | type  | description      |
-| --------- | ----- | ---------------- |
+| parameter | type  | description        |
+| --------- | ----- | ------------------ |
 | `filter`  | Array | maplibre gl filter |
 
 **Returns** `Function`, filter-evaluating function
 
 ### Usage
 
-``` javascript
+```javascript
 var ff = require('@maplibre/maplibre-gl-style-spec').featureFilter;
 
 // will match a feature with class of street_limited,
 // AND an admin_level less than or equal to 3,
 // that's NOT a polygon.
-var filter = [
-    "all",
-    ["==", "class", "street_limited"],
-    ["<=", "admin_level", 3],
-    ["!=", "$type", "Polygon"]
-]
+var filter = ['all', ['==', 'class', 'street_limited'], ['<=', 'admin_level', 3], ['!=', '$type', 'Polygon']];
 
 // will match a feature that has a class of
 // wetland OR wetland_noveg.
@@ -45,8 +40,8 @@ var testFilter = ff(filter);
 var feature = {
     type: 2,
     properties: {
-       class: "street_limited",
-       admin_level: 1
+        class: 'street_limited',
+        admin_level: 1
     }
 };
 

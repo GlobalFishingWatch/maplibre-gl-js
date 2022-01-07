@@ -43,5 +43,5 @@ declare module '@mapbox/vector-tile' {
         VectorTileFeature: typeof VectorTileFeature;
     };
 
-    export = __exports
+    export = __exports;
 }

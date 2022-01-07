@@ -5,9 +5,14 @@ export default class ValidationError {
     identifier: string;
     line: number;
 
-    constructor(key: string, value: {
-      __line__: number;
-    }, message: string, identifier?: string | null) {
+    constructor(
+        key: string,
+        value: {
+            __line__: number;
+        },
+        message: string,
+        identifier?: string | null
+    ) {
         this.message = (key ? `${key}: ` : '') + message;
         if (identifier) this.identifier = identifier;
 

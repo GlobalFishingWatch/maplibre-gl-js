@@ -13,7 +13,7 @@ function createSource(options, transformCallback?) {
         _requestManager: new RequestManager(transformCallback)
     } as any);
 
-    source.on('error', (e) => {
+    source.on('error', e => {
         throw e.error;
     });
 
@@ -32,14 +32,17 @@ describe('RasterTileSource', () => {
     });
 
     test('transforms request for TileJSON URL', done => {
-        server.respondWith('/source.json', JSON.stringify({
-            minzoom: 0,
-            maxzoom: 22,
-            attribution: 'MapLibre',
-            tiles: ['http://example.com/{z}/{x}/{y}.pngraw'],
-            bounds: [-47, -7, -45, -5]
-        }));
-        const transformSpy = jest.fn().mockImplementation((url) => {
+        server.respondWith(
+            '/source.json',
+            JSON.stringify({
+                minzoom: 0,
+                maxzoom: 22,
+                attribution: 'MapLibre',
+                tiles: ['http://example.com/{z}/{x}/{y}.pngraw'],
+                bounds: [-47, -7, -45, -5]
+            })
+        );
+        const transformSpy = jest.fn().mockImplementation(url => {
             return {url};
         });
 
@@ -52,21 +55,24 @@ describe('RasterTileSource', () => {
     });
 
     test('transforms tile urls before requesting', done => {
-        server.respondWith('/source.json', JSON.stringify({
-            minzoom: 0,
-            maxzoom: 22,
-            attribution: 'MapLibre',
-            tiles: ['http://example.com/{z}/{x}/{y}.png'],
-            bounds: [-47, -7, -45, -5]
-        }));
+        server.respondWith(
+            '/source.json',
+            JSON.stringify({
+                minzoom: 0,
+                maxzoom: 22,
+                attribution: 'MapLibre',
+                tiles: ['http://example.com/{z}/{x}/{y}.png'],
+                bounds: [-47, -7, -45, -5]
+            })
+        );
         const source = createSource({url: '/source.json'});
         const transformSpy = jest.spyOn(source.map._requestManager, 'transformRequest');
-        source.on('data', (e) => {
+        source.on('data', e => {
             if (e.sourceDataType === 'metadata') {
                 const tile = {
                     tileID: new OverscaledTileID(10, 0, 10, 5, 5),
                     state: 'loading',
-                    loadVectorData () {},
+                    loadVectorData() {},
                     setExpiryData() {}
                 } as any as Tile;
                 source.loadTile(tile, () => {});
@@ -75,25 +81,27 @@ describe('RasterTileSource', () => {
                 expect(transformSpy.mock.calls[0][0]).toBe('http://example.com/10/5/5.png');
                 expect(transformSpy.mock.calls[0][1]).toBe('Tile');
                 done();
-
             }
         });
         server.respond();
     });
     test('populates neighboringTiles', done => {
-        server.respondWith('/source.json', JSON.stringify({
-            minzoom: 0,
-            maxzoom: 22,
-            attribution: 'MapLibre',
-            tiles: ['http://example.com/{z}/{x}/{y}.png']
-        }));
+        server.respondWith(
+            '/source.json',
+            JSON.stringify({
+                minzoom: 0,
+                maxzoom: 22,
+                attribution: 'MapLibre',
+                tiles: ['http://example.com/{z}/{x}/{y}.png']
+            })
+        );
         const source = createSource({url: '/source.json'});
-        source.on('data', (e) => {
+        source.on('data', e => {
             if (e.sourceDataType === 'metadata') {
                 const tile = {
                     tileID: new OverscaledTileID(10, 0, 10, 5, 5),
                     state: 'loading',
-                    loadVectorData () {},
+                    loadVectorData() {},
                     setExpiryData() {}
                 } as any as Tile;
                 source.loadTile(tile, () => {});
@@ -110,26 +118,28 @@ describe('RasterTileSource', () => {
                 ]);
 
                 done();
-
             }
         });
         server.respond();
     });
 
     test('populates neighboringTiles with wrapped tiles', done => {
-        server.respondWith('/source.json', JSON.stringify({
-            minzoom: 0,
-            maxzoom: 22,
-            attribution: 'MapLibre',
-            tiles: ['http://example.com/{z}/{x}/{y}.png']
-        }));
+        server.respondWith(
+            '/source.json',
+            JSON.stringify({
+                minzoom: 0,
+                maxzoom: 22,
+                attribution: 'MapLibre',
+                tiles: ['http://example.com/{z}/{x}/{y}.png']
+            })
+        );
         const source = createSource({url: '/source.json'});
-        source.on('data', (e) => {
+        source.on('data', e => {
             if (e.sourceDataType === 'metadata') {
                 const tile = {
                     tileID: new OverscaledTileID(5, 0, 5, 31, 5),
                     state: 'loading',
-                    loadVectorData () {},
+                    loadVectorData() {},
                     setExpiryData() {}
                 } as any as Tile;
                 source.loadTile(tile, () => {});
@@ -138,11 +148,11 @@ describe('RasterTileSource', () => {
                     new OverscaledTileID(5, 0, 5, 30, 6).key,
                     new OverscaledTileID(5, 0, 5, 31, 6).key,
                     new OverscaledTileID(5, 0, 5, 30, 5).key,
-                    new OverscaledTileID(5, 1, 5, 0,  5).key,
+                    new OverscaledTileID(5, 1, 5, 0, 5).key,
                     new OverscaledTileID(5, 0, 5, 30, 4).key,
                     new OverscaledTileID(5, 0, 5, 31, 4).key,
-                    new OverscaledTileID(5, 1, 5, 0,  4).key,
-                    new OverscaledTileID(5, 1, 5, 0,  6).key
+                    new OverscaledTileID(5, 1, 5, 0, 4).key,
+                    new OverscaledTileID(5, 1, 5, 0, 6).key
                 ]);
                 done();
             }

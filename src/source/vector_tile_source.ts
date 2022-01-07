@@ -63,9 +63,14 @@ class VectorTileSource extends Evented implements Source {
     _tileJSONRequest: Cancelable;
     _loaded: boolean;
 
-    constructor(id: string, options: VectorSourceSpecification & {
-      collectResourceTiming: boolean;
-    }, dispatcher: Dispatcher, eventedParent: Evented) {
+    constructor(
+        id: string,
+        options: VectorSourceSpecification & {
+            collectResourceTiming: boolean;
+        },
+        dispatcher: Dispatcher,
+        eventedParent: Evented
+    ) {
         super();
         this.id = id;
         this.dispatcher = dispatcher;
@@ -206,15 +211,13 @@ class VectorTileSource extends Evented implements Source {
         function done(err, data) {
             delete tile.request;
 
-            if (tile.aborted)
-                return callback(null);
+            if (tile.aborted) return callback(null);
 
             if (err && err.status !== 404) {
                 return callback(err);
             }
 
-            if (data && data.resourceTiming)
-                tile.resourceTiming = data.resourceTiming;
+            if (data && data.resourceTiming) tile.resourceTiming = data.resourceTiming;
 
             if (this.map._refreshExpiredTiles && data) tile.setExpiryData(data);
             tile.loadVectorData(data, this.map.painter);

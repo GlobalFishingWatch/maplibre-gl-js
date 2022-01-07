@@ -11,15 +11,18 @@ import type ParsingContext from '../parsing_context';
 import type EvaluationContext from '../evaluation_context';
 import type {Type} from '../types';
 
-export type InterpolationType = {
-  name: 'linear';
-} | {
-  name: 'exponential';
-  base: number;
-} | {
-  name: 'cubic-bezier';
-  controlPoints: [number, number, number, number];
-};
+export type InterpolationType =
+    | {
+          name: 'linear';
+      }
+    | {
+          name: 'exponential';
+          base: number;
+      }
+    | {
+          name: 'cubic-bezier';
+          controlPoints: [number, number, number, number];
+      };
 
 class Interpolate implements Expression {
     type: Type;
@@ -30,7 +33,13 @@ class Interpolate implements Expression {
     labels: Array<number>;
     outputs: Array<Expression>;
 
-    constructor(type: Type, operator: 'interpolate' | 'interpolate-hcl' | 'interpolate-lab', interpolation: InterpolationType, input: Expression, stops: Stops) {
+    constructor(
+        type: Type,
+        operator: 'interpolate' | 'interpolate-hcl' | 'interpolate-lab',
+        interpolation: InterpolationType,
+        input: Expression,
+        stops: Stops
+    ) {
         this.type = type;
         this.operator = operator;
         this.interpolation = interpolation;
@@ -77,16 +86,16 @@ class Interpolate implements Expression {
             };
         } else if (interpolation[0] === 'cubic-bezier') {
             const controlPoints = interpolation.slice(1);
-            if (
-                controlPoints.length !== 4 ||
-                controlPoints.some(t => typeof t !== 'number' || t < 0 || t > 1)
-            ) {
-                return context.error('Cubic bezier interpolation requires four numeric arguments with values between 0 and 1.', 1) as null;
+            if (controlPoints.length !== 4 || controlPoints.some(t => typeof t !== 'number' || t < 0 || t > 1)) {
+                return context.error(
+                    'Cubic bezier interpolation requires four numeric arguments with values between 0 and 1.',
+                    1
+                ) as null;
             }
 
             interpolation = {
                 name: 'cubic-bezier',
-                controlPoints: (controlPoints as any)
+                controlPoints: controlPoints as any
             };
         } else {
             return context.error(`Unknown interpolation type ${String(interpolation[0])}`, 1, 0) as null;
@@ -120,11 +129,17 @@ class Interpolate implements Expression {
             const valueKey = i + 4;
 
             if (typeof label !== 'number') {
-                return context.error('Input/output pairs for "interpolate" expressions must be defined using literal numeric values (not computed expressions) for the input values.', labelKey) as null;
+                return context.error(
+                    'Input/output pairs for "interpolate" expressions must be defined using literal numeric values (not computed expressions) for the input values.',
+                    labelKey
+                ) as null;
             }
 
             if (stops.length && stops[stops.length - 1][0] >= label) {
-                return context.error('Input/output pairs for "interpolate" expressions must be arranged with input values in strictly ascending order.', labelKey) as null;
+                return context.error(
+                    'Input/output pairs for "interpolate" expressions must be arranged with input values in strictly ascending order.',
+                    labelKey
+                ) as null;
             }
 
             const parsed = context.parse(value, valueKey, outputType);
@@ -133,18 +148,21 @@ class Interpolate implements Expression {
             stops.push([label, parsed]);
         }
 
-        if (outputType.kind !== 'number' &&
+        if (
+            outputType.kind !== 'number' &&
             outputType.kind !== 'color' &&
-            !(
-                outputType.kind === 'array' &&
-                outputType.itemType.kind === 'number' &&
-                typeof outputType.N === 'number'
-            )
+            !(outputType.kind === 'array' && outputType.itemType.kind === 'number' && typeof outputType.N === 'number')
         ) {
             return context.error(`Type ${toString(outputType)} is not interpolatable.`) as null;
         }
 
-        return new Interpolate(outputType, (operator as any), interpolation as InterpolationType, input as Expression, stops);
+        return new Interpolate(
+            outputType,
+            operator as any,
+            interpolation as InterpolationType,
+            input as Expression,
+            stops
+        );
     }
 
     evaluate(ctx: EvaluationContext) {
@@ -155,7 +173,7 @@ class Interpolate implements Expression {
             return outputs[0].evaluate(ctx);
         }
 
-        const value = (this.input.evaluate(ctx) as any as number);
+        const value = this.input.evaluate(ctx) as any as number;
         if (value <= labels[0]) {
             return outputs[0].evaluate(ctx);
         }
@@ -174,7 +192,7 @@ class Interpolate implements Expression {
         const outputUpper = outputs[index + 1].evaluate(ctx);
 
         if (this.operator === 'interpolate') {
-            return ((interpolate[this.type.kind.toLowerCase()] as any))(outputLower, outputUpper, t); // eslint-disable-line import/namespace
+            return (interpolate[this.type.kind.toLowerCase()] as any)(outputLower, outputUpper, t); // eslint-disable-line import/namespace
         } else if (this.operator === 'interpolate-hcl') {
             return hcl.reverse(hcl.interpolate(hcl.forward(outputLower), hcl.forward(outputUpper), t));
         } else {
@@ -198,7 +216,7 @@ class Interpolate implements Expression {
         if (this.interpolation.name === 'linear') {
             interpolation = ['linear'];
         } else if (this.interpolation.name === 'exponential') {
-            if  (this.interpolation.base === 1) {
+            if (this.interpolation.base === 1) {
                 interpolation = ['linear'];
             } else {
                 interpolation = ['exponential', this.interpolation.base];
@@ -210,10 +228,7 @@ class Interpolate implements Expression {
         const serialized = [this.operator, interpolation, this.input.serialize()];
 
         for (let i = 0; i < this.labels.length; i++) {
-            serialized.push(
-                this.labels[i],
-                this.outputs[i].serialize()
-            );
+            serialized.push(this.labels[i], this.outputs[i].serialize());
         }
         return serialized;
     }
@@ -253,7 +268,7 @@ class Interpolate implements Expression {
  * expensive `Math.pow()` operations.)
  *
  * @private
-*/
+ */
 function exponentialInterpolation(input, base, lowerValue, upperValue) {
     const difference = upperValue - lowerValue;
     const progress = input - lowerValue;

@@ -2,7 +2,12 @@ import assert from 'assert';
 
 import TransferableGridIndex from 'grid-index';
 import Color from '../style-spec/util/color';
-import {StylePropertyFunction, StyleExpression, ZoomDependentExpression, ZoomConstantExpression} from '../style-spec/expression';
+import {
+    StylePropertyFunction,
+    StyleExpression,
+    ZoomDependentExpression,
+    ZoomConstantExpression
+} from '../style-spec/expression';
 import CompoundExpression from '../style-spec/expression/compound_expression';
 import expressions from '../style-spec/expression/definitions';
 import ResolvedImage from '../style-spec/expression/types/resolved_image';
@@ -11,25 +16,41 @@ import type {Transferable} from '../types/transferable';
 import {isImageBitmap} from './util';
 
 type SerializedObject = {
-  [_: string]: Serialized;
+    [_: string]: Serialized;
 }; // eslint-disable-line
 
-export type Serialized = null | void | boolean | number | string | Boolean | Number | String | Date | RegExp | ArrayBuffer | ArrayBufferView | ImageData | ImageBitmap | Array<Serialized> | SerializedObject;
+export type Serialized =
+    | null
+    | void
+    | boolean
+    | number
+    | string
+    | Boolean
+    | Number
+    | String
+    | Date
+    | RegExp
+    | ArrayBuffer
+    | ArrayBufferView
+    | ImageData
+    | ImageBitmap
+    | Array<Serialized>
+    | SerializedObject;
 
 type Registry = {
-  [_: string]: {
-    klass: {
-      new (...args: any): any;
-      deserialize?: (input: Serialized) => unknown;
+    [_: string]: {
+        klass: {
+            new (...args: any): any;
+            deserialize?: (input: Serialized) => unknown;
+        };
+        omit: ReadonlyArray<string>;
+        shallow: ReadonlyArray<string>;
     };
-    omit: ReadonlyArray<string>;
-    shallow: ReadonlyArray<string>;
-  };
 };
 
 type RegisterOptions<T> = {
-  omit?: ReadonlyArray<keyof T>;
-  shallow?: ReadonlyArray<keyof T>;
+    omit?: ReadonlyArray<keyof T>;
+    shallow?: ReadonlyArray<keyof T>;
 };
 
 const registry: Registry = {};
@@ -44,31 +65,34 @@ const registry: Registry = {};
  * @private
  */
 export function register<T extends any>(
-  name: string,
-  klass: {
-    new (...args: any): T;
-  },
-  options: RegisterOptions<T> = {}
+    name: string,
+    klass: {
+        new (...args: any): T;
+    },
+    options: RegisterOptions<T> = {}
 ) {
     assert(!registry[name], `${name} is already registered.`);
-    ((Object.defineProperty as any))(klass, '_classRegistryKey', {
+    (Object.defineProperty as any)(klass, '_classRegistryKey', {
         value: name,
         writeable: false
     });
     registry[name] = {
         klass,
-        omit: options.omit as ReadonlyArray<string> || [],
-        shallow: options.shallow as ReadonlyArray<string> || []
+        omit: (options.omit as ReadonlyArray<string>) || [],
+        shallow: (options.shallow as ReadonlyArray<string>) || []
     };
 }
 
 register('Object', Object);
 
 type SerializedGrid = {
-  buffer: ArrayBuffer;
+    buffer: ArrayBuffer;
 };
 
-TransferableGridIndex.serialize = function serialize(grid: TransferableGridIndex, transferables?: Array<Transferable>): SerializedGrid {
+TransferableGridIndex.serialize = function serialize(
+    grid: TransferableGridIndex,
+    transferables?: Array<Transferable>
+): SerializedGrid {
     const buffer = grid.toArrayBuffer();
     if (transferables) {
         transferables.push(buffer);
@@ -97,8 +121,11 @@ for (const name in expressions) {
 }
 
 function isArrayBuffer(value: any): value is ArrayBuffer {
-    return value && typeof ArrayBuffer !== 'undefined' &&
-           (value instanceof ArrayBuffer || (value.constructor && value.constructor.name === 'ArrayBuffer'));
+    return (
+        value &&
+        typeof ArrayBuffer !== 'undefined' &&
+        (value instanceof ArrayBuffer || (value.constructor && value.constructor.name === 'ArrayBuffer'))
+    );
 }
 
 /**
@@ -116,7 +143,8 @@ function isArrayBuffer(value: any): value is ArrayBuffer {
  * @private
  */
 export function serialize(input: unknown, transferables?: Array<Transferable> | null): Serialized {
-    if (input === null ||
+    if (
+        input === null ||
         input === undefined ||
         typeof input === 'boolean' ||
         typeof input === 'number' ||
@@ -125,7 +153,8 @@ export function serialize(input: unknown, transferables?: Array<Transferable> | 
         input instanceof Number ||
         input instanceof String ||
         input instanceof Date ||
-        input instanceof RegExp) {
+        input instanceof RegExp
+    ) {
         return input;
     }
 
@@ -167,22 +196,23 @@ export function serialize(input: unknown, transferables?: Array<Transferable> | 
     }
 
     if (typeof input === 'object') {
-        const klass = (input.constructor as any);
+        const klass = input.constructor as any;
         const name = klass._classRegistryKey;
         if (!name) {
-            throw new Error('can\'t serialize object of unregistered class');
+            throw new Error("can't serialize object of unregistered class");
         }
         assert(registry[name]);
 
-        const properties: SerializedObject = klass.serialize ?
-            // (Temporary workaround) allow a class to provide static
-            // `serialize()` and `deserialize()` methods to bypass the generic
-            // approach.
-            // This temporary workaround lets us use the generic serialization
-            // approach for objects whose members include instances of dynamic
-            // StructArray types. Once we refactor StructArray to be static,
-            // we can remove this complexity.
-            (klass.serialize(input, transferables) as SerializedObject) : {};
+        const properties: SerializedObject = klass.serialize
+            ? // (Temporary workaround) allow a class to provide static
+              // `serialize()` and `deserialize()` methods to bypass the generic
+              // approach.
+              // This temporary workaround lets us use the generic serialization
+              // approach for objects whose members include instances of dynamic
+              // StructArray types. Once we refactor StructArray to be static,
+              // we can remove this complexity.
+              (klass.serialize(input, transferables) as SerializedObject)
+            : {};
 
         if (!klass.serialize) {
             for (const key in input) {
@@ -190,16 +220,15 @@ export function serialize(input: unknown, transferables?: Array<Transferable> | 
                 if (!(input as any).hasOwnProperty(key)) continue; // eslint-disable-line no-prototype-builtins
                 if (registry[name].omit.indexOf(key) >= 0) continue;
                 const property = (input as any)[key];
-                properties[key] = registry[name].shallow.indexOf(key) >= 0 ?
-                    property :
-                    serialize(property, transferables);
+                properties[key] =
+                    registry[name].shallow.indexOf(key) >= 0 ? property : serialize(property, transferables);
             }
             if (input instanceof Error) {
                 properties.message = input.message;
             }
         } else {
             // make sure statically serialized object survives transfer of $name property
-            assert(!transferables || properties as any !== transferables[transferables.length - 1]);
+            assert(!transferables || (properties as any) !== transferables[transferables.length - 1]);
         }
 
         if (properties.$name) {
@@ -216,7 +245,8 @@ export function serialize(input: unknown, transferables?: Array<Transferable> | 
 }
 
 export function deserialize(input: Serialized): unknown {
-    if (input === null ||
+    if (
+        input === null ||
         input === undefined ||
         typeof input === 'boolean' ||
         typeof input === 'number' ||
@@ -229,7 +259,8 @@ export function deserialize(input: Serialized): unknown {
         isArrayBuffer(input) ||
         isImageBitmap(input) ||
         ArrayBuffer.isView(input) ||
-        input instanceof ImageData) {
+        input instanceof ImageData
+    ) {
         return input;
     }
 
