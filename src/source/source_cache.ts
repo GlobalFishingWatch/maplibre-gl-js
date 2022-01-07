@@ -274,7 +274,7 @@ class SourceCache extends Evented {
         this._source.fire(new Event('data', {dataType: 'source', tile, coord: tile.tileID, previousState}));
 
         if (this.loaded()) {
-            this._source.fire(new Event('data', { dataType: 'sourcetiles', sourceId: this._source.id }));
+            this._source.fire(new Event('data', {dataType: 'sourcetiles', sourceId: this._source.id}));
         }
     }
 
