@@ -430,7 +430,9 @@ class Style extends Evented {
             }
         }
 
-        this.light.recalculate(parameters);
+        if (this.light) {
+            this.light.recalculate(parameters);
+        }
         this.z = parameters.zoom;
 
         if (changed) {
