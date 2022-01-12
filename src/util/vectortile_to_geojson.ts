@@ -1,9 +1,9 @@
 import type {VectorTileFeature} from '@mapbox/vector-tile';
 
-class GeoJSONFeature {
+class GeoJSONFeature<P = {}> {
     type: 'Feature';
     _geometry: GeoJSON.Geometry;
-    properties: {};
+    properties: P;
     id: number | string | void;
 
     _vectorTileFeature: VectorTileFeature;
