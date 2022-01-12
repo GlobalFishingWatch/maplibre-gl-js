@@ -8,10 +8,10 @@ export type MapGeoJSONFeature = GeoJSONFeature & {
     state: { [key: string]: any };
 }
 
-class GeoJSONFeature {
+class GeoJSONFeature<P = Record<string, any>> {
     type: 'Feature';
     _geometry: GeoJSON.Geometry;
-    properties: { [name: string]: any };
+    properties: P;
     id: number | string | undefined;
 
     _vectorTileFeature: VectorTileFeature;
@@ -24,7 +24,7 @@ class GeoJSONFeature {
         (vectorTileFeature as any)._x = x;
         (vectorTileFeature as any)._y = y;
 
-        this.properties = vectorTileFeature.properties;
+        this.properties = vectorTileFeature.properties as any;
         this.id = id;
     }
 
