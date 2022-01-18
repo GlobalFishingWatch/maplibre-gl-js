@@ -259,9 +259,19 @@ class SourceCache extends Evented {
     _tileLoaded(tile: Tile, id: string, previousState: TileState, err?: Error | null) {
         if (err) {
             tile.state = 'errored';
-            if ((err as any).status !== 404) this._source.fire(new ErrorEvent(err, {tile}));
-            // continue to try loading parent/children tiles if a tile doesn't exist (404)
-            else this.update(this.transform);
+            if ((err as any).status !== 404) {
+                this._source.fire(new ErrorEvent(err, {tile}));
+                if (this.loaded()) {
+                    this._source.fire(new Event('data', {
+                        dataType: 'sourcetiles',
+                        sourceId: this._source.id,
+                        error: err.message
+                    }));
+                }
+            } else {
+                // continue to try loading parent/children tiles if a tile doesn't exist (404)
+                this.update(this.transform);
+            }
             return;
         }
 
@@ -271,7 +281,7 @@ class SourceCache extends Evented {
         if (this.getSource().type === 'raster-dem' && tile.dem) this._backfillDEM(tile);
         this._state.initializeTileState(tile, this.map ? this.map.painter : null);
 
-        this._source.fire(new Event('data', {dataType: 'source', tile, coord: tile.tileID, previousState}));
+        this._source.fire(new Event('data', {dataType: 'source', tile, coord: tile.tileID}));
 
         if (this.loaded()) {
             this._source.fire(new Event('data', {dataType: 'sourcetiles', sourceId: this._source.id}));
