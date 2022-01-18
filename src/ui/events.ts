@@ -309,6 +309,9 @@ export type MapDataEvent = {
     type: string;
     dataType: string;
     sourceDataType: MapSourceDataType;
+    // Custom props for sourcetiles event
+    sourceId?: string;
+    error?: string;
 };
 
 export type MapTerrainEvent = {
