@@ -168,6 +168,7 @@
     "build-dev": "npm run build-tsc && rollup -c --environment BUILD:dev",
     "watch-dev": "rollup -c --environment BUILD:dev --watch",
     "build-prod": "npm run build-tsc && rollup -c --environment BUILD:production",
+    "watch-prod": "npm run build-tsc && rollup -c --environment BUILD:production --watch",
     "build-prod-min": "npm run build-tsc-min && rollup -c --environment BUILD:production,MINIFY:true",
     "build-csp": "rollup -c rollup.config.csp.js",
     "build-query-suite": "rollup -c test/integration/rollup.config.test.js",
