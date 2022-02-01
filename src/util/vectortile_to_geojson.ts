@@ -16,7 +16,7 @@ class GeoJSONFeature<P = {}> {
         (vectorTileFeature as any)._x = x;
         (vectorTileFeature as any)._y = y;
 
-        this.properties = vectorTileFeature.properties;
+        this.properties = vectorTileFeature.properties as any;
         this.id = id;
     }
 
