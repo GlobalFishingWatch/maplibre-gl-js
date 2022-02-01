@@ -173,6 +173,9 @@ class SourceCache extends Evented {
             this._source.abortTile(tile, () => {});
 
         this._source.fire(new Event('dataabort', {tile, coord: tile.tileID, dataType: 'source'}));
+        if (this.loaded()) {
+            this._source.fire(new Event('data', {dataType: 'sourcetiles', sourceId: this._source.id}));
+        }
     }
 
     serialize() {
