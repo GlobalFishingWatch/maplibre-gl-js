@@ -4,8 +4,8 @@ import vtpbf from 'vt-pbf';
 import geojsonVt from 'geojson-vt';
 import MultiSourceLayerGeoJSONWrapper from './multi_source_geojson_wrapper';
 import VectorTileWorkerSource, {LoadVectorDataCallback} from './vector_tile_worker_source';
-import {getArrayBuffer} from '../util/ajax';
-import {aggregateTile} from '@globalfishingwatch/fourwings-aggregate';
+import {FourWingsHeaders, getArrayBuffer} from '../util/ajax';
+import {aggregate} from '@globalfishingwatch/fourwings-aggregate';
 import tilebelt from '@mapbox/tilebelt';
 import {WorkerTileParameters} from './worker_source';
 import {extend} from '../util/util';
@@ -147,14 +147,11 @@ type SourceLayers = {
     temporalgrid: any;
     temporalgrid_interactive?: any;
 };
-const getTile = (data, options) => {
+const getTile = (data, options, headers: FourWingsHeaders) => {
     const {x, y, z} = options;
     const tileBBox = tilebelt.tileToBBOX([x, y, z]);
     const int16ArrayBuffer = decodeProto(data);
-    const aggregated = aggregateTile(int16ArrayBuffer, {
-        ...options,
-        tileBBox
-    });
+    const aggregated = aggregate(int16ArrayBuffer, {...options, tileBBox}, headers);
 
     const mainTile = geoJSONtoVectorTile(aggregated.main, options);
     const sourceLayers: SourceLayers = {
@@ -188,11 +185,11 @@ const loadVectorData = (params: WorkerTileParameters, callback: LoadVectorDataCa
     const requestParams = extend(params.request, {url});
     const request = getArrayBuffer(
         requestParams,
-        (err?: Error | null, data?: ArrayBuffer | null, cacheControl?: string | null, expires?: string | null) => {
+        (err?: Error | null, data?: ArrayBuffer | null, cacheControl?: string | null, expires?: string | null, fourWingsParams?) => {
             if (err) {
                 callback(err);
             } else if (data) {
-                const tile = getTile(data, aggregationParams);
+                const tile = getTile(data, aggregationParams, fourWingsParams);
                 callback(null, {
                     ...tile,
                     cacheControl,
