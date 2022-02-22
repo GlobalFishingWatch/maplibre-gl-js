@@ -73,11 +73,26 @@ export type RequestParameters = {
     collectResourceTiming?: boolean;
 };
 
+export type FourWingsHeaders = {
+    h3Indexes: string[]; // test 4wings and h3
+    // numSublayers: number;
+    // numRows: number;
+    // numColumns: number;
+    // timeStart: string;
+    // timeEnd: string;
+    // timeStepUnit:  'year' | 'month' | 'day' | 'hour';
+    // timeStepValue: number;
+    // valueMin: number;
+    // valueMax: number;
+    // valueStep: number;
+}
+
 export type ResponseCallback<T> = (
     error?: Error | null,
     data?: T | null,
     cacheControl?: string | null,
-    expires?: string | null
+    expires?: string | null,
+    fourWingsParams?: FourWingsHeaders
 ) => void;
 
 /**
@@ -206,7 +221,17 @@ function makeFetchRequest(requestParameters: RequestParameters, callback: Respon
                 cachePut(request, cacheableResponse, requestTime);
             }
             complete = true;
-            callback(null, result, response.headers.get('Cache-Control'), response.headers.get('Expires'));
+            const fourWingsParams: FourWingsHeaders = {
+                h3Indexes: []
+            };
+            let index = 0;
+            let h3Indexes = response.headers.get(`indexes-${index}`);
+            while (h3Indexes !== null) {
+                index++;
+                fourWingsParams.h3Indexes = fourWingsParams.h3Indexes.concat(h3Indexes.split(','));
+                h3Indexes = response.headers.get(`indexes-${index}`);
+            }
+            callback(null, result, response.headers.get('Cache-Control'), response.headers.get('Expires'), fourWingsParams);
         }).catch(err => {
             if (!aborted) callback(new Error(err.message));
         });
