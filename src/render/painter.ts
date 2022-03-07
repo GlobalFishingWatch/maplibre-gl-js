@@ -374,7 +374,7 @@ class Painter {
 
         for (const id in sourceCaches) {
             const sourceCache = sourceCaches[id];
-            if (sourceCache.used) {
+            if (sourceCache?.used) {
                 sourceCache.prepare(this.context);
             }
         }
