@@ -348,6 +348,7 @@ export type MapEventType = {
     data: MapDataEvent;
     tiledataloading: MapDataEvent;
     sourcedataloading: MapSourceDataEvent;
+    sourcetilesdata: MapSourceDataEvent;
     styledataloading: MapStyleDataEvent;
     sourcedata: MapSourceDataEvent;
     styledata: MapStyleDataEvent;
@@ -1374,6 +1375,25 @@ export type MapEvent =
      * });
      */
     | 'sourcedataloading'
+
+    /**
+     * Fired when one of the map's sources has loaded every tile.
+     * See {@link MapDataEvent} for more information.
+     *
+     * @event sourcetilesdata
+     * @memberof Map
+     * @instance
+     * @property {MapDataEvent} data
+     * @example
+     * // Initialize the map
+     * var map = new maplibregl.Map({ // map options });
+     * // Set an event listener that fires
+     * // map source all tiles were loaded
+     * map.on('sourcetilesdata', function() {
+     *   console.log('A sourcetilesdata event occurred.');
+     * });
+     */
+    | 'sourcetilesdata'
 
     /**
      * Fired when an icon or pattern needed by the style is missing. The missing image can

@@ -1114,6 +1114,7 @@ class Map extends Camera {
      * | [`dataloading`](#map.event:dataloading)                   |                           |
      * | [`styledataloading`](#map.event:styledataloading)         |                           |
      * | [`sourcedataloading`](#map.event:sourcedataloading)       |                           |
+     * | [`sourcetilesdata`](#map.event:sourcetilesdata)           |                           |
      * | [`styleimagemissing`](#map.event:styleimagemissing)       |                           |
      * | [`dataabort`](#map.event:dataabort)                       |                           |
      * | [`sourcedataabort`](#map.event:sourcedataabort)           |                           |
