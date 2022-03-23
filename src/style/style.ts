@@ -425,7 +425,7 @@ class Style extends Evented {
 
         for (const sourceId in sourcesUsedBefore) {
             const sourceCache = this.sourceCaches[sourceId];
-            if (sourcesUsedBefore[sourceId] !== sourceCache.used) {
+            if (sourcesUsedBefore[sourceId] !== sourceCache?.used) {
                 sourceCache.fire(new Event('data', {sourceDataType: 'visibility', dataType:'source', sourceId}));
             }
         }
