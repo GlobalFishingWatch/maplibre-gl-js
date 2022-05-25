@@ -1,7 +1,7 @@
 {
   "name": "@globalfishingwatch/maplibre-gl",
   "description": "BSD licensed community fork of mapbox-gl, a WebGL interactive maps library",
-  "version": "2.1.9-gfw.20",
+  "version": "2.1.9-gfw.21",
   "main": "dist/maplibre-gl.js",
   "style": "dist/maplibre-gl.css",
   "license": "BSD-3-Clause",
@@ -137,6 +137,9 @@
     "stylelint-config-standard": "^25.0.0",
     "ts-node": "^10.5.0",
     "typescript": "^4.6.2"
+  },
+  "optionalDependencies": {
+    "@swc/core-linux-x64-gnu": "^1.2.192"
   },
   "scripts": {
     "generate-shaders": "node --loader ts-node/esm --experimental-specifier-resolution=node build/generate-shaders.ts",

@@ -218,6 +218,11 @@
       "value": "string",
       "doc": "An array of one or more tile source URLs, as in the TileJSON spec."
     },
+    "updateDebounce": {
+      "type": "boolean",
+      "default": false,
+      "doc": "A flag to avoid requesting tiles (not updating the source) while map is moving (debounced by 60ms)"
+    },
     "bounds": {
       "type": "array",
       "value": "number",
