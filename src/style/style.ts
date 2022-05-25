@@ -32,6 +32,7 @@ import PauseablePlacement from './pauseable_placement';
 import ZoomHistory from './zoom_history';
 import CrossTileSymbolIndex from '../symbol/cross_tile_symbol_index';
 import {validateCustomStyleLayer} from './style_layer/custom_style_layer';
+import type {MapGeoJSONFeature} from '../util/vectortile_to_geojson';
 
 // We're skipping validation errors with the `source.canvas` identifier in order
 // to continue to allow canvas sources to be added at runtime/updated in
@@ -86,6 +87,12 @@ const ignoredDiffOperations = pick(diffOperations, [
 ]);
 
 const empty = emptyStyle() as StyleSpecification;
+
+export type FeatureIdentifier = {
+    id?: string | number | undefined;
+    source: string;
+    sourceLayer?: string | undefined;
+};
 
 export type StyleOptions = {
     validate?: boolean;
@@ -606,9 +613,7 @@ class Style extends Evented {
         delete this._updatedSources[id];
         sourceCache.fire(new Event('data', {sourceDataType: 'metadata', dataType:'source', sourceId: id}));
         sourceCache.setEventedParent(null);
-        sourceCache.clearTiles();
-
-        if (sourceCache.onRemove) sourceCache.onRemove(this.map);
+        sourceCache.onRemove(this.map);
         this._changed = true;
     }
 
@@ -914,11 +919,7 @@ class Style extends Evented {
         return this.getLayer(layer).getPaintProperty(name);
     }
 
-    setFeatureState(target: {
-        source: string;
-        sourceLayer?: string;
-        id: string | number;
-    }, state: any) {
+    setFeatureState(target: FeatureIdentifier, state: any) {
         this._checkLoaded();
         const sourceId = target.source;
         const sourceLayer = target.sourceLayer;
@@ -944,11 +945,7 @@ class Style extends Evented {
         sourceCache.setFeatureState(sourceLayer, target.id, state);
     }
 
-    removeFeatureState(target: {
-        source: string;
-        sourceLayer?: string;
-        id?: string | number;
-    }, key?: string) {
+    removeFeatureState(target: FeatureIdentifier, key?: string) {
         this._checkLoaded();
         const sourceId = target.source;
         const sourceCache = this.sourceCaches[sourceId];
@@ -974,11 +971,7 @@ class Style extends Evented {
         sourceCache.removeFeatureState(sourceLayer, target.id, key);
     }
 
-    getFeatureState(target: {
-        source: string;
-        sourceLayer?: string;
-        id: string | number;
-    }) {
+    getFeatureState(target: FeatureIdentifier) {
         this._checkLoaded();
         const sourceId = target.source;
         const sourceLayer = target.sourceLayer;
@@ -1033,7 +1026,7 @@ class Style extends Evented {
         this._changed = true;
     }
 
-    _flattenAndSortRenderedFeatures(sourceResults: Array<any>) {
+    _flattenAndSortRenderedFeatures(sourceResults: Array<{ [key: string]: Array<{featureIndex: number; feature: MapGeoJSONFeature}> }>) {
         // Feature order is complicated.
         // The order between features in two 2D layers is always determined by layer order.
         // The order between features in two 3D layers is always determined by depth.
@@ -1248,8 +1241,9 @@ class Style extends Evented {
             layer.setEventedParent(null);
         }
         for (const id in this.sourceCaches) {
-            this.sourceCaches[id].clearTiles();
-            this.sourceCaches[id].setEventedParent(null);
+            const sourceCache = this.sourceCaches[id];
+            sourceCache.setEventedParent(null);
+            sourceCache.onRemove(this.map);
         }
         this.imageManager.setEventedParent(null);
         this.setEventedParent(null);
