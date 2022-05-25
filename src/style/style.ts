@@ -1,3 +1,6 @@
+import assert from 'assert';
+import debounce from 'lodash/debounce';
+
 import {Event, ErrorEvent, Evented} from '../util/evented';
 import StyleLayer from './style_layer';
 import createStyleLayer from './create_style_layer';
@@ -1376,9 +1379,20 @@ class Style extends Evented {
         this.sourceCaches[id].reload();
     }
 
+    _debouncedUpdateSource = debounce(
+        (id: string, transform: Transform) => {
+            this.sourceCaches[id].update(transform, this.map.terrain);
+        },
+        60
+    );
+
     _updateSources(transform: Transform) {
         for (const id in this.sourceCaches) {
-            this.sourceCaches[id].update(transform, this.map.terrain);
+            if (this.sourceCaches[id]._updateDebounce) {
+                this._debouncedUpdateSource(id, transform);
+            } else {
+                this.sourceCaches[id].update(transform, this.map.terrain);
+            }
         }
     }
 
