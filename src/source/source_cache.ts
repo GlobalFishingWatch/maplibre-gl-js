@@ -20,7 +20,7 @@ import type Dispatcher from '../util/dispatcher';
 import type Transform from '../geo/transform';
 import type {TileState} from './tile';
 import type {Callback} from '../types/callback';
-import type {SourceSpecification} from '../style-spec/types.g';
+import type {SourceSpecification, TemporalgridSourceSpecification} from '../style-spec/types.g';
 import type {MapSourceDataEvent} from '../ui/events';
 import Terrain from '../render/terrain';
 
@@ -55,6 +55,7 @@ class SourceCache extends Evented {
     };
     _maxTileCacheSize: number;
     _paused: boolean;
+    _updateDebounce: boolean;
     _shouldReloadOnResume: boolean;
     _coveredTiles: {[_: string]: boolean};
     transform: Transform;
@@ -99,7 +100,7 @@ class SourceCache extends Evented {
         });
 
         this._source = createSource(id, options, dispatcher, this);
-
+        this._updateDebounce = (options as TemporalgridSourceSpecification).updateDebounce || false;
         this._tiles = {};
         this._cache = new TileCache(0, this._unloadTile.bind(this));
         this._timers = {};
