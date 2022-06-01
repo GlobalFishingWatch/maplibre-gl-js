@@ -1264,7 +1264,7 @@ class Style extends Evented {
         (id: string, transform: Transform) => {
             this.sourceCaches[id].update(transform);
         },
-        60
+        60, {leading: true}
     );
 
     _updateSources(transform: Transform) {
