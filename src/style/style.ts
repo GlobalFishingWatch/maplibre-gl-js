@@ -1262,7 +1262,7 @@ class Style extends Evented {
 
     _debouncedUpdateSource = debounce(
         (id: string, transform: Transform) => {
-            this.sourceCaches[id].update(transform);
+            this.sourceCaches[id]?.update(transform);
         },
         60, {leading: true}
     );
