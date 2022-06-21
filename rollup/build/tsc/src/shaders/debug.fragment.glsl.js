@@ -1,0 +1,1 @@
+export default "uniform highp vec4 u_color;\nuniform sampler2D u_overlay;\n\nvarying vec2 v_uv;\n\nvoid main() {\n    vec4 overlay_color = texture2D(u_overlay, v_uv);\n    gl_FragColor = mix(u_color, overlay_color, overlay_color.a);\n}\n";

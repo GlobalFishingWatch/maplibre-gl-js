@@ -1,0 +1,8 @@
+import { createLayout } from '../../util/struct_array';
+const lineLayoutAttributesExt = createLayout([
+    { name: 'a_uv_x', components: 1, type: 'Float32' },
+    { name: 'a_split_index', components: 1, type: 'Float32' },
+]);
+export default lineLayoutAttributesExt;
+export const { members, size, alignment } = lineLayoutAttributesExt;
+//# sourceMappingURL=line_attributes_ext.js.map
