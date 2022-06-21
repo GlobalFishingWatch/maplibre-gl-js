@@ -1,7 +1,7 @@
 {
   "name": "@globalfishingwatch/maplibre-gl",
   "description": "BSD licensed community fork of mapbox-gl, a WebGL interactive maps library",
-  "version": "2.1.9-gfw.24",
+  "version": "2.2.0-gfw.24",
   "main": "dist/maplibre-gl.js",
   "style": "dist/maplibre-gl.css",
   "license": "BSD-3-Clause",
@@ -98,7 +98,6 @@
     "eslint-plugin-jest": "^26.0.0",
     "eslint-plugin-jsdoc": "^39.2.9",
     "eslint-plugin-react": "^7.28.0",
-    "gl": "^5.0.0",
     "glob": "^7.2.0",
     "is-builtin-module": "^3.1.0",
     "jest": "^27.5.1",
