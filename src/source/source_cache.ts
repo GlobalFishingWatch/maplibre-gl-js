@@ -20,7 +20,7 @@ import type Dispatcher from '../util/dispatcher';
 import type Transform from '../geo/transform';
 import type {TileState} from './tile';
 import type {Callback} from '../types/callback';
-import type {SourceSpecification} from '../style-spec/types.g';
+import type {SourceSpecification, TemporalgridSourceSpecification} from '../style-spec/types.g';
 import type {MapSourceDataEvent} from '../ui/events';
 import Terrain from '../render/terrain';
 
@@ -55,6 +55,7 @@ class SourceCache extends Evented {
     };
     _maxTileCacheSize: number;
     _paused: boolean;
+    _updateDebounce: boolean;
     _shouldReloadOnResume: boolean;
     _coveredTiles: {[_: string]: boolean};
     transform: Transform;
@@ -99,7 +100,7 @@ class SourceCache extends Evented {
         });
 
         this._source = createSource(id, options, dispatcher, this);
-
+        this._updateDebounce = (options as TemporalgridSourceSpecification).updateDebounce || false;
         this._tiles = {};
         this._cache = new TileCache(0, this._unloadTile.bind(this));
         this._timers = {};
@@ -174,6 +175,9 @@ class SourceCache extends Evented {
             this._source.abortTile(tile, () => {});
 
         this._source.fire(new Event('dataabort', {tile, coord: tile.tileID, dataType: 'source'}));
+        if (this.loaded()) {
+            this._source.fire(new Event('data', {dataType: 'sourcetiles', sourceId: this._source.id}));
+        }
     }
 
     serialize() {
@@ -266,9 +270,19 @@ class SourceCache extends Evented {
     _tileLoaded(tile: Tile, id: string, previousState: TileState, err?: Error | null) {
         if (err) {
             tile.state = 'errored';
-            if ((err as any).status !== 404) this._source.fire(new ErrorEvent(err, {tile}));
-            // continue to try loading parent/children tiles if a tile doesn't exist (404)
-            else this.update(this.transform, this.terrain);
+            if ((err as any).status !== 404) {
+                this._source.fire(new ErrorEvent(err, {tile}));
+                if (this.loaded()) {
+                    this._source.fire(new Event('data', {
+                        dataType: 'sourcetiles',
+                        sourceId: this._source.id,
+                        error: err.message
+                    }));
+                }
+            } else {
+                // continue to try loading parent/children tiles if a tile doesn't exist (404)
+                this.update(this.transform, this.terrain);
+            }
             return;
         }
 
@@ -279,7 +293,11 @@ class SourceCache extends Evented {
         this._state.initializeTileState(tile, this.map ? this.map.painter : null);
 
         if (!tile.aborted) {
-            this._source.fire(new Event('data', {dataType: 'source', tile, coord: tile.tileID}));
+            this._source.fire(new Event('data', {dataType: 'source', tile, coord: tile.tileID, previousState}));
+        }
+
+        if (this.loaded()) {
+            this._source.fire(new Event('data', {dataType: 'sourcetiles', sourceId: this._source.id}));
         }
     }
 

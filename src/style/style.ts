@@ -1,4 +1,5 @@
 import assert from 'assert';
+import debounce from 'lodash/debounce';
 
 import {Event, ErrorEvent, Evented} from '../util/evented';
 import StyleLayer from './style_layer';
@@ -440,12 +441,14 @@ class Style extends Evented {
 
         for (const sourceId in sourcesUsedBefore) {
             const sourceCache = this.sourceCaches[sourceId];
-            if (sourcesUsedBefore[sourceId] !== sourceCache.used) {
+            if (sourcesUsedBefore[sourceId] !== sourceCache?.used) {
                 sourceCache.fire(new Event('data', {sourceDataType: 'visibility', dataType:'source', sourceId}));
             }
         }
 
-        this.light.recalculate(parameters);
+        if (this.light) {
+            this.light.recalculate(parameters);
+        }
         this.z = parameters.zoom;
 
         if (changed) {
@@ -986,7 +989,7 @@ class Style extends Evented {
             this.fire(new ErrorEvent(new Error('GeoJSON sources cannot have a sourceLayer parameter.')));
             return;
         }
-        if (sourceType === 'vector' && !sourceLayer) {
+        if ((sourceType === 'vector' || sourceType === 'temporalgrid') && !sourceLayer) {
             this.fire(new ErrorEvent(new Error('The sourceLayer parameter must be provided for vector source types.')));
             return;
         }
@@ -1008,9 +1011,9 @@ class Style extends Evented {
         }
 
         const sourceType = sourceCache.getSource().type;
-        const sourceLayer = sourceType === 'vector' ? target.sourceLayer : undefined;
+        const sourceLayer = (sourceType === 'vector' || sourceType === 'temporalgrid') ? target.sourceLayer : undefined;
 
-        if (sourceType === 'vector' && !sourceLayer) {
+        if ((sourceType === 'vector' || sourceType === 'temporalgrid') && !sourceLayer) {
             this.fire(new ErrorEvent(new Error('The sourceLayer parameter must be provided for vector source types.')));
             return;
         }
@@ -1034,7 +1037,7 @@ class Style extends Evented {
             return;
         }
         const sourceType = sourceCache.getSource().type;
-        if (sourceType === 'vector' && !sourceLayer) {
+        if ((sourceType === 'vector' || sourceType === 'temporalgrid') && !sourceLayer) {
             this.fire(new ErrorEvent(new Error('The sourceLayer parameter must be provided for vector source types.')));
             return;
         }
@@ -1311,9 +1314,22 @@ class Style extends Evented {
         this.sourceCaches[id].reload();
     }
 
+    _debouncedUpdateSource = debounce(
+        (id: string, transform: Transform) => {
+            if (this.sourceCaches[id]) {
+                this.sourceCaches[id].update(transform, this.terrain);
+            }
+        },
+        60, {leading: true}
+    );
+
     _updateSources(transform: Transform) {
         for (const id in this.sourceCaches) {
-            this.sourceCaches[id].update(transform, this.terrain);
+            if (this.sourceCaches[id]._updateDebounce) {
+                this._debouncedUpdateSource(id, transform);
+            } else {
+                this.sourceCaches[id].update(transform, this.terrain);
+            }
         }
     }
 
