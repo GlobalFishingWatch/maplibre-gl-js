@@ -151,6 +151,7 @@ const getTile = (data, options) => {
     const {x, y, z} = options;
     const tileBBox = tilebelt.tileToBBOX([x, y, z]);
     const int16ArrayBuffer = decodeProto(data);
+
     const aggregated = aggregate(int16ArrayBuffer, {
         ...options,
         tileBBox
