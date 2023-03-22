@@ -1,1 +1,0 @@
-export default "varying vec4 v_color;\n\nvoid main() {\n    gl_FragColor = v_color;\n\n#ifdef OVERDRAW_INSPECTOR\n    gl_FragColor = vec4(1.0);\n#endif\n}\n";
