@@ -19,6 +19,7 @@ import {mercatorZfromAltitude} from '../geo/mercator_coordinate';
 import Transform from '../geo/transform';
 import {StyleImageInterface} from '../style/style_image';
 import ImageRequest from '../util/image_request';
+import Style from '../style/style';
 
 function createStyleSource() {
     return {
@@ -160,6 +161,45 @@ describe('Map', () => {
             map.setStyle(createStyle());
         }, 1);
 
+    });
+
+    describe('#mapOptions', () => {
+        test('Style validation is enabled by default', () => {
+            let validationOption = false;
+            jest.spyOn(Style.prototype, 'loadJSON').mockImplementationOnce((styleJson, options) => {
+                validationOption = options.validate;
+            });
+            createMap();
+            expect(validationOption).toBeTruthy();
+        });
+
+        test('Style validation disabled using mapOptions', () => {
+            let validationOption = true;
+            jest.spyOn(Style.prototype, 'loadJSON').mockImplementationOnce((styleJson, options) => {
+                validationOption = options.validate;
+            });
+            createMap({validateStyle: false});
+
+            expect(validationOption).toBeFalsy();
+        });
+
+        test('fadeDuration is set after first idle event', async () => {
+            let idleTriggered = false;
+            const fadeDuration = 100;
+            const spy = jest.spyOn(Style.prototype, 'update').mockImplementation((parameters: EvaluationParameters) => {
+                if (!idleTriggered) {
+                    expect(parameters.fadeDuration).toBe(0);
+                } else {
+                    expect(parameters.fadeDuration).toBe(fadeDuration);
+                }
+            });
+            const style = createStyle();
+            const map = createMap({style, fadeDuration});
+            await map.once('idle');
+            idleTriggered = true;
+            map.zoomTo(0.5, {duration: 100});
+            spy.mockReset();
+        });
     });
 
     describe('#setStyle', () => {
@@ -453,6 +493,17 @@ describe('Map', () => {
                 }
             });
             map.on('load', () => done());
+        });
+
+        test('Override default style validation', () => {
+            let validationOption = true;
+            jest.spyOn(Style.prototype, 'loadJSON').mockImplementationOnce((styleJson, options) => {
+                validationOption = options.validate;
+            });
+            const map = createMap({style: null});
+            map.setStyle({version: 8, sources: {}, layers: []}, {validate: false});
+
+            expect(validationOption).toBeFalsy();
         });
     });
 
@@ -2091,6 +2142,29 @@ describe('Map', () => {
         });
     });
 
+    test('no render before style loaded', done => {
+        server.respondWith('/styleUrl', JSON.stringify(createStyle()));
+        const map = createMap({style: '/styleUrl'});
+
+        jest.spyOn(map, 'triggerRepaint').mockImplementationOnce(() => {
+            if (!map.style._loaded) {
+                done('test failed');
+            }
+        });
+        map.on('render', () => {
+            if (map.style._loaded) {
+                done();
+            } else {
+                done('test failed');
+            }
+        });
+
+        // Force a update should not call triggerRepaint till style is loaded.
+        // Once style is loaded, it will trigger the update.
+        map._update();
+        server.respond();
+    });
+
     test('no idle event during move', async () => {
         const style = createStyle();
         const map = createMap({style, fadeDuration: 0});
@@ -2400,6 +2474,33 @@ describe('Map', () => {
         const sourcePromise = map.once('sourcedataabort');
         map.fire(new Event('dataabort'));
         await sourcePromise;
+    });
+
+    describe('#setTerrain', () => {
+        test('warn when terrain and hillshade source identical', done => {
+            server.respondWith('/source.json', JSON.stringify({
+                minzoom: 5,
+                maxzoom: 12,
+                attribution: 'Terrain',
+                tiles: ['http://example.com/{z}/{x}/{y}.pngraw'],
+                bounds: [-47, -7, -45, -5]
+            }));
+
+            const map = createMap();
+
+            map.on('load', () => {
+                map.addSource('terrainrgb', {type: 'raster-dem', url: '/source.json'});
+                server.respond();
+                map.addLayer({id: 'hillshade', type: 'hillshade', source: 'terrainrgb'});
+                const stub = jest.spyOn(console, 'warn').mockImplementation(() => { });
+                stub.mockReset();
+                map.setTerrain({
+                    source: 'terrainrgb'
+                });
+                expect(console.warn).toHaveBeenCalledTimes(1);
+                done();
+            });
+        });
     });
 
     describe('#setCooperativeGestures', () => {
