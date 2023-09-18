@@ -1,5 +1,5 @@
 import type {VectorTileFeature} from '@mapbox/vector-tile';
-import type {LayerSpecification} from '@maplibre/maplibre-gl-style-spec';
+import type {LayerSpecification} from '@globalfishingwatch/maplibre-gl-style-spec';
 
 /**
  * A helper for type to omit a property from a type
@@ -25,10 +25,10 @@ export type MapGeoJSONFeature = GeoJSONFeature & {
 /**
  * A geojson feature
  */
-export class GeoJSONFeature {
+export class GeoJSONFeature<P = Record<string, any>> {
     type: 'Feature';
     _geometry: GeoJSON.Geometry;
-    properties: { [name: string]: any };
+    properties: P;
     id: number | string | undefined;
 
     _vectorTileFeature: VectorTileFeature;
@@ -41,7 +41,7 @@ export class GeoJSONFeature {
         (vectorTileFeature as any)._x = x;
         (vectorTileFeature as any)._y = y;
 
-        this.properties = vectorTileFeature.properties;
+        this.properties = vectorTileFeature.properties as any;
         this.id = id;
     }
 

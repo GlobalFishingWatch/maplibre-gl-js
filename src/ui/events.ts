@@ -7,7 +7,7 @@ import type {MapGeoJSONFeature} from '../util/vectortile_to_geojson';
 
 import type {Map} from './map';
 import type {LngLat} from '../geo/lng_lat';
-import {SourceSpecification} from '@maplibre/maplibre-gl-style-spec';
+import {SourceSpecification} from '@globalfishingwatch/maplibre-gl-style-spec';
 
 /**
  * An event from the mouse relevant to a specific layer.
@@ -224,6 +224,10 @@ export type MapEventType = {
      * to a source loads or changes.
      */
     sourcedata: MapSourceDataEvent;
+    /**
+     * Fired when one of the map's tile sources is fully loaded
+     */
+    sourcetilesdata: MapSourceDataEvent;
     /**
      * Fired when the map's style loads or changes.
      */
@@ -714,6 +718,9 @@ export type MapDataEvent = {
      *  Included if the event has a `dataType` of `source` and the event signals that internal data has been received or changed. Possible values are `metadata`, `content`, `visibility` and `idle`.
      */
     sourceDataType: MapSourceDataType;
+    // Custom props for sourcetiles event
+    sourceId?: string;
+    error?: string;
 };
 
 /**

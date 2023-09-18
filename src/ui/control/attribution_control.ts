@@ -3,7 +3,7 @@ import {DOM} from '../../util/dom';
 import type {Map} from '../map';
 import type {ControlPosition, IControl} from './control';
 import type {MapDataEvent} from '../events';
-import type {StyleSpecification} from '@maplibre/maplibre-gl-style-spec';
+import type {StyleSpecification} from '@globalfishingwatch/maplibre-gl-style-spec';
 /**
  * The {@link AttributionControl} options
  */
@@ -140,7 +140,7 @@ export class AttributionControl implements IControl {
         const sourceCaches = this._map.style.sourceCaches;
         for (const id in sourceCaches) {
             const sourceCache = sourceCaches[id];
-            if (sourceCache.used || sourceCache.usedForTerrain) {
+            if (sourceCache?.used || sourceCache?.usedForTerrain) {
                 const source = sourceCache.getSource();
                 if (source.attribution && attributions.indexOf(source.attribution) < 0) {
                     attributions.push(source.attribution);

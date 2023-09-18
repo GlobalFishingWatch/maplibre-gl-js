@@ -1,4 +1,5 @@
 import {VectorTileSource} from '../source/vector_tile_source';
+import {TemporalGridVectorTileSource} from '../source/temporalgrid_tile_source';
 import {RasterTileSource} from '../source/raster_tile_source';
 import {RasterDEMTileSource} from '../source/raster_dem_tile_source';
 import {GeoJSONSource} from '../source/geojson_source';
@@ -6,7 +7,7 @@ import {VideoSource} from '../source/video_source';
 import {ImageSource} from '../source/image_source';
 import {CanvasSource} from '../source/canvas_source';
 
-import type {SourceSpecification} from '@maplibre/maplibre-gl-style-spec';
+import type {SourceSpecification} from '@globalfishingwatch/maplibre-gl-style-spec';
 import type {Dispatcher} from '../util/dispatcher';
 import type {Event, Evented} from '../util/evented';
 import type {Map} from '../ui/map';
@@ -122,6 +123,8 @@ export const getSourceType = (name: string): SourceClass => {
             return RasterDEMTileSource;
         case 'vector':
             return VectorTileSource;
+        case 'temporalgrid':
+            return TemporalGridVectorTileSource;
         case 'video':
             return VideoSource;
         case 'canvas':
