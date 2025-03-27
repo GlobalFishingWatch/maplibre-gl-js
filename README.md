@@ -1,3 +1,6 @@
+# ⚠️ Archived ⚠️
+## The [temporal grid](https://github.com/GlobalFishingWatch/maplibre-gl-js/pull/2) feature was replaced with [deck-gl layers](https://github.com/GlobalFishingWatch/frontend/tree/develop/libs/deck-layers)
+
 ![MapLibre Logo](https://maplibre.org/img/maplibre-logo-big.svg)
 
 # MapLibre GL JS
